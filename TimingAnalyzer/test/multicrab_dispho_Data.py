@@ -58,7 +58,8 @@ def main():
     if options.crabCmd == 'submit':
 
         # External files needed by CRAB
-        inputDir     = '/afs/cern.ch/user/k/kmcdermo/public/input/'
+        #inputDir     = '/afs/cern.ch/user/k/kmcdermo/public/input/'
+	inputDir     = '/afs/cern.ch/user/j/jaking/private/ecal/CMSSW_9_4_10/src/Timing/TimingAnalyzer/test/input/'
         inputPaths   = 'HLTpathsWExtras.txt'
         inputFilters = 'HLTfilters.txt'
         inputFlags   = 'METflags.txt'
@@ -86,8 +87,10 @@ def main():
 
         config.Data.outputDatasetTag = None
         config.Data.publication      = False
-        config.Site.storageSite      = 'T2_CH_CERN'
-        config.Data.outLFNDirBase    = '/store/group/phys_exotica/displacedPhotons/nTuples/2017/analysis/unskimmed'
+        config.Site.storageSite      = 'T2_US_Nebraska'
+	#config.Data.outLFNDirBase    = '/store/group/phys_exotica/displacedPhotons/nTuples/2017/analysis/unskimmed'
+        config.Data.outLFNDirBase    = '/store/user/jaking/datasets/ecalTiming/'
+
         #--------------------------------------------------------
 
         # Will submit one task for each of these input datasets.

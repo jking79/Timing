@@ -59,11 +59,12 @@ options.register('leptondRmin',0.3,VarParsing.multiplicity.singleton,VarParsing.
 options.register('smearjetEmin',0.01,VarParsing.multiplicity.singleton,VarParsing.varType.float,'min jet E for smearing');
 
 ## trigger input
-options.register('inputPaths','/afs/cern.ch/user/k/kmcdermo/public/input/HLTpathsWExtras.txt',VarParsing.multiplicity.singleton,VarParsing.varType.string,'text file list of input signal paths');
-options.register('inputFilters','/afs/cern.ch/user/k/kmcdermo/public/input/HLTfilters.txt',VarParsing.multiplicity.singleton,VarParsing.varType.string,'text file list of input signal filters');
+inputDir = '/afs/cern.ch/user/j/jaking/private/ecal/CMSSW_9_4_10/src/Timing/TimingAnalyzer/test/input/'
+options.register('inputPaths',inputDir+'HLTpathsWExtras.txt',VarParsing.multiplicity.singleton,VarParsing.varType.string,'text file list of input signal paths');
+options.register('inputFilters',inputDir+'HLTfilters.txt',VarParsing.multiplicity.singleton,VarParsing.varType.string,'text file list of input signal filters');
 
 ## met filter input
-options.register('inputFlags','/afs/cern.ch/user/k/kmcdermo/public/input/METflags.txt',VarParsing.multiplicity.singleton,VarParsing.varType.string,'text file list of input MET filter flags');
+options.register('inputFlags',inputDir+'METflags.txt',VarParsing.multiplicity.singleton,VarParsing.varType.string,'text file list of input MET filter flags');
 
 ## data or MC options
 options.register('isMC',False,VarParsing.multiplicity.singleton,VarParsing.varType.bool,'flag to indicate data or MC');
@@ -224,7 +225,7 @@ runMetCorAndUncFromMiniAOD (
         process,
         isData = not options.isMC,
         fixEE2017 = True,
-	fixEE2017Params = {'userawPt':True, 'PtThreshold':50.0, 'MinEtaThreshold':2.65, 'MaxEtaThreshold':3.139},
+	fixEE2017Params = {'userawPt':True, 'ptThreshold':50.0, 'minEtaThreshold':2.65, 'maxEtaThreshold':3.139},
         postfix = "ModifiedMET"
 )
 
