@@ -9,24 +9,16 @@ source scripts/common_variables.sh
 ## Config ##
 ############
 
-echo "Reading Config"
-
 ## command line inputs
 #outdirbase=${1:-"madv2_v1/timing/Zee"}
-outdirbase=${1:-"dispho_plots"}
+outdirbase=${1:-"dipho"}
 usetof=${2:-"false"}
 useshift=${3:-"false"}
 usesmear=${4:-"false"}
 triggertower=${5:-"Inclusive"}
 
-echo "outdirbase=${outdirbase}"
-echo "usetof=${usetof}"
-echo "useshift=${useshift}"
-echo "usesmear=${usesmear}"
-echo "triggertower=${triggertower}"
-
 ## other info
-diphodir="test"
+diphodir="/home/t3-ku/jaking/trees/ecal/skimmed"
 fragdir="plot_config/fragments"
 
 ## eta regions
@@ -60,7 +52,6 @@ declare -a sigmafit_vars=(pt_0 pt_1 pt_eff E_0 E_1 E_eff seedE_eff A_eff)
 ## write tmp configs as needed
 ## run 1D plots, 2D plots, and time fitter
 
-echo "Run code!"
 for var_pair in "${vars_map[@]}"
 do 
     echo ${var_pair} | while read -r var fragment
@@ -68,7 +59,7 @@ do
         ##########################
         ## Set plot config (1D) ##
         ##########################
-	echo "Set plot config (1D)"
+
 	while IFS='' read -r line || [[ -n "${line}" ]]
 	do
 	    if   [[ "${line}" == "var="* ]]
@@ -125,7 +116,7 @@ do
         ##########################
         ## Set plot config (2D) ##
         ##########################
-	echo "Set plot config (2D)"
+
 	while IFS='' read -r line || [[ -n "${line}" ]]
 	do
 	    if   [[ "${line}" == "var="* ]]
@@ -152,7 +143,7 @@ do
         #####################
         ## set corrections ##
         #####################
-	echo "set corrections"
+
 	## deltaT first, single T after
 	time_data_corr=""
 	time_mc_corr=""
@@ -237,7 +228,6 @@ do
 	fi
     
         ## loop over dieta regions
-	echo "loop over dieta regions"
 	for eta in "${dietas[@]}"
 	do
 	    ## only do Full detector for time plot only
@@ -249,7 +239,7 @@ do
 	    #####################
 	    ## make cut config ##
 	    #####################
-	    echo "make cut config"
+
 	    cut="tmp_cut_config.txt"
 	    > "${cut}"
 
@@ -296,7 +286,7 @@ do
 	    ###########################
             ## make plot config (1D) ##
 	    ###########################
-	    echo "make plot config (1D)"
+	    
 	    plot="tmp_${var}_${eta}.${inTextExt}"
 	    > "${plot}"
 	    
@@ -309,7 +299,7 @@ do
 	    ###########################
             ## make plot config (2D) ##
 	    ###########################
-	    echo "make plot config (2D)"
+
 	    plot2D="tmp_deltaT_vs_${var}_${eta}.${inTextExt}"
 	    > "${plot2D}"
 
@@ -346,7 +336,7 @@ do
 	    #########################
 	    ## make timefit config ##
 	    #########################
-	    echo "make timefit config"
+		
 	    timefit_config="tmp_timefit_config.${inTextExt}"
 	    > "${timefit_config}"
 	    
@@ -378,7 +368,7 @@ do
 	    ##############################
 	    ## make misc timefit config ##
 	    ##############################
-            echo "make misc timefit config"
+		
 	    misc_fit="tmp_misc_fit.${inTextExt}"
 	    > "${misc_fit}"
 
@@ -390,67 +380,52 @@ do
 		echo "do_logx=0" >> "${misc_fit}"
 	    fi
 
-	    ####################
-	    ## loop over eras ##
-	    ####################
-	    echo "loop over eras"
-	    for era in "${eras[@]}"
-	    do
-		## skip if not needed to do all eras
-		check_mualleras=$( CheckVar ${var} "${mualleras_vars[@]}" )
-		if [[ "${check_mualleras}" != "true" ]] && [[ "${era}" != "Full" ]]
-		then
-		    echo "Mualleras check FAILED"
-		    continue
-		fi
-		echo "Mualleras check Passed"		
-		################################
-		## loop over inputs: Zee only ##
-		################################
-		echo "loop over inputs: Zee only"
-		for input in "${inputs[@]}"
-		do echo ${!input} | while read -r label infile insigfile sel varwgtmap
-		    do
-                 	## outfile names
-			#outdir="${outdirbase}/${label}/${diphodir}/${eta}/${var}"
-			outdir="${outdirbase}/${diphodir}/"
-			outfile="${var}_${label}_${eta}_${era}"
-			
-			## run 1D plotter
-			echo "run 1D plotter"
-			./scripts/runTreePlotter.sh "${skimdir}/${infile}.root" "${skimdir}/${insigfile}.root" "${cut}" "${varwgtconfigdir}/${varwgtmap}.${inTextExt}" "${plot}" "${miscconfigdir}/${misc}.${inTextExt}" "${era}" "${outfile}" "${outdir}"
-
-			## run 2D plotter, passing 2D plots to make fits for all vars except vs time
-			echo " run 2D plotter, passing 2D plots to make fits for all vars except vs time"
-			if [[ "${var}" != "time_delta" ]]
-			then
-                 	    ## extra outfile name
-			    outfile2D="deltaT_vs_${outfile}"
-			    timefile="timefit"
-
-			    ## run 2D plotter
-			    echo "run 2D plotter"
-			    ./scripts/runTreePlotter2D.sh "${skimdir}/${infile}.root" "${skimdir}/${insigfile}.root" "${cut}" "${varwgtconfigdir}/${varwgtmap}.${inTextExt}" "${plot2D}" "${miscconfigdir}/${misc}.${inTextExt}" "${era}" "${outfile2D}" "${outdir}"
-
-			    ## run fitter, getting 2D plots from before
-			    echo "run fitter, getting 2D plots from before"
-			    ./scripts/runTimeFitter.sh "${outfile2D}.root" "${plot2D}" "${misc_fit}" "${timefit_config}" "${era}" "${outfile}_${timefile}" "${outdir}"
-				
-			fi ## end check over vars to fit
-		        echo "end check over vars to fit"
-		    done ## read input
-		    echo "End read input"
-		done ## loop over inputs
-		echo "end input loop"
-	    done ## loop over eras
-	    echo "end eras loop"
-	    ## remove tmp files
+#	    ####################
+#	    ## loop over eras ##
+#	    ####################
+#	    for era in "${eras[@]}"
+#	    do
+#		## skip if not needed to do all eras
+#		check_mualleras=$( CheckVar ${var} "${mualleras_vars[@]}" )
+#		if [[ "${check_mualleras}" != "true" ]] && [[ "${era}" != "Full" ]]
+#		then
+#		    continue
+#		fi
+#		
+#		################################
+#		## loop over inputs: Zee only ##
+#		################################
+#		for input in "${inputs[@]}"
+#		do echo ${!input} | while read -r label infile insigfile sel varwgtmap
+#		    do
+#                 	## outfile names
+#			outdir="${outdirbase}/${label}/${diphodir}/${eta}/${var}"
+#			outfile="${var}_${label}_${eta}_${era}"
+#			
+#			## run 1D plotter
+#			./scripts/runTreePlotter.sh "${skimdir}/${infile}.root" "${skimdir}/${insigfile}.root" "${cut}" "${varwgtconfigdir}/${varwgtmap}.${inTextExt}" "${plot}" "${miscconfigdir}/${misc}.${inTextExt}" "${era}" "${outfile}" "${outdir}"
+#
+#			## run 2D plotter, passing 2D plots to make fits for all vars except vs time
+#			if [[ "${var}" != "time_delta" ]]
+#			then
+#                 	    ## extra outfile names
+#			    outfile2D="deltaT_vs_${outfile}"
+#			    timefile="timefit"
+#
+#			    ## run 2D plotter
+#			    ./scripts/runTreePlotter2D.sh "${skimdir}/${infile}.root" "${skimdir}/${insigfile}.root" "${cut}" "${varwgtconfigdir}/${varwgtmap}.${inTextExt}" "${plot2D}" "${miscconfigdir}/${misc}.${inTextExt}" "${era}" "${outfile2D}" "${outdir}"
+#
+#			    ## run fitter, getting 2D plots from before
+#			    ./scripts/runTimeFitter.sh "${outfile2D}.root" "${plot2D}" "${misc_fit}" "${timefit_config}" "${era}" "${outfile}_${timefile}" "${outdir}"
+#				
+#			fi ## end check over vars to fit
+#		    done ## read input
+#		done ## loop over inputs
+#	    done ## loop over eras
+#
+#	    ## remove tmp files
 #	    rm "${cut}" "${plot}" "${plot2D}" "${timefit_config}" "${misc_fit}"
-
-	done ## loop over dieta
-	echo "end dieta loop"s
+#
+	done ## loop over dietas
     done ## read var_pair
-    echo "end var_pair loop"
 done ## loop over vars_map
-echo "end of script"
-

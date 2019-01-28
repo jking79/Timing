@@ -76,7 +76,7 @@ void TreePlotter::MakeTreePlot()
   TreePlotter::SaveOutput(fOutFileText,fEra);
 
   // Write Out Config
-  TreePlotter::MakeConfigPave();
+//  TreePlotter::MakeConfigPave();
 
   // Dump integrals into text file
   TreePlotter::DumpIntegrals(fOutFileText);
@@ -102,7 +102,8 @@ void TreePlotter::MakeHistFromTrees(TFile *& inFile, TFile *& inSignalFile)
     infile->cd();
 
     // Get TTree
-    auto intree = (TTree*)infile->Get(Form("%s",treename.Data()));
+    //auto intree = (TTree*)infile->Get(Form("%s",treename.Data()));
+    auto intree = (TTree*)infile->Get("disphotree");
     const auto isnull = Common::IsNullTree(intree);
 
     if (!isnull)
@@ -662,7 +663,7 @@ void TreePlotter::DeleteMemory(const Bool_t deleteInternal)
   std::cout << "Deleting memory in TreePlotter... deleting internal: " << Common::PrintBool(deleteInternal).Data() << std::endl;
 
   // delete everything
-  delete fConfigPave;
+//  delete fConfigPave;
 
   delete LowerPad;
   delete UpperPad;

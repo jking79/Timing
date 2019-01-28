@@ -53,7 +53,7 @@ void TreePlotter2D::MakeTreePlot2D()
   TreePlotter2D::MakeRatioOutput();
 
   // Write Out Config
-  TreePlotter2D::MakeConfigPave();
+//  TreePlotter2D::MakeConfigPave();
 
   // Delete Memory
   TreePlotter2D::DeleteMemory(true);
@@ -76,7 +76,8 @@ void TreePlotter2D::MakeHistFromTrees(TFile *& inFile, TFile *& inSignalFile)
     infile->cd();
 
     // Get TTree
-    auto intree = (TTree*)infile->Get(Form("%s",treename.Data()));
+    //auto intree = (TTree*)infile->Get(Form("%s",treename.Data()));
+    auto intree = (TTree*)infile->Get("disphotree");
     const auto isnull = Common::IsNullTree(intree);
 
     if (!isnull)
@@ -249,7 +250,7 @@ void TreePlotter2D::MakeConfigPave()
 
 void TreePlotter2D::DeleteMemory(const Bool_t deleteInternal)
 {
-  delete fConfigPave;
+//  delete fConfigPave;
   delete RatioMCErrs;
   delete RatioHist;
   delete EWKHist;

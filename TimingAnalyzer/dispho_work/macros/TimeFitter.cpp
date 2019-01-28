@@ -40,7 +40,7 @@ TimeFitter::~TimeFitter()
 {
   std::cout << "Tidying up in destructor..." << std::endl;
 
-  delete fConfigPave;
+  //delete fConfigPave;
 
   delete fOutFile;
   delete fTDRStyle;
@@ -70,7 +70,7 @@ void TimeFitter::MakeTimeFits()
   TimeFitter::MakePlots(DataInfo,MCInfo);
 
   // MakeConfigPave
-  TimeFitter::MakeConfigPave();
+//  TimeFitter::MakeConfigPave();
 
   // Dump mu's and sigma's into text file
   TimeFitter::DumpFitInfo(DataInfo,MCInfo);

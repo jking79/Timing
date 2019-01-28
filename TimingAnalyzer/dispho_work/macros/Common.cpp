@@ -767,7 +767,8 @@ namespace Common
     
       if (Common::GroupMap[sample] != SampleGroup::isData)
       {
-	cutwgt += " * (evtwgt * puwgt)";
+//	cutwgt += " * (evtwgt * puwgt)";
+        cutwgt += " * (evtwgt * 1)";
       }
     }  
 

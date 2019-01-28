@@ -59,7 +59,7 @@ def main():
 
         # External files needed by CRAB
         #inputDir     = '/afs/cern.ch/user/k/kmcdermo/public/input/'
-	inputDir     = '/afs/cern.ch/user/j/jaking/private/ecal/CMSSW_9_4_10/src/Timing/TimingAnalyzer/test/input/'
+	inputDir     = '/home/t3-ku/jaking/ecaltiming/CMSSW_9_4_10/src/Timing/TimingAnalyzer/test/'
         inputPaths   = 'HLTpathsWExtras.txt'
         inputFilters = 'HLTfilters.txt'
         inputFlags   = 'METflags.txt'
@@ -89,23 +89,23 @@ def main():
         config.Data.publication      = False
         config.Site.storageSite      = 'T2_US_Nebraska'
 	#config.Data.outLFNDirBase    = '/store/group/phys_exotica/displacedPhotons/nTuples/2017/analysis/unskimmed'
-        config.Data.outLFNDirBase    = '/store/user/jaking/datasets/ecalTiming/'
+        config.Data.outLFNDirBase    = '/store/user/jaking/ecalTiming/'
 
         #--------------------------------------------------------
 
         # Will submit one task for each of these input datasets.
         inputDataAndOpts = [
             ['/SinglePhoton/Run2017B-31Mar2018-v1/MINIAOD'],
-            ['/SinglePhoton/Run2017C-31Mar2018-v1/MINIAOD'],
-            ['/SinglePhoton/Run2017D-31Mar2018-v1/MINIAOD'],
-            ['/SinglePhoton/Run2017E-31Mar2018-v1/MINIAOD'],
-            ['/SinglePhoton/Run2017F-31Mar2018-v1/MINIAOD'],
+    #        ['/SinglePhoton/Run2017C-31Mar2018-v1/MINIAOD'],
+    #        ['/SinglePhoton/Run2017D-31Mar2018-v1/MINIAOD'],
+    #        ['/SinglePhoton/Run2017E-31Mar2018-v1/MINIAOD'],
+    #        ['/SinglePhoton/Run2017F-31Mar2018-v1/MINIAOD'],
 
-            ['/DoubleEG/Run2017B-31Mar2018-v1/MINIAOD'],
-            ['/DoubleEG/Run2017C-31Mar2018-v1/MINIAOD'],
-            ['/DoubleEG/Run2017D-31Mar2018-v1/MINIAOD'],
-            ['/DoubleEG/Run2017E-31Mar2018-v1/MINIAOD'],
-            ['/DoubleEG/Run2017F-31Mar2018-v1/MINIAOD'],
+    #        ['/DoubleEG/Run2017B-31Mar2018-v1/MINIAOD'],
+    #        ['/DoubleEG/Run2017C-31Mar2018-v1/MINIAOD'],
+    #        ['/DoubleEG/Run2017D-31Mar2018-v1/MINIAOD'],
+    #        ['/DoubleEG/Run2017E-31Mar2018-v1/MINIAOD'],
+    #        ['/DoubleEG/Run2017F-31Mar2018-v1/MINIAOD'],
 
             ]
  
