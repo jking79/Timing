@@ -19,7 +19,7 @@ def getOptions():
 
     parser.add_option('-c', '--crabCmd',
                       dest = 'crabCmd',
-                      default = '',
+                      default = 'submit',
                       help = "crab command",
                       metavar = 'CMD')
 
@@ -95,11 +95,11 @@ def main():
 
         # Will submit one task for each of these input datasets.
         inputDataAndOpts = [
-            ['/SinglePhoton/Run2017B-31Mar2018-v1/MINIAOD'],
-    #        ['/SinglePhoton/Run2017C-31Mar2018-v1/MINIAOD'],
-    #        ['/SinglePhoton/Run2017D-31Mar2018-v1/MINIAOD'],
-    #        ['/SinglePhoton/Run2017E-31Mar2018-v1/MINIAOD'],
-    #        ['/SinglePhoton/Run2017F-31Mar2018-v1/MINIAOD'],
+    #        ['/SinglePhoton/Run2017B-31Mar2018-v1/MINIAOD'],
+            ['/SinglePhoton/Run2017C-31Mar2018-v1/MINIAOD'],
+            ['/SinglePhoton/Run2017D-31Mar2018-v1/MINIAOD'],
+            ['/SinglePhoton/Run2017E-31Mar2018-v1/MINIAOD'],
+            ['/SinglePhoton/Run2017F-31Mar2018-v1/MINIAOD'],
 
     #        ['/DoubleEG/Run2017B-31Mar2018-v1/MINIAOD'],
     #        ['/DoubleEG/Run2017C-31Mar2018-v1/MINIAOD'],

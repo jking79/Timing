@@ -57,13 +57,13 @@ void TimeFitter::MakeTimeFits()
 
   // Do MC bkgd first
   FitStruct MCInfo("MC",Common::BkgdHistName.Data());
-  TimeFitter::MakeTimeFit(MCInfo);
+//  TimeFitter::MakeTimeFit(MCInfo);
 
   // Fit sigma plot if asked
   if (fDoSigmaFit)
   {
     TimeFitter::MakeSigmaFit(DataInfo);
-    TimeFitter::MakeSigmaFit(MCInfo);
+//    TimeFitter::MakeSigmaFit(MCInfo);
   }
 
   // Make Plots
@@ -77,7 +77,7 @@ void TimeFitter::MakeTimeFits()
 
   // Delete infos
   TimeFitter::DeleteInfo(DataInfo);
-  TimeFitter::DeleteInfo(MCInfo);
+//  TimeFitter::DeleteInfo(MCInfo);
 }
 
 void TimeFitter::MakeTimeFit(FitStruct & FitInfo)
@@ -118,20 +118,20 @@ void TimeFitter::MakePlots(FitStruct & DataInfo, FitStruct & MCInfo)
   std::cout << "Make overlay plots..." << std::endl;
 
   // make temp vector of hist key names
-  std::vector<TString> keys = {"mu","sigma"}; // can add chi2prob and chi2ndf
+  std::vector<TString> keys = {"sigma"}; // {"mu","sigma"}; // can add chi2prob and chi2ndf
 
   // loop over keys
   for (const auto & key : keys)
   {
     // get hists
     const auto & DataHist = DataInfo.ResultsMap[key];
-    const auto & MCHist   = MCInfo  .ResultsMap[key];
+//    const auto & MCHist   = MCInfo  .ResultsMap[key];
 
     // tmp max, min
     Float_t min =  1e9;
     Float_t max = -1e9;
     TimeFitter::GetMinMax(DataHist,min,max,key);
-    TimeFitter::GetMinMax(MCHist  ,min,max,key);
+//    TimeFitter::GetMinMax(MCHist  ,min,max,key);
 
     // lin first, then log --> log disabled for now
     TimeFitter::PrintCanvas(DataInfo,MCInfo,min,max,key,false);
@@ -324,11 +324,11 @@ void TimeFitter::PrintCanvas(FitStruct & DataInfo, FitStruct & MCInfo, Float_t m
   
   // get hists
   auto & DataHist = DataInfo.ResultsMap[key];
-  auto & MCHist   = MCInfo  .ResultsMap[key];
+//  auto & MCHist   = MCInfo  .ResultsMap[key];
 
   // get labels
   const auto & DataLabel = DataInfo.label;
-  const auto & MCLabel   = MCInfo  .label;
+//  const auto & MCLabel   = MCInfo  .label;
 
   // make canvas first
   auto Canvas = new TCanvas("Canvas_"+key,"");
@@ -369,21 +369,21 @@ void TimeFitter::PrintCanvas(FitStruct & DataInfo, FitStruct & MCInfo, Float_t m
 
   // draw!
   DataHist->Draw("ep");
-  MCHist  ->Draw("ep same");
+//  MCHist  ->Draw("ep same");
 
   // draw sigma fit
   TF1 * DataFit;
-  TF1 * MCFit;
+//  TF1 * MCFit;
   TPaveText * FitText = 0;
   
   if (doSigmaFit)
   {
     DataFit = DataInfo.SigmaFit;
-    MCFit   = MCInfo  .SigmaFit;
+//    MCFit   = MCInfo  .SigmaFit;
 
     // draw fits
     DataFit->Draw("same");
-    MCFit  ->Draw("same");
+//    MCFit  ->Draw("same");
 
     // setup output text
     FitText = new TPaveText(0.52,0.605,0.82,0.925,"NDC");
@@ -392,8 +392,8 @@ void TimeFitter::PrintCanvas(FitStruct & DataInfo, FitStruct & MCInfo, Float_t m
     FitText->AddText(Form("#sigma(t)=#frac{N}{%s} #oplus %sC",fSigmaVarText.Data(),fUseSqrt2?"#sqrt{2}":""));
     FitText->AddText(Form("N^{%s} = %4.1f #pm %3.1f [%sns]",DataLabel.Data(),DataFit->GetParameter(0),DataFit->GetParError(0),fSigmaVarUnit.Data()));
     FitText->AddText(Form("C^{%s} = %6.4f #pm %6.4f [ns]"  ,DataLabel.Data(),DataFit->GetParameter(1),DataFit->GetParError(1)));
-    FitText->AddText(Form("N^{%s} = %4.1f #pm %3.1f [%sns]",MCLabel  .Data(),MCFit  ->GetParameter(0),MCFit  ->GetParError(0),fSigmaVarUnit.Data()));
-    FitText->AddText(Form("C^{%s} = %6.4f #pm %6.4f [ns]"  ,MCLabel  .Data(),MCFit  ->GetParameter(1),MCFit  ->GetParError(1)));
+   // FitText->AddText(Form("N^{%s} = %4.1f #pm %3.1f [%sns]",MCLabel  .Data(),MCFit  ->GetParameter(0),MCFit  ->GetParError(0),fSigmaVarUnit.Data()));
+   // FitText->AddText(Form("C^{%s} = %6.4f #pm %6.4f [ns]"  ,MCLabel  .Data(),MCFit  ->GetParameter(1),MCFit  ->GetParError(1)));
     FitText->SetTextAlign(11);
     FitText->SetFillColorAlpha(FitText->GetFillColor(),0);
 
@@ -409,7 +409,7 @@ void TimeFitter::PrintCanvas(FitStruct & DataInfo, FitStruct & MCInfo, Float_t m
   
   // add to legend
   Legend->AddEntry(DataHist,DataInfo.label.Data(),"epl");
-  Legend->AddEntry(MCHist  ,MCInfo  .label.Data(),"epl");
+//  Legend->AddEntry(MCHist  ,MCInfo  .label.Data(),"epl");
 
   // draw legend
   Legend->Draw("same");
@@ -508,11 +508,11 @@ void TimeFitter::DumpFitInfo(FitStruct & DataInfo, FitStruct & MCInfo)
   std::cout << "Dumping fit info into text file..." << std::endl;
 
   // get histograms!
-  const auto & data_mu_hist = DataInfo.ResultsMap["mu"];
-  const auto & mc_mu_hist   = MCInfo  .ResultsMap["mu"];
+//  const auto & data_mu_hist = DataInfo.ResultsMap["mu"];
+//  const auto & mc_mu_hist   = MCInfo  .ResultsMap["mu"];
 
   const auto & data_sigma_hist = DataInfo.ResultsMap["sigma"];
-  const auto & mc_sigma_hist   = MCInfo  .ResultsMap["sigma"];
+//  const auto & mc_sigma_hist   = MCInfo  .ResultsMap["sigma"];
 
   // make dumpfile object
   const TString filename = fOutFileText+Common::outFitText+"."+Common::outTextExt; 
@@ -538,25 +538,25 @@ void TimeFitter::DumpFitInfo(FitStruct & DataInfo, FitStruct & MCInfo)
     const auto pt_low = fXBins[ibinX-1];
     const auto pt_up  = fXBins[ibinX];
 
-    const auto data_mu   = data_mu_hist->GetBinContent(ibinX);
+/*    const auto data_mu   = data_mu_hist->GetBinContent(ibinX);
     const auto data_mu_e = data_mu_hist->GetBinError  (ibinX);
     const auto mc_mu     = mc_mu_hist  ->GetBinContent(ibinX);
     const auto mc_mu_e   = mc_mu_hist  ->GetBinError  (ibinX);
-
+*/
     const auto data_sigma   = data_sigma_hist->GetBinContent(ibinX);
     const auto data_sigma_e = data_sigma_hist->GetBinError  (ibinX);
-    const auto mc_sigma     = mc_sigma_hist  ->GetBinContent(ibinX);
-    const auto mc_sigma_e   = mc_sigma_hist  ->GetBinError  (ibinX);
-    const auto diff_sigma   = std::sqrt(std::pow(data_sigma,2.f)-std::pow(mc_sigma,2.f));
-    const auto diff_sigma_e = std::sqrt(std::pow(data_sigma*data_sigma_e/diff_sigma,2.f)+std::pow(mc_sigma*mc_sigma_e/diff_sigma,2.f));
+//    const auto mc_sigma     = mc_sigma_hist  ->GetBinContent(ibinX);
+//    const auto mc_sigma_e   = mc_sigma_hist  ->GetBinError  (ibinX);
+//    const auto diff_sigma   = std::sqrt(std::pow(data_sigma,2.f)-std::pow(mc_sigma,2.f));
+//    const auto diff_sigma_e = std::sqrt(std::pow(data_sigma*data_sigma_e/diff_sigma,2.f)+std::pow(mc_sigma*mc_sigma_e/diff_sigma,2.f));
 
     dumpfile << std::setw(5)  << Form("%i |",ibinX) 
 	     << std::setw(17) << Form(" %6.1f - %6.1f |",pt_low,pt_up)
-	     << std::setw(19) << Form(" %6.3f +/- %5.3f |",data_mu,data_mu_e)
-	     << std::setw(19) << Form(" %6.3f +/- %5.3f |",mc_mu  ,mc_mu_e)
+//	     << std::setw(19) << Form(" %6.3f +/- %5.3f |",data_mu,data_mu_e)
+//	     << std::setw(19) << Form(" %6.3f +/- %5.3f |",mc_mu  ,mc_mu_e)
 	     << std::setw(19) << Form(" %6.3f +/- %5.3f |",data_sigma,data_sigma_e)
-	     << std::setw(19) << Form(" %6.3f +/- %5.3f |",mc_sigma  ,mc_sigma_e)
-	     << std::setw(17) << Form(" %6.3f +/- %5.3f"  ,diff_sigma,diff_sigma_e)
+//	     << std::setw(19) << Form(" %6.3f +/- %5.3f |",mc_sigma  ,mc_sigma_e)
+//	     << std::setw(17) << Form(" %6.3f +/- %5.3f"  ,diff_sigma,diff_sigma_e)
 	     << std::endl;
 
     if (ibinX % 20 == 0) dumpfile << space.c_str() << std::endl;
@@ -566,13 +566,13 @@ void TimeFitter::DumpFitInfo(FitStruct & DataInfo, FitStruct & MCInfo)
   {
     // get fits!
     const auto & data_sigma_fit = DataInfo.SigmaFit;
-    const auto & mc_sigma_fit   = MCInfo  .SigmaFit;
+//    const auto & mc_sigma_fit   = MCInfo  .SigmaFit;
 
     dumpfile << space.c_str() << std::endl << std::endl;
     dumpfile << "Sigma Fit Results" << std::endl;
     dumpfile << std::setw(5)  << "Par |"
 	     << std::setw(23) << "         Data         |"
-	     << std::setw(23) << "          MC          |"
+//	     << std::setw(23) << "          MC          |"
 	     << std::endl;
 
     // loop over params and dump
@@ -581,12 +581,12 @@ void TimeFitter::DumpFitInfo(FitStruct & DataInfo, FitStruct & MCInfo)
       // get constants
       const auto data_sigma_fit_par   = data_sigma_fit->GetParameter(ipar);
       const auto data_sigma_fit_par_e = data_sigma_fit->GetParError (ipar);
-      const auto mc_sigma_fit_par     = mc_sigma_fit  ->GetParameter(ipar);
-      const auto mc_sigma_fit_par_e   = mc_sigma_fit  ->GetParError (ipar);
+//      const auto mc_sigma_fit_par     = mc_sigma_fit  ->GetParameter(ipar);
+//      const auto mc_sigma_fit_par_e   = mc_sigma_fit  ->GetParError (ipar);
       
       dumpfile << std::setw(5)  << Form("%s |",data_sigma_fit->GetParName(ipar)) 
 	       << std::setw(23) << Form(" %8.3f +/- %7.3f |",data_sigma_fit_par,data_sigma_fit_par_e)
-	       << std::setw(23) << Form(" %8.3f +/- %7.3f |",mc_sigma_fit_par  ,mc_sigma_fit_par_e)
+//	       << std::setw(23) << Form(" %8.3f +/- %7.3f |",mc_sigma_fit_par  ,mc_sigma_fit_par_e)
 	       << std::endl;
     }
   }

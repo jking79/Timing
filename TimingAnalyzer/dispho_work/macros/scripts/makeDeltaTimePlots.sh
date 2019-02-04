@@ -18,6 +18,8 @@ usetof=${2:-"false"}
 useshift=${3:-"false"}
 usesmear=${4:-"false"}
 triggertower=${5:-"Inclusive"}
+#triggertower=${5:-"Same"}
+#triggertower=${5:-"Different"}
 
 echo "outdirbase=${outdirbase}"
 echo "usetof=${usetof}"
@@ -26,8 +28,19 @@ echo "usesmear=${usesmear}"
 echo "triggertower=${triggertower}"
 
 ## other info
-diphodir="test"
+diphodir="global_inc_nvtxtial2"
 fragdir="plot_config/fragments"
+
+Zee="Global dispho_Zee_2017B dispho_DiXtal_2017B always_true"
+#Zee="Local dispho_DiXtal_2017B dispho_Zee_2017B always_true"
+export ZEE="${Zee} empty"
+declare -a inputs=(ZEE)
+export inputs
+
+#nvxt_cut="nvtx>=0"
+#nvxt_cut="nvtx<=20"
+#nvxt_cut="nvtx>20&&nvtx<=30"
+nvxt_cut="nvtx>30"
 
 ## eta regions
 declare -a dietas=("EBEB")
@@ -288,7 +301,7 @@ do
 	    fi
 
 	    ## write the remainder of cuts
-	    echo "common_cut=${eta_cut}&&${TT_cut}" >> "${cut}"
+	    echo "common_cut=${eta_cut}&&${TT_cut}&&${nvxt_cut}" >> "${cut}"
 	    echo "data_cut=" >> "${cut}"
 	    echo "bkgd_cut=" >> "${cut}"
 	    echo "sign_cut=" >> "${cut}"
@@ -417,8 +430,8 @@ do
 			outfile="${var}_${label}_${eta}_${era}"
 			
 			## run 1D plotter
-			echo "run 1D plotter"
-			./scripts/runTreePlotter.sh "${skimdir}/${infile}.root" "${skimdir}/${insigfile}.root" "${cut}" "${varwgtconfigdir}/${varwgtmap}.${inTextExt}" "${plot}" "${miscconfigdir}/${misc}.${inTextExt}" "${era}" "${outfile}" "${outdir}"
+			#echo "run 1D plotter"
+			#./scripts/runTreePlotter.sh "${skimdir}/${infile}.root" "${skimdir}/${insigfile}.root" "${cut}" "${varwgtconfigdir}/${varwgtmap}.${inTextExt}" "${plot}" "${miscconfigdir}/${misc}.${inTextExt}" "${era}" "${outfile}" "${outdir}"
 
 			## run 2D plotter, passing 2D plots to make fits for all vars except vs time
 			echo " run 2D plotter, passing 2D plots to make fits for all vars except vs time"

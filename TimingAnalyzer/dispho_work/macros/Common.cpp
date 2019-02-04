@@ -202,7 +202,7 @@ namespace Common
     Common::SampleMap["MC/ZX/ZZ"] = "ZX";
     Common::SampleMap["MC/ZX/ZGGJets"] = "ZX";
     Common::SampleMap["MC/ZX/ZZZ"] = "ZX";
-    
+  
     // Data
     Common::SampleMap[Form("Data/%s/B/v1",Common::PrimaryDataset.Data())] = "Data";
     Common::SampleMap[Form("Data/%s/C/v1",Common::PrimaryDataset.Data())] = "Data";
@@ -224,7 +224,7 @@ namespace Common
       {
 	TString sctau = ctau;
 	if (ctau.EqualTo("0p1") && !(lambda.EqualTo("500") || lambda.EqualTo("600"))) sctau = "0_1";
-	Common::SampleMap["MC/GMSB/L-"+lambda+"TeV_Ctau-"+sctau+"cm"] = "GMSB_L"+lambda+"_CTau"+ctau;
+//	Common::SampleMap["MC/GMSB/L-"+lambda+"TeV_Ctau-"+sctau+"cm"] = "GMSB_L"+lambda+"_CTau"+ctau;
       }
     }
 

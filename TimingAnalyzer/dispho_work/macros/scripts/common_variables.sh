@@ -88,10 +88,10 @@ export wgtvar="phopt_0"
 #export Zee="Zee zee_TnP/skim zee_TnP/signals_skim always_true"
 #export Zee="Zee zee_timestudy/skim zee_timestudy/signals_skim always_true"
 #dispho_DiXtal_2017B
-export Zee="Dixtal dispho_Zee_2017B dispho_Zee_2017B always_true"
-export ZEE="${Zee} empty"
-declare -a inputs=(ZEE)
-export inputs
+#export Zee="Dixtal dispho_DiXtal_2017B dispho_DiXtal_DYJetsToLL_M50 always_true"
+#export ZEE="${Zee} empty"
+#declare -a inputs=(ZEE)
+#export inputs
 
 ################################
 ## Generic function overrides ##

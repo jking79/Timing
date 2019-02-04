@@ -27,23 +27,29 @@ Skimmer::Skimmer(const TString & indir, const TString & outdir, const TString & 
 
   // Get input file
   const TString infilename = Form("%s/%s", fInDir.Data(), fFileName.Data());
+  std::cout << "Getting input file " << infilename.Data() << std::endl;
   fInFile = TFile::Open(infilename.Data());
   Common::CheckValidFile(fInFile,infilename);
+  std::cout << "Finished getting input file " << infilename.Data() << std::endl;
 
   // Get input config tree
   const TString inconfigtreename = Form("%s/%s",Common::rootdir.Data(),Common::configtreename.Data());
+  std::cout << "Getting input config tree " << inconfigtreename.Data() << std::endl;
   fInConfigTree = (TTree*)fInFile->Get(inconfigtreename.Data());
   Common::CheckValidTree(fInConfigTree,inconfigtreename,infilename);
   Skimmer::GetInConfig();
+  std::cout << "Finished getting input config tree " << inconfigtreename.Data() << std::endl;
 
   // get sample weight from in config
   Skimmer::GetSampleWeight();
 
   // Get main input tree and initialize it
   const TString indisphotreename = Form("%s/%s",Common::rootdir.Data(),Common::disphotreename.Data());
+  std::cout << "Getting input tree " << indisphotreename.Data() << std::endl;
   fInTree = (TTree*)fInFile->Get(indisphotreename.Data());
   Common::CheckValidTree(fInTree,indisphotreename,infilename);
   Skimmer::InitInTree();
+  std::cout << "Finished getting input tree " << indisphotreename.Data() << std::endl;
 
   // Get the cut flow + event weight histogram --> set the wgtsum
   const TString inh_cutflowname = Form("%s/%s",Common::rootdir.Data(),Common::h_cutflowname.Data());
@@ -54,10 +60,13 @@ Skimmer::Skimmer(const TString & indir, const TString & outdir, const TString & 
   fInCutFlowWgt = (TH1F*)fInFile->Get(inh_cutflow_wgtname.Data());
   Common::CheckValidHist(fInCutFlowWgt,inh_cutflow_wgtname,infilename);
 
+
   // Get PU weights input
   fPUWeights.clear();
-  if (fIsMC)
+
+  if(fIsMC)
   {
+    std::cout << "Opening " << fPUWgtFileName << std::endl;
     fInPUWgtFile = TFile::Open(fPUWgtFileName);
     Common::CheckValidFile(fInPUWgtFile,fPUWgtFileName);
 
@@ -84,6 +93,8 @@ Skimmer::Skimmer(const TString & indir, const TString & outdir, const TString & 
   Skimmer::InitAndSetOutConfig();
   Skimmer::InitOutTree();
   Skimmer::InitOutCutFlowHists();
+
+  std::cout << "Finished setting up for skim" << std::endl;
 }
 
 Skimmer::~Skimmer()
@@ -380,6 +391,7 @@ void Skimmer::EventLoop()
       {
 	fInEvent.b_genputrue->GetEntry(entry);
 	if ((fInEvent.genputrue < 0) || (UInt_t(fInEvent.genputrue) >= fPUWeights.size())) continue;
+//        if ((fInEvent.genputrue < 0)) continue;
       }
 
       // fill cutflow
@@ -387,7 +399,7 @@ void Skimmer::EventLoop()
       fOutCutFlowWgt->Fill((cutLabels["badPU"]*1.f)-0.5f,wgt);
       fOutCutFlowScl->Fill((cutLabels["badPU"]*1.f)-0.5f,evtwgt);
     }
-    
+
     // end of skim, now copy... dropping rechits
     if (fOutConfig.isGMSB) Skimmer::FillOutGMSBs(entry);
     if (fOutConfig.isHVDS) Skimmer::FillOutHVDSs(entry);
