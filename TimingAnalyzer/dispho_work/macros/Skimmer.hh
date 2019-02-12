@@ -124,6 +124,33 @@ private:
   PhoVec  fOutPhos;
 
   Configuration fOutConfig;
+
+// LHCInfo
+
+   bool		isLHCInfo;
+
+   UInt_t          bunch_crossing;
+   UInt_t          num_bunch;
+   UInt_t          subtrain_position;
+   UInt_t          train_position;
+   UInt_t          subtrain_number;
+   UInt_t          train_number;
+   Float_t         beam1_VC[3564];   //[num_bunch]
+   Float_t         beam2_VC[3564];   //[num_bunch]
+   Float_t         beam1_RF[3564];   //[num_bunch]
+   Float_t         beam2_RF[3564];   //[num_bunch]
+
+   TBranch        *b_bunch_crossing;   //!
+   TBranch        *b_num_bunch;   //!
+   TBranch        *b_subtrain_position;   //!
+   TBranch        *b_train_position;   //!
+   TBranch        *b_subtrain_number;   //!
+   TBranch        *b_train_number;   //! 
+   TBranch        *b_beam1_VC;   //!
+   TBranch        *b_beam2_VC;   //!
+   TBranch        *b_beam1_RF;   //!
+   TBranch        *b_beam2_RF;   //!
+
 };
 
 #endif

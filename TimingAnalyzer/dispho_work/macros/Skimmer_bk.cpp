@@ -617,24 +617,6 @@ void Skimmer::FillOutEvent(const UInt_t entry, const Float_t evtwgt)
   fInEvent.b_nrechits->GetEntry(entry);
   fInEvent.b_nphotons->GetEntry(entry);
 
-
-   bunch_crossing = 0;
-   num_bunch = 0;
-   subtrain_position=0;
-   train_position=0;
-   subtrain_number=0;
-   train_number=0;
-
-   if( isLHCInfo ) {
-   b_bunch_crossing->GetEntry(entry);   //!
-   b_num_bunch->GetEntry(entry);   //!
-
-   b_subtrain_position->GetEntry(entry);   //!
-   b_train_position->GetEntry(entry);   //!
-   b_subtrain_number->GetEntry(entry);   //!
-   b_train_number->GetEntry(entry);   //!
-   }
-
   // isMC only conditions
   if (fIsMC)
   {
@@ -700,9 +682,6 @@ void Skimmer::FillOutEvent(const UInt_t entry, const Float_t evtwgt)
   fOutEvent.nrechits = fInEvent.nrechits;
   fOutEvent.nphotons = fInEvent.nphotons;
   fOutEvent.evtwgt   = evtwgt;
-
-
-
 
   // isMC only branches
   if (fIsMC)
@@ -1506,19 +1485,6 @@ void Skimmer::InitInBranches()
   fInTree->SetBranchAddress(fInEvent.s_lumi.c_str(), &fInEvent.lumi, &fInEvent.b_lumi);
   fInTree->SetBranchAddress(fInEvent.s_event.c_str(), &fInEvent.event, &fInEvent.b_event);
 
-   if( isLHCInfo ){
-   fInTree->SetBranchAddress("bunch_crossing", &bunch_crossing, &b_bunch_crossing);
-   fInTree->SetBranchAddress("num_bunch", &num_bunch, &b_num_bunch);
-   fInTree->SetBranchAddress("subtrain_position", &subtrain_position, &b_subtrain_position);
-   fInTree->SetBranchAddress("train_position", &train_position, &b_train_position);
-   fInTree->SetBranchAddress("subtrain_number", &subtrain_number, &b_subtrain_number);
-   fInTree->SetBranchAddress("train_number", &train_number, &b_train_number);
-   fInTree->SetBranchAddress("beam1_VC", beam1_VC, &b_beam1_VC);
-   fInTree->SetBranchAddress("beam2_VC", beam2_VC, &b_beam2_VC);
-   fInTree->SetBranchAddress("beam1_RF", beam1_RF, &b_beam1_RF);
-   fInTree->SetBranchAddress("beam2_RF", beam2_RF, &b_beam2_RF);
-   }
-
   fInTree->SetBranchAddress(fInEvent.s_hltSignal.c_str(), &fInEvent.hltSignal, &fInEvent.b_hltSignal);
   fInTree->SetBranchAddress(fInEvent.s_hltRefPhoID.c_str(), &fInEvent.hltRefPhoID, &fInEvent.b_hltRefPhoID);
   fInTree->SetBranchAddress(fInEvent.s_hltRefDispID.c_str(), &fInEvent.hltRefDispID, &fInEvent.b_hltRefDispID);
@@ -1933,13 +1899,6 @@ void Skimmer::InitOutBranches()
   fOutTree->Branch(fOutEvent.s_lumi.c_str(), &fOutEvent.lumi);
   fOutTree->Branch(fOutEvent.s_event.c_str(), &fOutEvent.event);
 
-  fOutTree->Branch("bunch_crossing",&bunch_crossing);
-  fOutTree->Branch("num_bunch",&num_bunch);
-  fOutTree->Branch("subtrain_position",&subtrain_position);
-  fOutTree->Branch("train_position",&train_position);
-  fOutTree->Branch("subtrain_number",&subtrain_number);
-  fOutTree->Branch("train_number",&train_number);
-
   fOutTree->Branch(fOutEvent.s_hltSignal.c_str(), &fOutEvent.hltSignal);
   fOutTree->Branch(fOutEvent.s_hltRefPhoID.c_str(), &fOutEvent.hltRefPhoID);
   fOutTree->Branch(fOutEvent.s_hltRefDispID.c_str(), &fOutEvent.hltRefDispID);
@@ -2188,7 +2147,6 @@ void Skimmer::SetupDefaults()
 {
   fSkim = SkimType::Standard;
   fSumWgts = 1.f;
-  isLHCInfo = true;
   fJEC = ECorr::Nominal;
   fJER = ECorr::Nominal;
   fPhoSc = ECorr::Nominal;
@@ -2239,12 +2197,6 @@ void Skimmer::SetupSkimConfig()
       str = Common::RemoveDelim(str,"pho_smear=");
       Skimmer::SetupEnergyCorrection(str,fPhoSm,"pho_smear");
     }
-    else if (str.find("isLHCInfo=") != std::string::npos)
-    { 
-      str = Common::RemoveDelim(str,"isLHCInfo=");
-      if( str == "true" ) isLHCInfo = true;
-      if( str == "false" ) isLHCInfo = false;
-    }
     else
     {
       std::cerr << "Specified a non-known option: " << str.c_str() << " ...Exiting..." << std::endl;
@@ -2282,3 +2234,4 @@ void Skimmer::SetupEnergyCorrection(const TString & str, ECorr & ecorr, const TS
     exit(1);
   }
 }
+

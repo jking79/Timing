@@ -1,7 +1,9 @@
-skim_type=DiXtal
+skim_type=Zee
 
 pho_scale=Nominal
 pho_smear=Nominal
 
 jet_scale=Nominal
 jet_resol=Nominal
+
+isLHCInfo=false
