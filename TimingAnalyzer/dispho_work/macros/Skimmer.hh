@@ -116,6 +116,39 @@ private:
   TH1F  * fOutCutFlowWgt;
   TH1F  * fOutCutFlowScl;
 
+  TH1F  * fOutAveXtalRecTimeHist;
+  TH1F  * fOutAveXtalPhoRecTimeHist;
+  TH1F  * fOutAveXtalOccHist;
+  TH1F  * fOutAveXtalPhoOccHist;
+
+  TH1F  * fOutAveXtalRecTimeHistEB;
+  TH1F  * fOutAveXtalRecTimeHistEP;
+  TH1F  * fOutAveXtalRecTimeHistEM;
+  TH1F  * fOutAveXtalOccHistEB;
+  TH1F  * fOutAveXtalOccHistEP;
+  TH1F  * fOutAveXtalOccHistEM;
+
+  TH1F  * fOutAveXtalPhoRecTimeHistEB;
+  TH1F  * fOutAveXtalPhoRecTimeHistEP;
+  TH1F  * fOutAveXtalPhoRecTimeHistEM;
+  TH1F  * fOutAveXtalPhoOccHistEB;
+  TH1F  * fOutAveXtalPhoOccHistEP;
+  TH1F  * fOutAveXtalPhoOccHistEM;
+
+  TH2F  * fOutAveXtalRecTimeMapEB;
+  TH2F  * fOutAveXtalRecTimeMapEP;
+  TH2F  * fOutAveXtalRecTimeMapEM;
+  TH2F  * fOutAveXtalOccMapEB;
+  TH2F  * fOutAveXtalOccMapEP;
+  TH2F  * fOutAveXtalOccMapEM;
+ 
+  TH2F  * fOutAveXtalPhoRecTimeMapEB;
+  TH2F  * fOutAveXtalPhoRecTimeMapEP;
+  TH2F  * fOutAveXtalPhoRecTimeMapEM;
+  TH2F  * fOutAveXtalPhoOccMapEB;
+  TH2F  * fOutAveXtalPhoOccMapEP;
+  TH2F  * fOutAveXtalPhoOccMapEM;
+
   GmsbVec fOutGMSBs;
   HvdsVec fOutHVDSs;
   ToyVec  fOutToys;
@@ -129,6 +162,31 @@ private:
 
    bool		isLHCInfo;
 
+   //typedef std::map<UInt_t,Float_t> sumXtalRecTime_t;
+   std::map<UInt_t,Float_t> sumXtalRecTime;
+   std::map<UInt_t,UInt_t> numXtalRecTime;
+
+   std::map<UInt_t,Float_t> sumXtalRecTimeEB;
+   std::map<UInt_t,UInt_t> numXtalRecTimeEB;
+   std::map<UInt_t,Float_t> sumXtalRecTimeEP;
+   std::map<UInt_t,UInt_t> numXtalRecTimeEP;
+   std::map<UInt_t,Float_t> sumXtalRecTimeEM;
+   std::map<UInt_t,UInt_t> numXtalRecTimeEM;
+
+   std::map<UInt_t,Float_t> sumXtalPhoRecTime;
+   std::map<UInt_t,UInt_t> numXtalPhoRecTime;
+
+   std::map<UInt_t,Float_t> sumXtalPhoRecTimeEB;
+   std::map<UInt_t,UInt_t> numXtalPhoRecTimeEB;
+   std::map<UInt_t,Float_t> sumXtalPhoRecTimeEP;
+   std::map<UInt_t,UInt_t> numXtalPhoRecTimeEP;
+   std::map<UInt_t,Float_t> sumXtalPhoRecTimeEM;
+   std::map<UInt_t,UInt_t> numXtalPhoRecTimeEM;
+
+
+   //Float_t	   aveRecTime;
+   //UInt_t	   numAveRecTime;
+
    UInt_t          bunch_crossing;
    UInt_t          num_bunch;
    UInt_t          subtrain_position;
@@ -139,6 +197,9 @@ private:
    Float_t         beam2_VC[3564];   //[num_bunch]
    Float_t         beam1_RF[3564];   //[num_bunch]
    Float_t         beam2_RF[3564];   //[num_bunch]
+
+   //TBranch	  *b_aveRecTime;
+   //TBranch        *b_numAveRecTime;
 
    TBranch        *b_bunch_crossing;   //!
    TBranch        *b_num_bunch;   //!

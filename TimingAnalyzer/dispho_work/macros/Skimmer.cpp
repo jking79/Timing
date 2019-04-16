@@ -3,6 +3,7 @@
 
 #include <iostream>
 
+
 Skimmer::Skimmer(const TString & indir, const TString & outdir, const TString & filename, const TString & skimconfig)
 
   : fInDir(indir), fOutDir(outdir), fFileName(filename), fSkimConfig(skimconfig)
@@ -60,7 +61,6 @@ Skimmer::Skimmer(const TString & indir, const TString & outdir, const TString & 
   fInCutFlowWgt = (TH1F*)fInFile->Get(inh_cutflow_wgtname.Data());
   Common::CheckValidHist(fInCutFlowWgt,inh_cutflow_wgtname,infilename);
 
-
   // Get PU weights input
   fPUWeights.clear();
 
@@ -94,6 +94,72 @@ Skimmer::Skimmer(const TString & indir, const TString & outdir, const TString & 
   Skimmer::InitOutTree();
   Skimmer::InitOutCutFlowHists();
 
+  fOutAveXtalRecTimeHist = new TH1F("AveXtalRecTimeHist","AveXtalRecTime",400,-20,20);
+  fOutAveXtalRecTimeHist->Sumw2();
+  fOutAveXtalPhoRecTimeHist = new TH1F("AveXtalPhoRecTimeHist","AveXtalPhoRecTime",400,-20,20);
+  fOutAveXtalPhoRecTimeHist->Sumw2();
+
+  fOutAveXtalOccHist = new TH1F("AveXtalOccHist","AveXtalOcc",2500,0,5000);
+  fOutAveXtalOccHist->Sumw2();
+  fOutAveXtalPhoOccHist = new TH1F("AveXtalPhoOccHist","AveXtalPhoOcc",2500,0,5000);
+  fOutAveXtalPhoOccHist->Sumw2();
+
+  fOutAveXtalRecTimeHistEB = new TH1F("AveXtalRecTimeEBHist","AveXtalRecTime EB",400,-20,20);
+  fOutAveXtalRecTimeHistEB->Sumw2();
+  fOutAveXtalRecTimeHistEP = new TH1F("AveXtalRecTimeEPHist","AveXtalRecTime EP",400,-20,20);
+  fOutAveXtalRecTimeHistEP->Sumw2();
+  fOutAveXtalRecTimeHistEM = new TH1F("AveXtalRecTimeEMHist","AveXtalRecTime EM",400,-20,20);
+  fOutAveXtalRecTimeHistEM->Sumw2();
+ 
+  fOutAveXtalOccHistEB = new TH1F("AveXtalOccEBHist","AveXtalOcc EB",2000,0,4000);
+  fOutAveXtalOccHistEB->Sumw2();
+  fOutAveXtalOccHistEP = new TH1F("AveXtalOccEPHist","AveXtalOcc EP",2000,0,4000);
+  fOutAveXtalOccHistEP->Sumw2();
+  fOutAveXtalOccHistEM = new TH1F("AveXtalOccEMHist","AveXtalOcc EM",2000,0,4000);
+  fOutAveXtalOccHistEM->Sumw2();
+ 
+  fOutAveXtalPhoRecTimeHistEB = new TH1F("AveXtalPhoRecTimeEBHist","AveXtalPhoRecTime EB",400,-20,20);
+  fOutAveXtalPhoRecTimeHistEB->Sumw2();
+  fOutAveXtalPhoRecTimeHistEP = new TH1F("AveXtalPhoRecTimeEPHist","AveXtalPhoRecTime EP",400,-20,20);
+  fOutAveXtalPhoRecTimeHistEP->Sumw2();
+  fOutAveXtalPhoRecTimeHistEM = new TH1F("AveXtalPhoRecTimeEMHist","AveXtalPhoRecTime EM",400,-20,20);
+  fOutAveXtalPhoRecTimeHistEM->Sumw2();
+
+  fOutAveXtalPhoOccHistEB = new TH1F("AveXtalPhoOccEBHist","AveXtalPhoOcc EB",20,0,20);
+  fOutAveXtalPhoOccHistEB->Sumw2();
+  fOutAveXtalPhoOccHistEP = new TH1F("AveXtalPhoOccEPHist","AveXtalPhoOcc EP",20,0,20);
+  fOutAveXtalPhoOccHistEP->Sumw2();
+  fOutAveXtalPhoOccHistEM = new TH1F("AveXtalPhoOccEMHist","AveXtalPhoOcc EM",20,0,20);
+  fOutAveXtalPhoOccHistEM->Sumw2();
+
+  fOutAveXtalRecTimeMapEB = new TH2F("AveXtalRecTimeEBMap","AveXtalRecTime Map EB",171,-85.5,85.5,360,0.5,360.5);
+  fOutAveXtalRecTimeMapEB->Sumw2();
+  fOutAveXtalRecTimeMapEP = new TH2F("AveXtalRecTimeEPMap","AveXtalRecTime Map EP",100,0.5,100.5,100,0.5,100.5);
+  fOutAveXtalRecTimeMapEP->Sumw2();
+  fOutAveXtalRecTimeMapEM = new TH2F("AveXtalRecTimeEMMap","AveXtalRecTime Map EM",100,0.5,100.5,100,0.5,100.5);
+  fOutAveXtalRecTimeMapEM->Sumw2();
+
+  fOutAveXtalOccMapEB = new TH2F("AveXtalOccEBMap","AveXtalOcc Map EB",171,-85.5,85.5,360,0.5,360.5);
+  fOutAveXtalOccMapEB->Sumw2();
+  fOutAveXtalOccMapEP = new TH2F("AveXtalOccEPMap","AveXtalOcc Map EP",100,0.5,100.5,100,0.5,100.5);
+  fOutAveXtalOccMapEP->Sumw2();
+  fOutAveXtalOccMapEM = new TH2F("AveXtalOccEMMap","AveXtalOcc Map EM",100,0.5,100.5,100,0.5,100.5);
+  fOutAveXtalOccMapEM->Sumw2();
+ 
+  fOutAveXtalPhoRecTimeMapEB = new TH2F("AveXtalPhoRecTimeEBMap","AveXtalPhoRecTime Map EB",171,-85.5,85.5,360,0.5,360.5);
+  fOutAveXtalPhoRecTimeMapEB->Sumw2();
+  fOutAveXtalPhoRecTimeMapEP = new TH2F("AveXtalPhoRecTimeEPMap","AveXtalPhoRecTime Map EP",100,0.5,100.5,100,0.5,100.5);
+  fOutAveXtalPhoRecTimeMapEP->Sumw2();
+  fOutAveXtalPhoRecTimeMapEM = new TH2F("AveXtalPhoRecTimeEMMap","AveXtalPhoRecTime Map EM",100,0.5,100.5,100,0.5,100.5);
+  fOutAveXtalPhoRecTimeMapEM->Sumw2();
+
+  fOutAveXtalPhoOccMapEB = new TH2F("AveXtalPhoOccEBMap","AveXtalPhoOcc Map EB",171,-85.5,85.5,360,0.5,360.5);
+  fOutAveXtalPhoOccMapEB->Sumw2();
+  fOutAveXtalPhoOccMapEP = new TH2F("AveXtalPhoOccEPMap","AveXtalPhoOcc Map EP",100,0.5,100.5,100,0.5,100.5);
+  fOutAveXtalPhoOccMapEP->Sumw2();
+  fOutAveXtalPhoOccMapEM = new TH2F("AveXtalPhoOccEMMap","AveXtalPhoOcc Map EM",100,0.5,100.5,100,0.5,100.5);
+  fOutAveXtalPhoOccMapEM->Sumw2();
+
   std::cout << "Finished setting up for skim" << std::endl;
 }
 
@@ -115,6 +181,37 @@ Skimmer::~Skimmer()
   delete fOutCutFlowScl;
   delete fOutCutFlowWgt;
   delete fOutCutFlow;
+
+  delete fOutAveXtalRecTimeHist;
+  delete fOutAveXtalOccHist;
+  delete fOutAveXtalRecTimeHistEB;
+  delete fOutAveXtalRecTimeHistEP;
+  delete fOutAveXtalRecTimeHistEM;
+  delete fOutAveXtalOccHistEB;
+  delete fOutAveXtalOccHistEP;
+  delete fOutAveXtalOccHistEM;
+  delete fOutAveXtalRecTimeMapEB;
+  delete fOutAveXtalRecTimeMapEP;
+  delete fOutAveXtalRecTimeMapEM;
+  delete fOutAveXtalOccMapEB;
+  delete fOutAveXtalOccMapEP;
+  delete fOutAveXtalOccMapEM;
+ 
+  delete fOutAveXtalPhoRecTimeHist;
+  delete fOutAveXtalPhoOccHist;
+  delete fOutAveXtalPhoRecTimeHistEB;
+  delete fOutAveXtalPhoRecTimeHistEP;
+  delete fOutAveXtalPhoRecTimeHistEM;
+  delete fOutAveXtalPhoOccHistEB;
+  delete fOutAveXtalPhoOccHistEP;
+  delete fOutAveXtalPhoOccHistEM;
+  delete fOutAveXtalPhoRecTimeMapEB;
+  delete fOutAveXtalPhoRecTimeMapEP;
+  delete fOutAveXtalPhoRecTimeMapEM;
+  delete fOutAveXtalPhoOccMapEB;
+  delete fOutAveXtalPhoOccMapEP;
+  delete fOutAveXtalPhoOccMapEM;
+
   delete fOutTree;
   delete fOutConfigTree;
   delete fOutFile;
@@ -138,6 +235,9 @@ void Skimmer::EventLoop()
     fOutCutFlow   ->Fill((cutLabels["PreSkim"]*1.f)-0.5f);
     fOutCutFlowWgt->Fill((cutLabels["PreSkim"]*1.f)-0.5f,wgt);
     fOutCutFlowScl->Fill((cutLabels["PreSkim"]*1.f)-0.5f,evtwgt);
+
+    //sumXtalRecTime.clear();
+    //numXtalRecTime.clear();
 
     // perform skim: standard
     if (fSkim == SkimType::Standard) // do not apply skim selection on toy config
@@ -188,6 +288,7 @@ void Skimmer::EventLoop()
     }
     else if (fSkim == SkimType::Zee)
     {
+      
       // cut on HLT right away
       //      fInEvent.b_hltDiEle33MW->GetEntry(entry);
       
@@ -198,6 +299,8 @@ void Skimmer::EventLoop()
 
       // build list of "good electrons"
       std::vector<Int_t> good_phos;
+
+      //cout << "nPhotons " << Common::nPhotons << endl;   
       for (auto ipho = 0; ipho < Common::nPhotons; ipho++)
       {
 	auto & inpho = fInPhos[ipho];
@@ -206,12 +309,15 @@ void Skimmer::EventLoop()
 	// 	if (inpho.pt < 40.f) continue;
 
 	inpho.b_hasPixSeed->GetEntry(entry);
-	if (!inpho.hasPixSeed) continue;
+	//cout << "has Pix Seed? " << inpho.hasPixSeed << endl;
+//	if (!inpho.hasPixSeed) continue;   //   <<<<<<<<<<<<<<<<<<<<<<<<<<<<< uncomment  temp fix to run 2018?
 
 	inpho.b_gedID->GetEntry(entry);
-	if (inpho.gedID < 3) continue;
+//	cout << "gedID " << inpho.gedID << endl;
+	if (inpho.gedID < 3) continue; //  <<<<<<<<<<<<<<<<<<<<<<<<<<  change back to inpho.gedID < 3    temp fix ro run 2018
 
 	inpho.b_isOOT->GetEntry(entry);
+//	cout << "isOOT " << inpho.isOOT << endl;
 	if (inpho.isOOT) continue;
 
 	good_phos.emplace_back(ipho);
@@ -232,7 +338,8 @@ void Skimmer::EventLoop()
       // object for containing mass pairs
       std::vector<MassStruct> phopairs;
 
-      // double loop over photons, make masses
+      // double loop over photons, make masse
+      //cout << "good pho loop " << endl;
       for (auto i = 0U; i < good_phos.size(); i++)
       {
 	auto & pho1 = fInPhos[good_phos[i]];
@@ -256,7 +363,7 @@ void Skimmer::EventLoop()
 	  phopairs.emplace_back(good_phos[i],good_phos[j],pho1vec.M());
 	}
       }
-
+      //cout << "sort by mass " << endl;
       // sort the mass structs
       std::sort(phopairs.begin(),phopairs.end(),
 		[=](const auto & phopair1, const auto & phopair2)
@@ -283,6 +390,7 @@ void Skimmer::EventLoop()
       pho2.b_pt->GetEntry(entry);
 
       // now start to save them
+      //cout << "save photon " << endl;
       fPhoList.clear();
       fPhoList.emplace_back((pho1.pt > pho2.pt) ? phopair.ipho1 : phopair.ipho2);
       fPhoList.emplace_back((pho1.pt > pho2.pt) ? phopair.ipho2 : phopair.ipho1);
@@ -299,6 +407,15 @@ void Skimmer::EventLoop()
       // get rechits
       fInRecHits.b_E->GetEntry(entry);
       fInRecHits.b_ID->GetEntry(entry);
+      fInRecHits.b_time->GetEntry(entry);
+
+      for( auto idx = 0; idx < (*fInRecHits.ID).size(); idx++ ){
+                 //std::cout << "Filling first xtalRecHit " << id_i << " time with: " << t_i << std::endl;
+         	 const auto id_i = (*fInRecHits.ID)[idx];
+          	 const auto t_i = (*fInRecHits.time)[idx];		
+                 sumXtalRecTime[id_i] += t_i;
+                 numXtalRecTime[id_i] += 1;
+      }
 
       // loop over photons, getting pairs of rec hits that are most energetic and match!
       std::vector<DiXtalInfo> good_pairs;
@@ -327,6 +444,13 @@ void Skimmer::EventLoop()
 	  const auto rh_i = (*inpho.recHits)[i]; // position within event rec hits vector
 	  const auto E_i  = (*fInRecHits.E) [rh_i];
 	  const auto id_i = (*fInRecHits.ID)[rh_i];
+          const auto t_i = (*fInRecHits.time)[rh_i];
+
+ //	  std::cout << "Filling xtalRecHit " << id_i << " time with: " << t_i << std::endl;
+	  sumXtalPhoRecTime[id_i] += t_i;
+	  //std::cout << "-------------Finished filling sumXtalRecHit times." << std::endl;
+	  numXtalPhoRecTime[id_i] += 1;
+	  //std::cout << "-------------Finished filling numXxtalRecHit times." << std::endl;
 
 	  for (auto j = i+1; j < n; j++)
 	  {
@@ -364,6 +488,10 @@ void Skimmer::EventLoop()
       fOutPhos[0].seed = pair.rh1;
       fOutPhos[1].seed = pair.rh2;
 
+  //    std::cout << "Filling fOutAveXtalRecTimeHist. " << std::endl;
+  //    for( std::map<UInt_t,Float_t>::iterator it=sumXtalRecTime.begin(); it!=sumXtalRecTime.end(); ++it){
+  //    	fOutAveXtalRecTimeHist->Fill( (it->second)/(numXtalRecTime[it->first]) );
+  //    }
       // set pho list in standard fashion
       fPhoList.clear();
       fPhoList.emplace_back(pair.iph);
@@ -382,6 +510,7 @@ void Skimmer::EventLoop()
       std::cerr << "How did this happen?? Somehow SkimType Enum is not one that is specified... Exiting..."  << std::endl;
       exit(1);
     }
+    //std::cout << "Finished proccessing skim type." << std::endl;
 
     // common skim params for MC
     if (fSkim != SkimType::AlwaysTrue)
@@ -405,19 +534,108 @@ void Skimmer::EventLoop()
     if (fOutConfig.isHVDS) Skimmer::FillOutHVDSs(entry);
     if (fOutConfig.isToy)  Skimmer::FillOutToys(entry);
     Skimmer::FillOutEvent(entry,evtwgt);
-    if (fSkim != SkimType::DiXtal) Skimmer::FillOutJets(entry);
+    //std::cout << "Finished proccessing event info." << std::endl;
+    //if (fSkim != SkimType::DiXtal) Skimmer::FillOutJets(entry);
+    //std::cout << "Start proccessing phos info." << std::endl;
     Skimmer::FillOutPhos(entry);
+    //std::cout << "Finished proccessing phos info." << std::endl;
     if (fIsMC) Skimmer::CorrectMET();
 
     // fill the tree
     fOutTree->Fill();
   } // end loop over events
 
+  if (fSkim == SkimType::DiXtal){
+
+	  UInt_t offset = 100;
+	  std::cout << "Filling fOutAveXtalRecTime Hists and Maps. " << std::endl;
+	  for( std::map<UInt_t,Float_t>::iterator it=sumXtalRecTime.begin(); it!=sumXtalRecTime.end(); ++it){
+		const auto & idinfo = Common::DetIDMap[it->first];
+                const auto & aveXtalTime = (it->second)/(numXtalRecTime[it->first]);
+		//std::cout << "Filling " << it->first << " with " << it->second << " / " << numXtalRecTime[it->first] << std::endl;
+	        fOutAveXtalRecTimeHist->Fill( aveXtalTime  );
+                fOutAveXtalOccHist->Fill( numXtalRecTime[it->first] );
+		if( idinfo.ecal == ECAL::EB ){ 
+			fOutAveXtalRecTimeHistEB->Fill( aveXtalTime );
+                        fOutAveXtalOccHistEB->Fill( numXtalRecTime[it->first] );
+			fOutAveXtalRecTimeMapEB->Fill( idinfo.i2, idinfo.i1, aveXtalTime + offset ); 
+                        fOutAveXtalOccMapEB->Fill( idinfo.i2, idinfo.i1, numXtalRecTime[it->first] );
+		} else if( idinfo.ecal == ECAL::EP ){
+                        fOutAveXtalRecTimeHistEP->Fill( aveXtalTime ); 
+                        fOutAveXtalOccHistEP->Fill( numXtalRecTime[it->first] ); 
+                        fOutAveXtalRecTimeMapEP->Fill( idinfo.i1, idinfo.i2, aveXtalTime + offset );
+                        fOutAveXtalOccMapEP->Fill( idinfo.i1, idinfo.i2, numXtalRecTime[it->first] );
+                } else if( idinfo.ecal == ECAL::EM ){ 
+                        fOutAveXtalRecTimeHistEM->Fill( aveXtalTime );
+                        fOutAveXtalOccHistEM->Fill( numXtalRecTime[it->first] );
+                        fOutAveXtalRecTimeMapEM->Fill( idinfo.i1, idinfo.i2, aveXtalTime + offset );
+                        fOutAveXtalOccMapEM->Fill( idinfo.i1, idinfo.i2, numXtalRecTime[it->first] );
+		}
+	  }
+	
+	  std::cout << "Filling fOutAveXtalPhoRecTime Hists and Maps. " << std::endl;
+	  for( std::map<UInt_t,Float_t>::iterator it=sumXtalPhoRecTime.begin(); it!=sumXtalPhoRecTime.end(); ++it){
+                const auto & idinfo = Common::DetIDMap[it->first];
+                const auto & aveXtalTime = (it->second)/(numXtalPhoRecTime[it->first]);
+//	        std::cout << "Filling " << it->first << " with " << it->second << " / " << numXtalPhoRecTime[it->first] << std::endl;
+                fOutAveXtalPhoRecTimeHist->Fill( aveXtalTime );
+                fOutAveXtalPhoOccHist->Fill( numXtalPhoRecTime[it->first] );
+                if( idinfo.ecal == ECAL::EB ){
+                        fOutAveXtalPhoRecTimeHistEB->Fill( aveXtalTime ); 
+                        fOutAveXtalPhoOccHistEB->Fill( numXtalPhoRecTime[it->first] ); 
+                        fOutAveXtalPhoRecTimeMapEB->Fill( idinfo.i2, idinfo.i1, aveXtalTime + offset );
+                        fOutAveXtalPhoOccMapEB->Fill( idinfo.i2, idinfo.i1, numXtalPhoRecTime[it->first] );
+                } else if( idinfo.ecal == ECAL::EP ){
+                        fOutAveXtalPhoRecTimeHistEP->Fill( aveXtalTime );
+                        fOutAveXtalPhoOccHistEP->Fill( numXtalPhoRecTime[it->first] );
+                        fOutAveXtalPhoRecTimeMapEP->Fill( idinfo.i1, idinfo.i2, aveXtalTime + offset );
+                        fOutAveXtalPhoOccMapEP->Fill( idinfo.i1, idinfo.i2, numXtalPhoRecTime[it->first] );
+                } else if( idinfo.ecal == ECAL::EM ){  
+                        fOutAveXtalPhoRecTimeHistEM->Fill( aveXtalTime );
+                        fOutAveXtalPhoOccHistEM->Fill( numXtalPhoRecTime[it->first] );
+                        fOutAveXtalPhoRecTimeMapEM->Fill( idinfo.i1, idinfo.i2, aveXtalTime + offset );
+                        fOutAveXtalPhoOccMapEM->Fill( idinfo.i1, idinfo.i2, numXtalPhoRecTime[it->first] );
+                }
+	  }
+
+  }
+  
   // write out the output!
   fOutFile->cd();
   fOutCutFlow->Write();
   fOutCutFlowWgt->Write();
   fOutCutFlowScl->Write();
+
+  fOutAveXtalRecTimeHist->Write();
+  fOutAveXtalOccHist->Write();
+  fOutAveXtalRecTimeHistEB->Write();
+  fOutAveXtalRecTimeHistEP->Write();
+  fOutAveXtalRecTimeHistEM->Write();
+  fOutAveXtalOccHistEB->Write();
+  fOutAveXtalOccHistEP->Write();
+  fOutAveXtalOccHistEM->Write();
+  fOutAveXtalRecTimeMapEB->Write();
+  fOutAveXtalRecTimeMapEP->Write();
+  fOutAveXtalRecTimeMapEM->Write();
+  fOutAveXtalOccMapEB->Write();
+  fOutAveXtalOccMapEP->Write();
+  fOutAveXtalOccMapEM->Write();
+
+  fOutAveXtalPhoRecTimeHist->Write();
+  fOutAveXtalPhoOccHist->Write();
+  fOutAveXtalPhoRecTimeHistEB->Write();
+  fOutAveXtalPhoRecTimeHistEP->Write();
+  fOutAveXtalPhoRecTimeHistEM->Write();
+  fOutAveXtalPhoOccHistEB->Write();
+  fOutAveXtalPhoOccHistEP->Write();
+  fOutAveXtalPhoOccHistEM->Write();
+  fOutAveXtalPhoRecTimeMapEB->Write();
+  fOutAveXtalPhoRecTimeMapEP->Write();
+  fOutAveXtalPhoRecTimeMapEM->Write();
+  fOutAveXtalPhoOccMapEB->Write();
+  fOutAveXtalPhoOccMapEP->Write();
+  fOutAveXtalPhoOccMapEM->Write();
+
   fOutConfigTree->Write();
   fOutTree->Write();
 }
@@ -598,10 +816,12 @@ void Skimmer::FillOutEvent(const UInt_t entry, const Float_t evtwgt)
   fInEvent.b_vtxY->GetEntry(entry);
   fInEvent.b_vtxZ->GetEntry(entry);
   fInEvent.b_rho->GetEntry(entry);
+  if( false ) {
   fInEvent.b_t1pfMETpt->GetEntry(entry);
   fInEvent.b_t1pfMETphi->GetEntry(entry);
   fInEvent.b_t1pfMETsumEt->GetEntry(entry);
   fInEvent.b_njets->GetEntry(entry);
+  }
   // fInEvent.b_nelLowL->GetEntry(entry);
   // fInEvent.b_nelLowM->GetEntry(entry);
   // fInEvent.b_nelLowT->GetEntry(entry);
@@ -635,6 +855,7 @@ void Skimmer::FillOutEvent(const UInt_t entry, const Float_t evtwgt)
    b_train_number->GetEntry(entry);   //!
    }
 
+  //std::cout << "lhcinfo done" << std::endl;
   // isMC only conditions
   if (fIsMC)
   {
@@ -681,10 +902,12 @@ void Skimmer::FillOutEvent(const UInt_t entry, const Float_t evtwgt)
   fOutEvent.vtxY = fInEvent.vtxY;
   fOutEvent.vtxZ = fInEvent.vtxZ;
   fOutEvent.rho = fInEvent.rho;
+  if( false ) {
   fOutEvent.t1pfMETpt = fInEvent.t1pfMETpt;
   fOutEvent.t1pfMETphi = fInEvent.t1pfMETphi;
   fOutEvent.t1pfMETsumEt = fInEvent.t1pfMETsumEt;
   fOutEvent.njets = fInEvent.njets;
+  }
   // fOutEvent.nelLowL = fInEvent.nelLowL;
   // fOutEvent.nelLowM = fInEvent.nelLowM;
   // fOutEvent.nelLowT = fInEvent.nelLowT;
@@ -702,7 +925,7 @@ void Skimmer::FillOutEvent(const UInt_t entry, const Float_t evtwgt)
   fOutEvent.evtwgt   = evtwgt;
 
 
-
+  //std::cout << "event info done" << std::endl;
 
   // isMC only branches
   if (fIsMC)
@@ -860,6 +1083,7 @@ void Skimmer::FillOutJets(const UInt_t entry)
 void Skimmer::FillOutPhos(const UInt_t entry)
 {  
   // get input photon branches
+  //std::cout << "Starting get entry" << std::endl;
   for (auto ipho : fPhoList)
   {
     auto & inpho = fInPhos[ipho];
@@ -904,6 +1128,7 @@ void Skimmer::FillOutPhos(const UInt_t entry)
     inpho.b_gedID->GetEntry(entry);
     inpho.b_ootID->GetEntry(entry);
 
+    //std::cout << "Finished Base Pho list" << std::endl;
     if (fInConfig.storeRecHits)
     {
       inpho.b_seed->GetEntry(entry);
@@ -942,7 +1167,7 @@ void Skimmer::FillOutPhos(const UInt_t entry)
       if (fPhoSm == ECorr::Down || fPhoSm == ECorr::Up) inpho.b_smearAbs->GetEntry(entry);
     }
   }
-
+  //std::cout << "Finished Pho list" << std::endl;
   // get input recHits if needed
   if (fInConfig.storeRecHits)
   {
@@ -966,6 +1191,7 @@ void Skimmer::FillOutPhos(const UInt_t entry)
     fInRecHits.b_pedrms1->GetEntry(entry);
   }
 
+  //std::cout << "Finished get entry" << std::endl;
   // set output photon branches
   for (auto ipho = 0; ipho < fNOutPhos; ipho++) 
   {
@@ -1549,6 +1775,7 @@ void Skimmer::InitInBranches()
   fInTree->SetBranchAddress(fInEvent.s_vtxZ.c_str(), &fInEvent.vtxZ, &fInEvent.b_vtxZ);
   fInTree->SetBranchAddress(fInEvent.s_rho.c_str(), &fInEvent.rho, &fInEvent.b_rho);
 
+  if( false ) {
   fInTree->SetBranchAddress(fInEvent.s_t1pfMETpt.c_str(), &fInEvent.t1pfMETpt, &fInEvent.b_t1pfMETpt);
   fInTree->SetBranchAddress(fInEvent.s_t1pfMETphi.c_str(), &fInEvent.t1pfMETphi, &fInEvent.b_t1pfMETphi);
   fInTree->SetBranchAddress(fInEvent.s_t1pfMETsumEt.c_str(), &fInEvent.t1pfMETsumEt, &fInEvent.b_t1pfMETsumEt);
@@ -1559,6 +1786,8 @@ void Skimmer::InitInBranches()
   fInTree->SetBranchAddress(fInJets.s_phi.c_str(), &fInJets.phi, &fInJets.b_phi);
   fInTree->SetBranchAddress(fInJets.s_eta.c_str(), &fInJets.eta, &fInJets.b_eta);
   fInTree->SetBranchAddress(fInJets.s_ID.c_str(), &fInJets.ID, &fInJets.b_ID);
+
+	}
 
   // fInTree->SetBranchAddress(fInJets.s_NHF.c_str(), &fInJets.NHF, &fInJets.b_NHF);
   // fInTree->SetBranchAddress(fInJets.s_NEMF.c_str(), &fInJets.NEMF, &fInJets.b_NEMF);

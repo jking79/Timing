@@ -33,12 +33,13 @@ do
 		continue ## do not produce logy plots for mu
 	    fi
 
-	    cp ${output}_${outfiletext}_${canvscale}.${ext} ${fulldir}
-	    cp ${output}_${outfiletext}_${canvscale}_logx.${ext} ${fulldir}
+	    mv ${output}_${outfiletext}_${canvscale}.${ext} ${fulldir}
+	    mv ${output}_${outfiletext}_${canvscale}_logx.${ext} ${fulldir}
 	done
     done
 done
-cp ${outfiletext}.root ${outfiletext}"_fitinfo".${outTextExt} ${fulldir}
+mv ${outfiletext}.root ${outfiletext}"_fitinfo".${outTextExt} ${fulldir}
+rm ${infilename}.root
 
 ## Final message
 echo "Finished TimeFitting for plot:" ${plotconfig}

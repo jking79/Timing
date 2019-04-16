@@ -220,6 +220,7 @@ from PhysicsTools.PatAlgos.slimming.unpackedTracksAndVertices_cfi import unpacke
 process.unpackedTracksAndVertices = unpackedTracksAndVertices.clone()
 
 ## MET corrections for 2017 data: https://twiki.cern.ch/twiki/bin/view/CMS/MissingETUncertaintyPrescription#Instructions_for_9_4_X_X_9_for_2
+##  for 2017 data with 17Nov2017 and 31Mar2018 rereco  only
 from PhysicsTools.PatUtils.tools.runMETCorrectionsAndUncertainties import runMetCorAndUncFromMiniAOD
 runMetCorAndUncFromMiniAOD (
         process,

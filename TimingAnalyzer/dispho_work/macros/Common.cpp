@@ -133,9 +133,10 @@ namespace Common
     Common::EraMap["2017C"] = {299337,302029,9.633f}; // 9.633
     Common::EraMap["2017D"] = {302030,303434,4.228f}; // 4.228
     Common::EraMap["2017E"] = {303435,304826,9.315f}; // 9.315
-    Common::EraMap["2017F"] = {304911,306462,13.54f}; // 13.540
-
-    Common::EraMap["Full"] = {Common::EraMap["2017B"].startRun,Common::EraMap["2017F"].endRun,41.53f}; // for some idiotic reason, sum of above is 41.51
+//    Common::EraMap["2017F"] = {304911,306462,13.54f}; // 13.540
+    Common::EraMap["2017F"] = {304911,326462,13.54f}; // 13.540
+    Common::EraMap["Full"] = {0,1000000,1.00f}; // just run over the whole input file
+//    Common::EraMap["Full"] = {Common::EraMap["2017B"].startRun,Common::EraMap["2017F"].endRun,41.53f}; // for some idiotic reason, sum of above is 41.51
   }
 
   void SetupSamples()

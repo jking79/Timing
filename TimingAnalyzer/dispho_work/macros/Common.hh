@@ -144,7 +144,8 @@ namespace Common
   static const TString eosDir         = "/eos/cms/store/group/phys_exotica/displacedPhotons/nTuples/2017/analysis";
   static const TString baseDir        = "skims";
   static const TString tupleFileName  = "tree.root";
-  static const TString rootdir        = "tree";
+  //static const TString rootdir        = "tree";
+  static const TString rootdir        = "dispho";
   static const TString configtreename = "configtree";
   static const TString disphotreename = "disphotree";
   static const TString h_cutflowname  = "h_cutflow";
