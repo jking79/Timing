@@ -15,7 +15,8 @@ echo "Reading Config"
 ## command line inputs
 #outdirbase=${1:-"madv2_v1/timing/Zee"}
 outdirbase=${1:-"dispho_plots"}
-usetof=${2:-"false"}
+usetof=${2:-"true"}
+#usetof=${2:-"false"}
 #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 useshift=${3:-"false"}
 usesmear=${4:-"false"}
@@ -38,7 +39,8 @@ tower_d="Different"
 
 #run="2016"
 #run="2017"
-run="2018"
+#run="2018"
+run="Run2018Dp"
 
 loc="Local"
 glo="Global"
@@ -52,8 +54,8 @@ sam="Same"
 dif="Different"
 
 towerlistg="${inc}"
-towerlistl="${inc}"
-#towerlistl="${inc} ${sam} ${dif}"
+#towerlistl="${inc}"
+towerlistl="${inc} ${sam} ${dif}"
 
 ntcutname0="None"
 ntcutname1="nvtxCut1"
@@ -89,8 +91,12 @@ fragdir="plot_config/fragments"
 #Zeel="Local dispho_DiXtal_v2_2018RAW dispho_Zee_2017B always_true"
 #Zeeg="Global dispho_Zee_v2_2018RAW dispho_Zee_2017B always_true"
 
-Zeel="Local dispho_DiXtal_v2_2018 dispho_Zee_2017B always_true"
-Zeeg="Global dispho_Zee_v2_2018 dispho_Zee_2017B always_true"
+#dispho_Zee_v2_2018Dp_RAW.root
+Zeel="Local dispho_DiXtal_v2_2018Dp_RAW dispho_Zee_2017B always_true"
+Zeeg="Global dispho_Zee_v2_2018Dp_RAW dispho_Zee_2017B always_true"
+
+#Zeel="Local dispho_DiXtal_v2_2018 dispho_Zee_2017B always_true"
+#Zeeg="Global dispho_Zee_v2_2018 dispho_Zee_2017B always_true"
 
 ZEEL="${Zeel} empty"
 #declare -a inputsl=(ZEEL)
@@ -117,14 +123,14 @@ nvxt_cut4="nvtx>30&&nvtx<=40"
 nvxt_cut5="nvtx>40&&nvtx<=60"
 nvxt_cut6="nvtx>40"
 
-nvxt_cut7="subtrain_position>0&&subtrain_position<=16"
-nvxt_cut8="subtrain_position>16&&subtrain_position<=32"
-nvxt_cut9="subtrain_position>32&&subtrain_position<=200"
-nvxt_cut10="subtrain_position>0&&subtrain_position<=6"
-nvxt_cut11="subtrain_position>6&&subtrain_position<=12"
-nvxt_cut12="subtrain_position>12&&subtrain_position<=38"
-nvxt_cut13="subtrain_position>38&&subtrain_position<=42"
-nvxt_cut14="subtrain_position>42"
+nvxt_cut7="subtrain_position>0&&subtrain_position<=4"
+nvxt_cut8="subtrain_position>4&&subtrain_position<=8"
+nvxt_cut9="subtrain_position>8&&subtrain_position<=12"
+nvxt_cut10="subtrain_position>0&&subtrain_position<=8"
+nvxt_cut11="subtrain_position>8&&subtrain_position<=16"
+nvxt_cut12="subtrain_position>16&&subtrain_position<=30"
+nvxt_cut13="subtrain_position>30&&subtrain_position<=38"
+nvxt_cut14="subtrain_position>38"
 
 
 
@@ -161,9 +167,9 @@ E_cutList="${E10_120}"
 
 #nvxt_cuts="${nvxt_cut0}"
 #nvxt_cuts="${nvxt_cut1} ${nvxt_cut2} ${nvxt_cut3} ${nvxt_cut4} ${nvxt_cut5} ${nvxt_cut6}" 
-#nvxt_cuts="${nvxt_cut1} ${nvxt_cut2} ${nvxt_cut3} ${nvxt_cut4} ${nvxt_cut5} ${nvxt_cut6} ${nvxt_cut7} ${nvxt_cut8} ${nvxt_cut9} ${nvxt_cut10} ${nvxt_cut11} ${nvxt_cut12} ${nvxt_cut13}  ${nvxt_cut14}"
+nvxt_cuts="${nvxt_cut0} ${nvxt_cut1} ${nvxt_cut2} ${nvxt_cut3} ${nvxt_cut4} ${nvxt_cut5} ${nvxt_cut6} ${nvxt_cut7} ${nvxt_cut8} ${nvxt_cut9} ${nvxt_cut10} ${nvxt_cut11} ${nvxt_cut12} ${nvxt_cut13}  ${nvxt_cut14}"
 #nvxt_cuts="${nvxt_cut7} ${nvxt_cut8}  ${nvxt_cut9} ${nvxt_cut10} ${nvxt_cut11} ${nvxt_cut12} ${nvxt_cut13}  ${nvxt_cut14}"
-nvxt_cuts="${nvxt_cut10} ${nvxt_cut11} ${nvxt_cut12} ${nvxt_cut13} ${nvxt_cut14}"
+#nvxt_cuts="${nvxt_cut10} ${nvxt_cut11} ${nvxt_cut12} ${nvxt_cut13} ${nvxt_cut14}"
 #echo ${nvxt_cuts}
 
 for plottype in ${typelist}
