@@ -198,6 +198,14 @@ private:
    Float_t         beam1_RF[3564];   //[num_bunch]
    Float_t         beam2_RF[3564];   //[num_bunch]
 
+   Bool_t	   hasUrecDigi;
+  
+   std::vector<float> uRhId;
+   UInt_t	   nxtal_sep;
+   UInt_t          nurechits;
+   UInt_t          ndigis;
+   std::vector<float> ootA0, ootA1, ootA2, ootA3, ootA4, ootA5, ootA6, ootA7, ootA8;
+
    //TBranch	  *b_aveRecTime;
    //TBranch        *b_numAveRecTime;
 
@@ -211,7 +219,10 @@ private:
    TBranch        *b_beam2_VC;   //!
    TBranch        *b_beam1_RF;   //!
    TBranch        *b_beam2_RF;   //!
-
+   TBranch        *b_nxtal_sep;   //!
+   TBranch        *b_nurechits;   //!
+   TBranch        *b_ndigis;   //!
+   TBranch 	  *b_ootA0, *b_ootA1, *b_ootA2, *b_ootA3, *b_ootA4, *b_ootA5, *b_ootA6, *b_ootA7, *b_ootA8;
 };
 
 #endif

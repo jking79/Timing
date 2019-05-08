@@ -492,6 +492,7 @@ struct Pho
   Float_t scphi;
   Float_t HoE;
   Float_t r9;
+  Float_t dz;
   Float_t ChgHadIso;
   Float_t NeuHadIso;
   Float_t PhoIso;
@@ -542,6 +543,16 @@ struct Pho
   Float_t seedpedrms12;
   Float_t seedpedrms6;
   Float_t seedpedrms1;
+  Float_t seedootA0;
+  Float_t seedootA1;
+  Float_t seedootA2;
+  Float_t seedootA3;
+  Float_t seedootA4;
+  Float_t seedootA5;
+  Float_t seedootA6;
+  Float_t seedootA7;
+  Float_t seedootA8;
+
   // MC types
   Bool_t  isGen;
   Int_t   isSignal;
@@ -568,6 +579,7 @@ struct Pho
   std::string s_scphi = "phoscphi";
   std::string s_HoE = "phoHoE";
   std::string s_r9 = "phor9";
+  std::string s_dz = "tdz";
   std::string s_ChgHadIso = "phoChgHadIso";
   std::string s_NeuHadIso = "phoNeuHadIso";
   std::string s_PhoIso = "phoPhoIso";
@@ -617,6 +629,15 @@ struct Pho
   std::string s_seedpedrms12 = "phoseedpedrms12";
   std::string s_seedpedrms6 = "phoseedpedrms6";
   std::string s_seedpedrms1 = "phoseedpedrms1";
+  std::string s_seedootA0 = "phoseedootA0";
+  std::string s_seedootA1 = "phoseedootA1";
+  std::string s_seedootA2 = "phoseedootA2";
+  std::string s_seedootA3 = "phoseedootA3";
+  std::string s_seedootA4 = "phoseedootA4";
+  std::string s_seedootA5 = "phoseedootA5";
+  std::string s_seedootA6 = "phoseedootA6";
+  std::string s_seedootA7 = "phoseedootA7";
+  std::string s_seedootA8 = "phoseedootA8"; 
   std::string s_isGen = "phoisGen";
   std::string s_isSignal = "phoisSignal";
   std::string s_scaleAbs = "phoscaleAbs";
@@ -641,6 +662,7 @@ struct Pho
   TBranch * b_scphi;
   TBranch * b_HoE;
   TBranch * b_r9;
+  TBranch * b_dz;
   TBranch * b_ChgHadIso;
   TBranch * b_NeuHadIso;
   TBranch * b_PhoIso;
@@ -690,6 +712,15 @@ struct Pho
   TBranch * b_seedpedrms12;
   TBranch * b_seedpedrms6;
   TBranch * b_seedpedrms1;
+  TBranch * b_seedootA0;
+  TBranch * b_seedootA1;
+  TBranch * b_seedootA2;
+  TBranch * b_seedootA3;
+  TBranch * b_seedootA4;
+  TBranch * b_seedootA5;
+  TBranch * b_seedootA6;
+  TBranch * b_seedootA7;
+  TBranch * b_seedootA8;
   TBranch * b_isGen;
   TBranch * b_isSignal;
   TBranch * b_scaleAbs;
