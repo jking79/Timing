@@ -161,6 +161,7 @@ private:
 // LHCInfo
 
    bool		isLHCInfo;
+   bool		hasUncalDigi;
 
    //typedef std::map<UInt_t,Float_t> sumXtalRecTime_t;
    std::map<UInt_t,Float_t> sumXtalRecTime;
@@ -198,16 +199,48 @@ private:
    Float_t         beam1_RF[3564];   //[num_bunch]
    Float_t         beam2_RF[3564];   //[num_bunch]
 
+<<<<<<< HEAD
    Bool_t	   hasUrecDigi;
   
    std::vector<float> uRhId;
    UInt_t	   nxtal_sep;
    UInt_t          nurechits;
    UInt_t          ndigis;
-   std::vector<float> ootA0, ootA1, ootA2, ootA3, ootA4, ootA5, ootA6, ootA7, ootA8;
+   //std::vector<float> ootA0, ootA1, ootA2, ootA3, ootA4, ootA5, ootA6, ootA7, ootA8;
+=======
+   Float_t	   Zmass;
+
+   //std::vector<std::vector<Float_t>> * outOfTimeAmplitude
+   std::vector<Float_t> * ootA0;
+   std::vector<Float_t> * ootA1;
+   std::vector<Float_t> * ootA2;
+   std::vector<Float_t> * ootA3;
+   std::vector<Float_t> * ootA4;
+   std::vector<Float_t> * ootA5;
+   std::vector<Float_t> * ootA6;
+   std::vector<Float_t> * ootA7;
+   std::vector<Float_t> * ootA8;
+   std::vector<UInt_t> * uRhId;
+   //Int_t          nurechits;
+   //Int_t          ndigis;
+>>>>>>> 9XY
 
    //TBranch	  *b_aveRecTime;
    //TBranch        *b_numAveRecTime;
+
+   TBranch        *b_nurechits;
+   TBranch        *b_ndigis;
+   TBranch        *b_uRhId;
+   //TBranch        *b_outOfTimeAmplitude;
+   TBranch        *b_ootA0;
+   TBranch        *b_ootA1;
+   TBranch        *b_ootA2;
+   TBranch        *b_ootA3;
+   TBranch        *b_ootA4;
+   TBranch        *b_ootA5;
+   TBranch        *b_ootA6;
+   TBranch        *b_ootA7;
+   TBranch        *b_ootA8;
 
    TBranch        *b_bunch_crossing;   //!
    TBranch        *b_num_bunch;   //!

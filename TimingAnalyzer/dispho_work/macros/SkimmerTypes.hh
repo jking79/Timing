@@ -13,12 +13,13 @@ enum ECorr {Nominal, Down, Up};
 struct MassStruct
 {
   MassStruct() {}
-  MassStruct(const Int_t ipho1, const Int_t ipho2, const Float_t mass)
-    : ipho1(ipho1), ipho2(ipho2), mass(mass) {}
+  MassStruct(const Int_t ipho1, const Int_t ipho2, const Float_t mass, Float_t dR12)
+    : ipho1(ipho1), ipho2(ipho2), mass(mass), dR12(dR12) {}
 
   Int_t ipho1;
   Int_t ipho2;
   Float_t mass;
+  Float_t dR12;
 };
 
 // simple struct for pairs of detids
@@ -568,7 +569,17 @@ struct Pho
   Float_t weightedtimeLT120;
   Float_t weightedtimeTOF;
   Float_t weightedtimeLT120TOF;
-  
+
+  Float_t ootA0;
+  Float_t ootA1;
+  Float_t ootA2;
+  Float_t ootA3;
+  Float_t ootA4;
+  Float_t ootA5;
+  Float_t ootA6;
+  Float_t ootA7;
+  Float_t ootA8;
+ 
   // branch names
   std::string s_E = "phoE";
   std::string s_pt = "phopt";
@@ -652,6 +663,16 @@ struct Pho
   std::string s_weightedtimeTOF = "phoweightedtimeTOF";
   std::string s_weightedtimeLT120TOF = "phoweightedtimeLT120TOF";
 
+  std::string s_ootA0 = "ootA0";
+  std::string s_ootA1 = "ootA1";
+  std::string s_ootA2 = "ootA2";
+  std::string s_ootA3 = "ootA3";
+  std::string s_ootA4 = "ootA4";
+  std::string s_ootA5 = "ootA5";
+  std::string s_ootA6 = "ootA6";
+  std::string s_ootA7 = "ootA7";
+  std::string s_ootA8 = "ootA8";
+
   // tbranches
   TBranch * b_E;
   TBranch * b_pt;
@@ -734,6 +755,17 @@ struct Pho
   TBranch * b_weightedtimeLT120;
   TBranch * b_weightedtimeTOF;
   TBranch * b_weightedtimeLT120TOF;
+
+  TBranch * b_ootA0;
+  TBranch * b_ootA1;
+  TBranch * b_ootA2;
+  TBranch * b_ootA3;
+  TBranch * b_ootA4;
+  TBranch * b_ootA5;
+  TBranch * b_ootA6;
+  TBranch * b_ootA7;
+  TBranch * b_ootA8;
+
 };
 typedef std::vector<Pho> PhoVec;
 
@@ -831,6 +863,16 @@ struct Hvds
   Float_t genHVph1eta;
   Int_t   genHVph1match;
 
+  Float_t ootA0;
+  Float_t ootA1;
+  Float_t ootA2;
+  Float_t ootA3;
+  Float_t ootA4;
+  Float_t ootA5;
+  Float_t ootA6;
+  Float_t ootA7;
+  Float_t ootA8;
+
   std::string s_genvPionmass = "genvPionmass";
   std::string s_genvPionE = "genvPionE";
   std::string s_genvPionpt = "genvPionpt";
@@ -853,6 +895,16 @@ struct Hvds
   std::string s_genHVph1eta = "genHVph1eta";
   std::string s_genHVph1match = "genHVph1match";
 
+  std::string s_ootA0 = "ootA0";
+  std::string s_ootA1 = "ootA1";
+  std::string s_ootA2 = "ootA2";
+  std::string s_ootA3 = "ootA3";
+  std::string s_ootA4 = "ootA4";
+  std::string s_ootA5 = "ootA5";
+  std::string s_ootA6 = "ootA6";
+  std::string s_ootA7 = "ootA7";
+  std::string s_ootA8 = "ootA8";
+
   TBranch * b_genvPionmass;
   TBranch * b_genvPionE;
   TBranch * b_genvPionpt;
@@ -874,6 +926,17 @@ struct Hvds
   TBranch * b_genHVph1phi;
   TBranch * b_genHVph1eta;
   TBranch * b_genHVph1match;
+
+  TBranch * b_ootA0;
+  TBranch * b_ootA1;
+  TBranch * b_ootA2;
+  TBranch * b_ootA3;
+  TBranch * b_ootA4;
+  TBranch * b_ootA5;
+  TBranch * b_ootA6;
+  TBranch * b_ootA7;
+  TBranch * b_ootA8;
+
 };
 typedef std::vector<Hvds> HvdsVec;
 

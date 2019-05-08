@@ -18,6 +18,8 @@ Skimmer::Skimmer(const TString & indir, const TString & outdir, const TString & 
   ////////////////////////
   std::cout << "Setting up inputs for skim" << std::endl;
 
+  hasUncalDigi = true;
+
   // Set skim config options 
   Skimmer::SetupDefaults();
   Skimmer::SetupSkimConfig();
@@ -66,18 +68,18 @@ Skimmer::Skimmer(const TString & indir, const TString & outdir, const TString & 
   // Get PU weights input
   fPUWeights.clear();
 
-  if(fIsMC)
-  {
-    std::cout << "Opening " << fPUWgtFileName << std::endl;
-    fInPUWgtFile = TFile::Open(fPUWgtFileName);
-    Common::CheckValidFile(fInPUWgtFile,fPUWgtFileName);
-
-    const TString puhistname = Form("%s_%s",Common::puTrueHistName.Data(),Common::puwgtHistName.Data());
-    fInPUWgtHist = (TH1F*)fInPUWgtFile->Get(puhistname.Data());
-    Common::CheckValidHist(fInPUWgtHist,puhistname,fPUWgtFileName);
-
-    Skimmer::GetPUWeights();
-  }
+//  if(fIsMC)
+//  {
+//    std::cout << "Opening " << fPUWgtFileName << std::endl;
+//    fInPUWgtFile = TFile::Open(fPUWgtFileName);
+//    Common::CheckValidFile(fInPUWgtFile,fPUWgtFileName);
+//
+//    const TString puhistname = Form("%s_%s",Common::puTrueHistName.Data(),Common::puwgtHistName.Data());
+//    fInPUWgtHist = (TH1F*)fInPUWgtFile->Get(puhistname.Data());
+//    Common::CheckValidHist(fInPUWgtHist,puhistname,fPUWgtFileName);
+//
+//    Skimmer::GetPUWeights();
+//  }
 
   /////////////////////////
   // Set all the outputs //
@@ -312,7 +314,7 @@ void Skimmer::EventLoop()
 
 	inpho.b_hasPixSeed->GetEntry(entry);
 	//cout << "has Pix Seed? " << inpho.hasPixSeed << endl;
-//	if (!inpho.hasPixSeed) continue;   //   <<<<<<<<<<<<<<<<<<<<<<<<<<<<< uncomment  temp fix to run 2018?
+	if (!inpho.hasPixSeed) continue;   //   <<<<<<<<<<<<<<<<<<<<<<<<<<<<< uncomment  temp fix to run 2018?
 
 	inpho.b_gedID->GetEntry(entry);
 //	cout << "gedID " << inpho.gedID << endl;
@@ -359,10 +361,10 @@ void Skimmer::EventLoop()
 	  pho2.b_phi->GetEntry(entry);
 	  pho2.b_E  ->GetEntry(entry);
 	  TLorentzVector pho2vec; pho2vec.SetPtEtaPhiE(pho2.pt, pho2.eta, pho2.phi, pho2.E);
-
 	  // get invariant mass
-	  pho1vec += pho2vec;
-	  phopairs.emplace_back(good_phos[i],good_phos[j],pho1vec.M());
+	  const auto dr12 = pho1vec.DeltaR(pho2vec);
+	  pho1vec += pho2vec;  
+	  phopairs.emplace_back(good_phos[i],good_phos[j],pho1vec.M(),dr12);
 	}
       }
       //cout << "sort by mass " << endl;
@@ -380,6 +382,8 @@ void Skimmer::EventLoop()
       
       // make sure within 30 GeV
       if ((phopair.mass < 60.f) || (phopair.mass > 150.f)) continue;
+      gZmass = phopair.mass;
+      gdR = pbhopair.dR12;
       fOutCutFlow   ->Fill((cutLabels["diPhoMZrange"]*1.f)-0.5f);
       fOutCutFlowWgt->Fill((cutLabels["diPhoMZrange"]*1.f)-0.5f,wgt);
       fOutCutFlowScl->Fill((cutLabels["diPhoMZrange"]*1.f)-0.5f,evtwgt);
@@ -426,6 +430,8 @@ void Skimmer::EventLoop()
 	b_nurechits->GetEntry(entry);
       }
 
+      gZmass = 0.f;     
+ 
       for( auto idx = 0; idx < (*fInRecHits.ID).size(); idx++ ){
                  //std::cout << "Filling first xtalRecHit " << id_i << " time with: " << t_i << std::endl;
          	 const auto id_i = (*fInRecHits.ID)[idx];
@@ -527,36 +533,36 @@ void Skimmer::EventLoop()
       std::cerr << "How did this happen?? Somehow SkimType Enum is not one that is specified... Exiting..."  << std::endl;
       exit(1);
     }
-    //std::cout << "Finished proccessing skim type." << std::endl;
+    std::cout << "Finished proccessing skim type." << std::endl;
 
     // common skim params for MC
     if (fSkim != SkimType::AlwaysTrue)
     {
       // cut on crappy pu
-      if (fIsMC)
-      {
-	fInEvent.b_genputrue->GetEntry(entry);
-	if ((fInEvent.genputrue < 0) || (UInt_t(fInEvent.genputrue) >= fPUWeights.size())) continue;
+//      if (fIsMC)
+//      {
+//	fInEvent.b_genputrue->GetEntry(entry);
+//	if ((fInEvent.genputrue < 0) || (UInt_t(fInEvent.genputrue) >= fPUWeights.size())) continue;
 //        if ((fInEvent.genputrue < 0)) continue;
-      }
+//      }
 
       // fill cutflow
       fOutCutFlow   ->Fill((cutLabels["badPU"]*1.f)-0.5f);
-      fOutCutFlowWgt->Fill((cutLabels["badPU"]*1.f)-0.5f,wgt);
-      fOutCutFlowScl->Fill((cutLabels["badPU"]*1.f)-0.5f,evtwgt);
+//      fOutCutFlowWgt->Fill((cutLabels["badPU"]*1.f)-0.5f,wgt);
+//      fOutCutFlowScl->Fill((cutLabels["badPU"]*1.f)-0.5f,evtwgt);
     }
 
     // end of skim, now copy... dropping rechits
-    if (fOutConfig.isGMSB) Skimmer::FillOutGMSBs(entry);
-    if (fOutConfig.isHVDS) Skimmer::FillOutHVDSs(entry);
-    if (fOutConfig.isToy)  Skimmer::FillOutToys(entry);
+//    if (fOutConfig.isGMSB) Skimmer::FillOutGMSBs(entry);
+//    if (fOutConfig.isHVDS) Skimmer::FillOutHVDSs(entry);
+//   if (fOutConfig.isToy)  Skimmer::FillOutToys(entry);
     Skimmer::FillOutEvent(entry,evtwgt);
-    //std::cout << "Finished proccessing event info." << std::endl;
+    std::cout << "Finished proccessing event info." << std::endl;
     //if (fSkim != SkimType::DiXtal) Skimmer::FillOutJets(entry);
     //std::cout << "Start proccessing phos info." << std::endl;
     Skimmer::FillOutPhos(entry);
-    //std::cout << "Finished proccessing phos info." << std::endl;
-    if (fIsMC) Skimmer::CorrectMET();
+    std::cout << "Finished proccessing phos info." << std::endl;
+//    if (fIsMC) Skimmer::CorrectMET();
 
     // fill the tree
     fOutTree->Fill();
@@ -620,8 +626,8 @@ void Skimmer::EventLoop()
   // write out the output!
   fOutFile->cd();
   fOutCutFlow->Write();
-  fOutCutFlowWgt->Write();
-  fOutCutFlowScl->Write();
+//  fOutCutFlowWgt->Write();
+//  fOutCutFlowScl->Write();
 
   fOutAveXtalRecTimeHist->Write();
   fOutAveXtalOccHist->Write();
@@ -660,159 +666,28 @@ void Skimmer::EventLoop()
 void Skimmer::FillOutGMSBs(const UInt_t entry)
 {
   // get input branches
-  for (auto igmsb = 0; igmsb < Common::nGMSBs; igmsb++)
-  {
-    auto & ingmsb = fInGMSBs[igmsb];
-    ingmsb.b_genNmass->GetEntry(entry);
-    ingmsb.b_genNE->GetEntry(entry);
-    ingmsb.b_genNpt->GetEntry(entry);
-    ingmsb.b_genNphi->GetEntry(entry);
-    ingmsb.b_genNeta->GetEntry(entry);
-    ingmsb.b_genNprodvx->GetEntry(entry);
-    ingmsb.b_genNprodvy->GetEntry(entry);
-    ingmsb.b_genNprodvz->GetEntry(entry);
-    ingmsb.b_genNdecayvx->GetEntry(entry);
-    ingmsb.b_genNdecayvy->GetEntry(entry);
-    ingmsb.b_genNdecayvz->GetEntry(entry);
-    ingmsb.b_genphE->GetEntry(entry);
-    ingmsb.b_genphpt->GetEntry(entry);
-    ingmsb.b_genphphi->GetEntry(entry);
-    ingmsb.b_genpheta->GetEntry(entry);
-    ingmsb.b_genphmatch->GetEntry(entry);
-    ingmsb.b_gengrmass->GetEntry(entry);
-    ingmsb.b_gengrE->GetEntry(entry);
-    ingmsb.b_gengrpt->GetEntry(entry);
-    ingmsb.b_gengrphi->GetEntry(entry);
-    ingmsb.b_gengreta->GetEntry(entry);
-  }
 
   // set output branches
-  for (auto igmsb = 0; igmsb < Common::nGMSBs; igmsb++)
-  {
-    const auto & ingmsb = fInGMSBs[igmsb];
-    auto & outgmsb = fOutGMSBs[igmsb];
-
-    outgmsb.genNmass = ingmsb.genNmass;
-    outgmsb.genNE = ingmsb.genNE;
-    outgmsb.genNpt = ingmsb.genNpt;
-    outgmsb.genNphi = ingmsb.genNphi;
-    outgmsb.genNeta = ingmsb.genNeta;
-    outgmsb.genNprodvx = ingmsb.genNprodvx;
-    outgmsb.genNprodvy = ingmsb.genNprodvy;
-    outgmsb.genNprodvz = ingmsb.genNprodvz;
-    outgmsb.genNdecayvx = ingmsb.genNdecayvx;
-    outgmsb.genNdecayvy = ingmsb.genNdecayvy;
-    outgmsb.genNdecayvz = ingmsb.genNdecayvz;
-    outgmsb.genphE = ingmsb.genphE;
-    outgmsb.genphpt = ingmsb.genphpt;
-    outgmsb.genphphi = ingmsb.genphphi;
-    outgmsb.genpheta = ingmsb.genpheta;
-    outgmsb.genphmatch = ingmsb.genphmatch;
-    outgmsb.gengrmass = ingmsb.gengrmass;
-    outgmsb.gengrE = ingmsb.gengrE;
-    outgmsb.gengrpt = ingmsb.gengrpt;
-    outgmsb.gengrphi = ingmsb.gengrphi;
-    outgmsb.gengreta = ingmsb.gengreta;
-  }
 }
 
 void Skimmer::FillOutHVDSs(const UInt_t entry)
 {
   // get input branches
-  for (auto ihvds = 0; ihvds < Common::nHVDSs; ihvds++)
-  {
-    auto & inhvds = fInHVDSs[ihvds];
-
-    inhvds.b_genvPionmass->GetEntry(entry);
-    inhvds.b_genvPionE->GetEntry(entry);
-    inhvds.b_genvPionpt->GetEntry(entry);
-    inhvds.b_genvPionphi->GetEntry(entry);
-    inhvds.b_genvPioneta->GetEntry(entry);
-    inhvds.b_genvPionprodvx->GetEntry(entry);
-    inhvds.b_genvPionprodvy->GetEntry(entry);
-    inhvds.b_genvPionprodvz->GetEntry(entry);
-    inhvds.b_genvPiondecayvx->GetEntry(entry);
-    inhvds.b_genvPiondecayvy->GetEntry(entry);
-    inhvds.b_genvPiondecayvz->GetEntry(entry);
-    inhvds.b_genHVph0E->GetEntry(entry);
-    inhvds.b_genHVph0pt->GetEntry(entry);
-    inhvds.b_genHVph0phi->GetEntry(entry);
-    inhvds.b_genHVph0eta->GetEntry(entry);
-    inhvds.b_genHVph0match->GetEntry(entry);
-    inhvds.b_genHVph1E->GetEntry(entry);
-    inhvds.b_genHVph1pt->GetEntry(entry);
-    inhvds.b_genHVph1phi->GetEntry(entry);
-    inhvds.b_genHVph1eta->GetEntry(entry);
-    inhvds.b_genHVph1match->GetEntry(entry);
-  }
 
   // set output branches
-  for (auto ihvds = 0; ihvds < Common::nHVDSs; ihvds++)
-  {
-    const auto & inhvds = fInHVDSs[ihvds];
-    auto & outhvds = fOutHVDSs[ihvds];
-
-    outhvds.genvPionmass = inhvds.genvPionmass;
-    outhvds.genvPionE = inhvds.genvPionE;
-    outhvds.genvPionpt = inhvds.genvPionpt;
-    outhvds.genvPionphi = inhvds.genvPionphi;
-    outhvds.genvPioneta = inhvds.genvPioneta;
-    outhvds.genvPionprodvx = inhvds.genvPionprodvx;
-    outhvds.genvPionprodvy = inhvds.genvPionprodvy;
-    outhvds.genvPionprodvz = inhvds.genvPionprodvz;
-    outhvds.genvPiondecayvx = inhvds.genvPiondecayvx;
-    outhvds.genvPiondecayvy = inhvds.genvPiondecayvy;
-    outhvds.genvPiondecayvz = inhvds.genvPiondecayvz;
-    outhvds.genHVph0E = inhvds.genHVph0E;
-    outhvds.genHVph0pt = inhvds.genHVph0pt;
-    outhvds.genHVph0phi = inhvds.genHVph0phi;
-    outhvds.genHVph0eta = inhvds.genHVph0eta;
-    outhvds.genHVph0match = inhvds.genHVph0match;
-    outhvds.genHVph1E = inhvds.genHVph1E;
-    outhvds.genHVph1pt = inhvds.genHVph1pt;
-    outhvds.genHVph1phi = inhvds.genHVph1phi;
-    outhvds.genHVph1eta = inhvds.genHVph1eta;
-    outhvds.genHVph1match = inhvds.genHVph1match;
-  }
 }
 
 void Skimmer::FillOutToys(const UInt_t entry)
 {
   // get input branches
-  for (auto itoy = 0; itoy < Common::nToys; itoy++)
-  {
-    auto & intoy = fInToys[itoy];
-
-    intoy.b_genphE->GetEntry(entry);
-    intoy.b_genphpt->GetEntry(entry);
-    intoy.b_genphphi->GetEntry(entry);
-    intoy.b_genpheta->GetEntry(entry);
-
-    intoy.b_genphmatch->GetEntry(entry);
-    intoy.b_genphmatch_ptres->GetEntry(entry);
-    intoy.b_genphmatch_status->GetEntry(entry);
-  }
 
   // set output branches
-  for (auto itoy = 0; itoy < Common::nToys; itoy++)
-  {
-    const auto & intoy = fInToys[itoy];
-    auto & outtoy = fOutToys[itoy];
-
-    outtoy.genphE = intoy.genphE;
-    outtoy.genphpt = intoy.genphpt;
-    outtoy.genphphi = intoy.genphphi;
-    outtoy.genpheta = intoy.genpheta;
-
-    outtoy.genphmatch = intoy.genphmatch;
-    outtoy.genphmatch_ptres = intoy.genphmatch_ptres;
-    outtoy.genphmatch_status = intoy.genphmatch_status;
-  }
 }
 
 void Skimmer::FillOutEvent(const UInt_t entry, const Float_t evtwgt)
 {
-  // get input branches
+  std::cout << "Starting FillOutEvent" << std::endl;
+ // get input branches
   fInEvent.b_run->GetEntry(entry);
   fInEvent.b_lumi->GetEntry(entry);
   fInEvent.b_event->GetEntry(entry);
@@ -833,27 +708,36 @@ void Skimmer::FillOutEvent(const UInt_t entry, const Float_t evtwgt)
   fInEvent.b_vtxY->GetEntry(entry);
   fInEvent.b_vtxZ->GetEntry(entry);
   fInEvent.b_rho->GetEntry(entry);
-  if( false ) {
-  fInEvent.b_t1pfMETpt->GetEntry(entry);
-  fInEvent.b_t1pfMETphi->GetEntry(entry);
-  fInEvent.b_t1pfMETsumEt->GetEntry(entry);
-  fInEvent.b_njets->GetEntry(entry);
-  }
-  // fInEvent.b_nelLowL->GetEntry(entry);
-  // fInEvent.b_nelLowM->GetEntry(entry);
-  // fInEvent.b_nelLowT->GetEntry(entry);
-  // fInEvent.b_nelHighL->GetEntry(entry);
-  // fInEvent.b_nelHighM->GetEntry(entry);
-  // fInEvent.b_nelHighT->GetEntry(entry);
-  // fInEvent.b_nmuLowL->GetEntry(entry);
-  // fInEvent.b_nmuLowM->GetEntry(entry);
-  // fInEvent.b_nmuLowT->GetEntry(entry);
-  // fInEvent.b_nmuHighL->GetEntry(entry);
-  // fInEvent.b_nmuHighM->GetEntry(entry);
   // fInEvent.b_nmuHighT->GetEntry(entry);
   fInEvent.b_nrechits->GetEntry(entry);
   fInEvent.b_nphotons->GetEntry(entry);
 
+  std::cout << "clearing UncalDigi " << std::endl;
+
+  nurechits = 0;
+  ndigis = 0;
+  //uRhId->clear();
+  //outOfTimeAmplitude->clear();
+
+  std::cout << "clearing UncalDigi done" << std::endl;
+ 
+  if( hasUncalDigi ){
+  	b_nurechits->GetEntry(entry);
+  	b_ndigis->GetEntry(entry);
+	b_uRhId->GetEntry(entry);
+	//b_outOfTimeAmplitude->GetEntry(entry);
+        b_ootA0->GetEntry(entry);
+        b_ootA1->GetEntry(entry);
+        b_ootA2->GetEntry(entry);
+        b_ootA3->GetEntry(entry);
+        b_ootA4->GetEntry(entry);
+        b_ootA5->GetEntry(entry);
+        b_ootA6->GetEntry(entry);
+        b_ootA7->GetEntry(entry);
+        b_ootA8->GetEntry(entry);
+  }
+
+  std::cout << "UncalDigi done" << std::endl;
 
    bunch_crossing = 0;
    num_bunch = 0;
@@ -861,7 +745,7 @@ void Skimmer::FillOutEvent(const UInt_t entry, const Float_t evtwgt)
    train_position=0;
    subtrain_number=0;
    train_number=0;
-
+   
    if( isLHCInfo ) {
    b_bunch_crossing->GetEntry(entry);   //!
    b_num_bunch->GetEntry(entry);   //!
@@ -872,33 +756,8 @@ void Skimmer::FillOutEvent(const UInt_t entry, const Float_t evtwgt)
    b_train_number->GetEntry(entry);   //!
    }
 
-  //std::cout << "lhcinfo done" << std::endl;
+  std::cout << "lhcinfo done" << std::endl;
   // isMC only conditions
-  if (fIsMC)
-  {
-    fInEvent.b_genwgt->GetEntry(entry);
-    fInEvent.b_genx0->GetEntry(entry);
-    fInEvent.b_geny0->GetEntry(entry);
-    fInEvent.b_genz0->GetEntry(entry);
-    fInEvent.b_gent0->GetEntry(entry);
-    fInEvent.b_genpuobs->GetEntry(entry);
-    fInEvent.b_genputrue->GetEntry(entry);
-
-    if (fInConfig.isGMSB)
-    {
-      fInEvent.b_nNeutoPhGr->GetEntry(entry);
-    }
-    if (fInConfig.isHVDS)
-    {
-      fInEvent.b_nvPions->GetEntry(entry);
-    }
-    if (fInConfig.isToy)
-    {
-      fInEvent.b_nToyPhs->GetEntry(entry);
-    }
-  }
-
-  // set output branches
   fOutEvent.run = fInEvent.run;
   fOutEvent.lumi = fInEvent.lumi;
   fOutEvent.event = fInEvent.event;
@@ -919,23 +778,7 @@ void Skimmer::FillOutEvent(const UInt_t entry, const Float_t evtwgt)
   fOutEvent.vtxY = fInEvent.vtxY;
   fOutEvent.vtxZ = fInEvent.vtxZ;
   fOutEvent.rho = fInEvent.rho;
-  if( false ) {
-  fOutEvent.t1pfMETpt = fInEvent.t1pfMETpt;
-  fOutEvent.t1pfMETphi = fInEvent.t1pfMETphi;
-  fOutEvent.t1pfMETsumEt = fInEvent.t1pfMETsumEt;
-  fOutEvent.njets = fInEvent.njets;
-  }
-  // fOutEvent.nelLowL = fInEvent.nelLowL;
-  // fOutEvent.nelLowM = fInEvent.nelLowM;
-  // fOutEvent.nelLowT = fInEvent.nelLowT;
-  // fOutEvent.nelHighL = fInEvent.nelHighL;
-  // fOutEvent.nelHighM = fInEvent.nelHighM;
-  // fOutEvent.nelHighT = fInEvent.nelHighT;
-  // fOutEvent.nmuLowL = fInEvent.nmuLowL;
-  // fOutEvent.nmuLowM = fInEvent.nmuLowM;
-  // fOutEvent.nmuLowT = fInEvent.nmuLowT;
-  // fOutEvent.nmuHighL = fInEvent.nmuHighL;
-  // fOutEvent.nmuHighM = fInEvent.nmuHighM;
+  
   // fOutEvent.nmuHighT = fInEvent.nmuHighT;
   fOutEvent.nrechits = fInEvent.nrechits;
   fOutEvent.nphotons = fInEvent.nphotons;
@@ -945,32 +788,6 @@ void Skimmer::FillOutEvent(const UInt_t entry, const Float_t evtwgt)
   //std::cout << "event info done" << std::endl;
 
   // isMC only branches
-  if (fIsMC)
-  {
-    fOutEvent.genwgt = fInEvent.genwgt;
-    fOutEvent.genx0 = fInEvent.genx0;
-    fOutEvent.geny0 = fInEvent.geny0;
-    fOutEvent.genz0 = fInEvent.genz0;
-    fOutEvent.gent0 = fInEvent.gent0;
-    fOutEvent.genpuobs = fInEvent.genpuobs;
-    fOutEvent.genputrue = fInEvent.genputrue;
-
-    if (fOutConfig.isGMSB)
-    {
-      fOutEvent.nNeutoPhGr = fInEvent.nNeutoPhGr;
-    }
-    if (fOutConfig.isHVDS)
-    {
-      fOutEvent.nvPions = fInEvent.nvPions;
-    }
-    if (fOutConfig.isToy)
-    {
-      fOutEvent.nToyPhs = fInEvent.nToyPhs;
-    }
-
-    // pileup weight!!
-    fOutEvent.puwgt = fPUWeights[fInEvent.genputrue];
-  }
 }
 
 void Skimmer::FillOutJets(const UInt_t entry)
@@ -1025,47 +842,6 @@ void Skimmer::FillOutJets(const UInt_t entry)
   }
 
   // apply energy corrections, then sort!
-  if (fIsMC)
-  {
-    // Read the JEC's and JER's
-    if      (fJER == ECorr::Nominal) fInJets.b_smearSF    ->GetEntry(entry);
-    else if (fJER == ECorr::Down)    fInJets.b_smearDownSF->GetEntry(entry);
-    else if (fJER == ECorr::Up)      fInJets.b_smearUpSF  ->GetEntry(entry);
-
-    if (fJEC == ECorr::Down || fJEC == ECorr::Up) fInJets.b_scaleRel->GetEntry(entry);
-    
-    // Apply JEC's and JER's
-    for (auto ijet = 0U; ijet < nJets; ijet++)
-    {
-      // JER's Uncs --> Apply nominal smearing always!
-      if (fJER == ECorr::Nominal)
-      {
-	fOutJets.E_f [ijet] *= (*fInJets.smearSF)[ijet];
-	fOutJets.pt_f[ijet] *= (*fInJets.smearSF)[ijet];
-      }
-      else if (fJER == ECorr::Down)
-      {
-	fOutJets.E_f [ijet] *= (*fInJets.smearDownSF)[ijet];
-	fOutJets.pt_f[ijet] *= (*fInJets.smearDownSF)[ijet];
-      }
-      else if (fJER == ECorr::Up)
-      {
-	fOutJets.E_f [ijet] *= (*fInJets.smearUpSF)[ijet];
-	fOutJets.pt_f[ijet] *= (*fInJets.smearUpSF)[ijet];
-      }
-      
-      // JEC's for Unc.
-      if (fJEC == ECorr::Down)
-      {
-	fOutJets.E_f [ijet] *= (1.f - (*fInJets.scaleRel)[ijet]);
-	fOutJets.pt_f[ijet] *= (1.f - (*fInJets.scaleRel)[ijet]);
-      }
-      else if (fJEC == ECorr::Up)
-      {
-	fOutJets.E_f [ijet] *= (1.f + (*fInJets.scaleRel)[ijet]);
-	fOutJets.pt_f[ijet] *= (1.f + (*fInJets.scaleRel)[ijet]);
-      }
-    }
 
     /////////////////
     // sort by pt! //
@@ -1088,13 +864,7 @@ void Skimmer::FillOutJets(const UInt_t entry)
     Common::ReorderVector(fOutJets.ID_i,ijets);
     
     // Common::ReorderVector(fOutJets.NHF_f,ijets);
-    // Common::ReorderVector(fOutJets.NEMF_f,ijets);
-    // Common::ReorderVector(fOutJets.CHF_f,ijets);
-    // Common::ReorderVector(fOutJets.CEMF_f,ijets);
-    // Common::ReorderVector(fOutJets.MUF_f,ijets);
-    // Common::ReorderVector(fOutJets.NHM_f,ijets);
-    // Common::ReorderVector(fOutJets.CHM_f,ijets);
-  }
+ 
 }
 
 void Skimmer::FillOutPhos(const UInt_t entry)
@@ -1172,19 +942,7 @@ void Skimmer::FillOutPhos(const UInt_t entry)
       inpho.b_seedpedrms6->GetEntry(entry);
       inpho.b_seedpedrms1->GetEntry(entry);
     }
-    
-    if (fIsMC)
-    {
-      inpho.b_isGen->GetEntry(entry);
-      if (fInConfig.isGMSB || fInConfig.isHVDS)
-      {
-	inpho.b_isSignal->GetEntry(entry);
-      }
-
-      if (fPhoSc == ECorr::Down || fPhoSc == ECorr::Up) inpho.b_scaleAbs->GetEntry(entry);
-      if (fPhoSm == ECorr::Down || fPhoSm == ECorr::Up) inpho.b_smearAbs->GetEntry(entry);
-    }
-  }
+  }  
   //std::cout << "Finished Pho list" << std::endl;
   // get input recHits if needed
   if (fInConfig.storeRecHits)
@@ -1281,6 +1039,31 @@ void Skimmer::FillOutPhos(const UInt_t entry)
 	
 	// outpho.seedID    = (*fInRecHits.ID)[seed];
 	// outpho.seedisOOT = (*fInRecHits.isOOT)[seed];
+
+	outpho.ootA0 = 0.0;
+        outpho.ootA1 = 0.0;
+        outpho.ootA2 = 0.0;
+        outpho.ootA3 = 0.0;
+        outpho.ootA4 = 0.0;
+        outpho.ootA5 = 0.0;
+        outpho.ootA6 = 0.0;
+        outpho.ootA7 = 0.0;
+
+        for( auto iurhid = 0; iurhid < (*uRhId).size(); ++iurhid ){
+		if( (*uRhId)[iurhid] == (*fInRecHits.ID)[seed] ){
+				outpho.ootA0 = (*ootA0)[seed];
+                                outpho.ootA1 = (*ootA1)[seed];
+                                outpho.ootA2 = (*ootA2)[seed];
+                                outpho.ootA3 = (*ootA3)[seed];
+                                outpho.ootA4 = (*ootA4)[seed];
+                                outpho.ootA5 = (*ootA5)[seed];
+                                outpho.ootA6 = (*ootA6)[seed];
+                                outpho.ootA7 = (*ootA7)[seed];
+                                outpho.ootA8 = (*ootA8)[seed];		
+				break;
+		}
+	}
+
 
 	outpho.seedisGS6 = (*fInRecHits.isGS6)[seed];
 	outpho.seedisGS1 = (*fInRecHits.isGS1)[seed];
@@ -1438,86 +1221,12 @@ void Skimmer::FillOutPhos(const UInt_t entry)
       outpho.seedpedrms1 = inpho.seedpedrms1;
     }
     
-    if (fIsMC)
-    {
-      outpho.isGen = inpho.isGen;
-      if (fOutConfig.isGMSB || fOutConfig.isHVDS)
-      {
-	outpho.isSignal = inpho.isSignal;
-      }
-
-      // apply photon scale uncs
-      if (fPhoSc == ECorr::Down)
-      {
-	outpho.E  -= inpho.scaleAbs;
-	outpho.pt -= inpho.scaleAbs;
-      }
-      else if (fPhoSc == ECorr::Up)
-      {
-	outpho.E  += inpho.scaleAbs;
-	outpho.pt += inpho.scaleAbs;
-      }
-      
-      // apply photon smear uncs
-      if (fPhoSm == ECorr::Down)
-      {
-	outpho.E  -= inpho.smearAbs;
-	outpho.pt -= inpho.smearAbs;
-      }
-      else if (fPhoSm == ECorr::Up)
-      {
-	outpho.E  += inpho.smearAbs;
-	outpho.pt += inpho.smearAbs;
-      }
-    }
   }
 }
 
 void Skimmer::CorrectMET()
 {
   // first, do jets
-  if (fJER == ECorr::Down || fJER == ECorr::Up || fJER == ECorr::Nominal || fJEC == ECorr::Down || fJEC == ECorr::Up)
-  {
-    const UInt_t nJets = fOutJets.pt_f.size();
-    for (auto ijet = 0U; ijet < nJets; ijet++)
-    {
-      const auto metpt  = fOutEvent.t1pfMETpt;
-      const auto metphi = fOutEvent.t1pfMETphi;
-
-      const auto ijetpt = (*fInJets.pt)[ijet];
-      const auto ojetpt = fOutJets.pt_f[ijet];
-      const auto jetphi = fOutJets.phi_f[ijet];
-
-      const Float_t x = (metpt * std::cos(metphi)) + ((ijetpt - ojetpt) * std::cos(jetphi));
-      const Float_t y = (metpt * std::sin(metphi)) + ((ijetpt - ojetpt) * std::sin(jetphi));
-
-      fOutEvent.t1pfMETphi = Common::phi  (x,y);
-      fOutEvent.t1pfMETpt  = Common::hypot(x,y);
-    }
-  }
-
-  // then, do photons
-  if (fPhoSc == ECorr::Down || fPhoSc == ECorr::Up || fPhoSm == ECorr::Down || fPhoSm == ECorr::Up)
-  {
-    for (auto ipho = 0; ipho < fNOutPhos; ipho++) 
-    {
-      const auto & inpho  = fInPhos[fPhoList[ipho]];
-      const auto & outpho = fOutPhos[ipho];
-      
-      const auto metpt  = fOutEvent.t1pfMETpt;
-      const auto metphi = fOutEvent.t1pfMETphi;
-      
-      const auto iphopt = inpho.pt;
-      const auto ophopt = outpho.pt;
-      const auto phophi = outpho.phi;
-      
-      const Float_t x = (metpt * std::cos(metphi)) + ((iphopt - ophopt) * std::cos(phophi));
-      const Float_t y = (metpt * std::sin(metphi)) + ((iphopt - ophopt) * std::sin(phophi));
-      
-      fOutEvent.t1pfMETphi = Common::phi  (x,y);
-      fOutEvent.t1pfMETpt  = Common::hypot(x,y);
-    }
-  }
 }
 
 void Skimmer::GetInConfig()
@@ -1639,14 +1348,6 @@ void Skimmer::InitInBranchVecs()
   // fInJets.NHM = 0;
   // fInJets.CHM = 0;
 
-  if (fIsMC)
-  {
-    if (fJEC == ECorr::Down || fJEC == ECorr::Up) fInJets.scaleRel = 0;
-    if (fJER == ECorr::Nominal) fInJets.smearSF = 0;
-    else if (fJER == ECorr::Down) fInJets.smearDownSF = 0;
-    else if (fJER == ECorr::Up) fInJets.smearUpSF = 0;
-    fInJets.isGen = 0;
-  }
 
   if (fInConfig.storeRecHits) 
   {
@@ -1783,6 +1484,21 @@ void Skimmer::InitInBranches()
    fInTree->SetBranchAddress("beam2_RF", beam2_RF, &b_beam2_RF);
    }
 
+  if( hasUncalDigi ){
+     fInTree->SetBranchAddress("nurechits", &nurechits, &b_nurechits);
+     fInTree->SetBranchAddress("ndigis", &ndigis, &b_ndigis);
+     fInTree->SetBranchAddress("uRhId", &uRhId, &b_uRhId);
+     fInTree->SetBranchAddress("ootA0", &ootA0, &b_ootA0);
+     fInTree->SetBranchAddress("ootA1", &ootA1, &b_ootA1);
+     fInTree->SetBranchAddress("ootA2", &ootA2, &b_ootA2);
+     fInTree->SetBranchAddress("ootA3", &ootA3, &b_ootA3);
+     fInTree->SetBranchAddress("ootA4", &ootA4, &b_ootA4);
+     fInTree->SetBranchAddress("ootA5", &ootA5, &b_ootA5);
+     fInTree->SetBranchAddress("ootA6", &ootA6, &b_ootA6);
+     fInTree->SetBranchAddress("ootA7", &ootA7, &b_ootA7);
+     fInTree->SetBranchAddress("ootA8", &ootA8, &b_ootA8);
+  }
+
   fInTree->SetBranchAddress(fInEvent.s_hltSignal.c_str(), &fInEvent.hltSignal, &fInEvent.b_hltSignal);
   fInTree->SetBranchAddress(fInEvent.s_hltRefPhoID.c_str(), &fInEvent.hltRefPhoID, &fInEvent.b_hltRefPhoID);
   fInTree->SetBranchAddress(fInEvent.s_hltRefDispID.c_str(), &fInEvent.hltRefDispID, &fInEvent.b_hltRefDispID);
@@ -1813,49 +1529,6 @@ void Skimmer::InitInBranches()
   fInTree->SetBranchAddress(fInEvent.s_vtxZ.c_str(), &fInEvent.vtxZ, &fInEvent.b_vtxZ);
   fInTree->SetBranchAddress(fInEvent.s_rho.c_str(), &fInEvent.rho, &fInEvent.b_rho);
 
-  if( false ) {
-  fInTree->SetBranchAddress(fInEvent.s_t1pfMETpt.c_str(), &fInEvent.t1pfMETpt, &fInEvent.b_t1pfMETpt);
-  fInTree->SetBranchAddress(fInEvent.s_t1pfMETphi.c_str(), &fInEvent.t1pfMETphi, &fInEvent.b_t1pfMETphi);
-  fInTree->SetBranchAddress(fInEvent.s_t1pfMETsumEt.c_str(), &fInEvent.t1pfMETsumEt, &fInEvent.b_t1pfMETsumEt);
-
-  fInTree->SetBranchAddress(fInEvent.s_njets.c_str(), &fInEvent.njets, &fInEvent.b_njets);
-  fInTree->SetBranchAddress(fInJets.s_E.c_str(), &fInJets.E, &fInJets.b_E);
-  fInTree->SetBranchAddress(fInJets.s_pt.c_str(), &fInJets.pt, &fInJets.b_pt);
-  fInTree->SetBranchAddress(fInJets.s_phi.c_str(), &fInJets.phi, &fInJets.b_phi);
-  fInTree->SetBranchAddress(fInJets.s_eta.c_str(), &fInJets.eta, &fInJets.b_eta);
-  fInTree->SetBranchAddress(fInJets.s_ID.c_str(), &fInJets.ID, &fInJets.b_ID);
-
-	}
-
-  // fInTree->SetBranchAddress(fInJets.s_NHF.c_str(), &fInJets.NHF, &fInJets.b_NHF);
-  // fInTree->SetBranchAddress(fInJets.s_NEMF.c_str(), &fInJets.NEMF, &fInJets.b_NEMF);
-  // fInTree->SetBranchAddress(fInJets.s_CHF.c_str(), &fInJets.CHF, &fInJets.b_CHF);
-  // fInTree->SetBranchAddress(fInJets.s_CEMF.c_str(), &fInJets.CEMF, &fInJets.b_CEMF);
-  // fInTree->SetBranchAddress(fInJets.s_MUF.c_str(), &fInJets.MUF, &fInJets.b_MUF);
-  // fInTree->SetBranchAddress(fInJets.s_NHM.c_str(), &fInJets.NHM, &fInJets.b_NHM);
-  // fInTree->SetBranchAddress(fInJets.s_CHM.c_str(), &fInJets.CHM, &fInJets.b_CHM);
-
-  if (fIsMC)
-  {
-    if (fJEC == ECorr::Down || fJEC == ECorr::Up) fInTree->SetBranchAddress(fInJets.s_scaleRel.c_str(), &fInJets.scaleRel, &fInJets.b_scaleRel);
-    if (fJER == ECorr::Nominal) fInTree->SetBranchAddress(fInJets.s_smearSF.c_str(), &fInJets.smearSF, &fInJets.b_smearSF);
-    else if (fJER == ECorr::Down) fInTree->SetBranchAddress(fInJets.s_smearDownSF.c_str(), &fInJets.smearDownSF, &fInJets.b_smearDownSF);
-    else if (fJER == ECorr::Up) fInTree->SetBranchAddress(fInJets.s_smearUpSF.c_str(), &fInJets.smearUpSF, &fInJets.b_smearUpSF);
-    fInTree->SetBranchAddress(fInJets.s_isGen.c_str(), &fInJets.isGen, &fInJets.b_isGen);
-  }
-
-  // fInTree->SetBranchAddress(fInEvent.s_nelLowL.c_str(), &fInEvent.nelLowL, &fInEvent.b_nelLowL);
-  // fInTree->SetBranchAddress(fInEvent.s_nelLowM.c_str(), &fInEvent.nelLowM, &fInEvent.b_nelLowM);
-  // fInTree->SetBranchAddress(fInEvent.s_nelLowT.c_str(), &fInEvent.nelLowT, &fInEvent.b_nelLowT);
-  // fInTree->SetBranchAddress(fInEvent.s_nelHighL.c_str(), &fInEvent.nelHighL, &fInEvent.b_nelHighL);
-  // fInTree->SetBranchAddress(fInEvent.s_nelHighM.c_str(), &fInEvent.nelHighM, &fInEvent.b_nelHighM);
-  // fInTree->SetBranchAddress(fInEvent.s_nelHighT.c_str(), &fInEvent.nelHighT, &fInEvent.b_nelHighT);
-  // fInTree->SetBranchAddress(fInEvent.s_nmuLowL.c_str(), &fInEvent.nmuLowL, &fInEvent.b_nmuLowL);
-  // fInTree->SetBranchAddress(fInEvent.s_nmuLowM.c_str(), &fInEvent.nmuLowM, &fInEvent.b_nmuLowM);
-  // fInTree->SetBranchAddress(fInEvent.s_nmuLowT.c_str(), &fInEvent.nmuLowT, &fInEvent.b_nmuLowT);
-  // fInTree->SetBranchAddress(fInEvent.s_nmuHighL.c_str(), &fInEvent.nmuHighL, &fInEvent.b_nmuHighL);
-  // fInTree->SetBranchAddress(fInEvent.s_nmuHighM.c_str(), &fInEvent.nmuHighM, &fInEvent.b_nmuHighM);
-  // fInTree->SetBranchAddress(fInEvent.s_nmuHighT.c_str(), &fInEvent.nmuHighT, &fInEvent.b_nmuHighT);
 
   fInTree->SetBranchAddress(fInEvent.s_nrechits.c_str(), &fInEvent.nrechits, &fInEvent.b_nrechits);
   if (fInConfig.storeRecHits)
@@ -1968,17 +1641,6 @@ void Skimmer::InitInBranches()
     fInTree->SetBranchAddress(Form("%s_%i",pho.s_gedID.c_str(),ipho), &pho.gedID, &pho.b_gedID);
     fInTree->SetBranchAddress(Form("%s_%i",pho.s_ootID.c_str(),ipho), &pho.ootID, &pho.b_ootID);
     
-    if (fIsMC)
-    {
-      fInTree->SetBranchAddress(Form("%s_%i",pho.s_isGen.c_str(),ipho), &pho.isGen, &pho.b_isGen);
-      if (fInConfig.isGMSB || fInConfig.isHVDS)
-      {
-	fInTree->SetBranchAddress(Form("%s_%i",pho.s_isSignal.c_str(),ipho), &pho.isSignal, &pho.b_isSignal);
-      }
-
-      if (fPhoSc == ECorr::Down || fPhoSc == ECorr::Up) fInTree->SetBranchAddress(Form("%s_%i",pho.s_scaleAbs.c_str(),ipho), &pho.scaleAbs, &pho.b_scaleAbs);
-      if (fPhoSm == ECorr::Down || fPhoSm == ECorr::Up) fInTree->SetBranchAddress(Form("%s_%i",pho.s_smearAbs.c_str(),ipho), &pho.smearAbs, &pho.b_smearAbs);
-    }
   }
 }
 
@@ -2100,24 +1762,6 @@ void Skimmer::InitOutTree()
 
 void Skimmer::InitOutStructs()
 {
-  if (fIsMC)
-  {
-    if (fOutConfig.isGMSB)
-    {
-      fOutGMSBs.clear(); 
-      fOutGMSBs.resize(Common::nGMSBs);
-    }
-    if (fOutConfig.isHVDS)
-    {
-      fOutHVDSs.clear(); 
-      fOutHVDSs.resize(Common::nHVDSs);
-    }
-    if (fOutConfig.isToy)
-    {
-      fOutToys.clear(); 
-      fOutToys.resize(Common::nToys);
-    }
-  }
 
   fOutPhos.clear();
   fOutPhos.resize(Common::nPhotons);
@@ -2125,99 +1769,13 @@ void Skimmer::InitOutStructs()
 
 void Skimmer::InitOutBranches()
 {
-  if (fIsMC)
-  {
-    fOutTree->Branch(fOutEvent.s_genwgt.c_str(), &fOutEvent.genwgt);
-    fOutTree->Branch(fOutEvent.s_puwgt.c_str(), &fOutEvent.puwgt);
-    fOutTree->Branch(fOutEvent.s_genx0.c_str(), &fOutEvent.genx0);
-    fOutTree->Branch(fOutEvent.s_geny0.c_str(), &fOutEvent.geny0);
-    fOutTree->Branch(fOutEvent.s_genz0.c_str(), &fOutEvent.genz0);
-    fOutTree->Branch(fOutEvent.s_gent0.c_str(), &fOutEvent.gent0);
-    fOutTree->Branch(fOutEvent.s_genpuobs.c_str(), &fOutEvent.genpuobs);
-    fOutTree->Branch(fOutEvent.s_genputrue.c_str(), &fOutEvent.genputrue);
-
-    if (fOutConfig.isGMSB)
-    {
-      fOutTree->Branch(fOutEvent.s_nNeutoPhGr.c_str(), &fOutEvent.nNeutoPhGr);
-      for (auto igmsb = 0; igmsb < Common::nGMSBs; igmsb++) 
-      {
-	auto & gmsb = fOutGMSBs[igmsb];
-	fOutTree->Branch(Form("%s_%i",gmsb.s_genNmass.c_str(),igmsb), &gmsb.genNmass);
-	fOutTree->Branch(Form("%s_%i",gmsb.s_genNE.c_str(),igmsb), &gmsb.genNE);
-	fOutTree->Branch(Form("%s_%i",gmsb.s_genNpt.c_str(),igmsb), &gmsb.genNpt);
-	fOutTree->Branch(Form("%s_%i",gmsb.s_genNphi.c_str(),igmsb), &gmsb.genNphi);
-	fOutTree->Branch(Form("%s_%i",gmsb.s_genNeta.c_str(),igmsb), &gmsb.genNeta);
-	fOutTree->Branch(Form("%s_%i",gmsb.s_genNprodvx.c_str(),igmsb), &gmsb.genNprodvx);
-	fOutTree->Branch(Form("%s_%i",gmsb.s_genNprodvy.c_str(),igmsb), &gmsb.genNprodvy);
-	fOutTree->Branch(Form("%s_%i",gmsb.s_genNprodvz.c_str(),igmsb), &gmsb.genNprodvz);
-	fOutTree->Branch(Form("%s_%i",gmsb.s_genNdecayvx.c_str(),igmsb), &gmsb.genNdecayvx);
-	fOutTree->Branch(Form("%s_%i",gmsb.s_genNdecayvy.c_str(),igmsb), &gmsb.genNdecayvy);
-	fOutTree->Branch(Form("%s_%i",gmsb.s_genNdecayvz.c_str(),igmsb), &gmsb.genNdecayvz);
-	fOutTree->Branch(Form("%s_%i",gmsb.s_genphE.c_str(),igmsb), &gmsb.genphE);
-	fOutTree->Branch(Form("%s_%i",gmsb.s_genphpt.c_str(),igmsb), &gmsb.genphpt);
-	fOutTree->Branch(Form("%s_%i",gmsb.s_genphphi.c_str(),igmsb), &gmsb.genphphi);
-	fOutTree->Branch(Form("%s_%i",gmsb.s_genpheta.c_str(),igmsb), &gmsb.genpheta);
-	fOutTree->Branch(Form("%s_%i",gmsb.s_genphmatch.c_str(),igmsb), &gmsb.genphmatch);
-	fOutTree->Branch(Form("%s_%i",gmsb.s_gengrmass.c_str(),igmsb), &gmsb.gengrmass);
-	fOutTree->Branch(Form("%s_%i",gmsb.s_gengrE.c_str(),igmsb), &gmsb.gengrE);
-	fOutTree->Branch(Form("%s_%i",gmsb.s_gengrpt.c_str(),igmsb), &gmsb.gengrpt);
-	fOutTree->Branch(Form("%s_%i",gmsb.s_gengrphi.c_str(),igmsb), &gmsb.gengrphi);
-	fOutTree->Branch(Form("%s_%i",gmsb.s_gengreta.c_str(),igmsb), &gmsb.gengreta);
-      } // end loop over neutralinos
-    } // end block over gmsb
-
-    if (fOutConfig.isHVDS)
-    {
-      fOutTree->Branch(fOutEvent.s_nvPions.c_str(), &fOutEvent.nvPions);
-      for (auto ihvds = 0; ihvds < Common::nHVDSs; ihvds++) 
-      {
-	auto & hvds = fOutHVDSs[ihvds]; 
-	fOutTree->Branch(Form("%s_%i",hvds.s_genvPionmass.c_str(),ihvds), &hvds.genvPionmass);
-	fOutTree->Branch(Form("%s_%i",hvds.s_genvPionE.c_str(),ihvds), &hvds.genvPionE);
-	fOutTree->Branch(Form("%s_%i",hvds.s_genvPionpt.c_str(),ihvds), &hvds.genvPionpt);
-	fOutTree->Branch(Form("%s_%i",hvds.s_genvPionphi.c_str(),ihvds), &hvds.genvPionphi);
-	fOutTree->Branch(Form("%s_%i",hvds.s_genvPioneta.c_str(),ihvds), &hvds.genvPioneta);
-	fOutTree->Branch(Form("%s_%i",hvds.s_genvPionprodvx.c_str(),ihvds), &hvds.genvPionprodvx);
-	fOutTree->Branch(Form("%s_%i",hvds.s_genvPionprodvy.c_str(),ihvds), &hvds.genvPionprodvy);
-	fOutTree->Branch(Form("%s_%i",hvds.s_genvPionprodvz.c_str(),ihvds), &hvds.genvPionprodvz);
-	fOutTree->Branch(Form("%s_%i",hvds.s_genvPiondecayvx.c_str(),ihvds), &hvds.genvPiondecayvx);
-	fOutTree->Branch(Form("%s_%i",hvds.s_genvPiondecayvy.c_str(),ihvds), &hvds.genvPiondecayvy);
-	fOutTree->Branch(Form("%s_%i",hvds.s_genvPiondecayvz.c_str(),ihvds), &hvds.genvPiondecayvz);
-	fOutTree->Branch(Form("%s_%i",hvds.s_genHVph0E.c_str(),ihvds), &hvds.genHVph0E);
-	fOutTree->Branch(Form("%s_%i",hvds.s_genHVph0pt.c_str(),ihvds), &hvds.genHVph0pt);
-	fOutTree->Branch(Form("%s_%i",hvds.s_genHVph0phi.c_str(),ihvds), &hvds.genHVph0phi);
-	fOutTree->Branch(Form("%s_%i",hvds.s_genHVph0eta.c_str(),ihvds), &hvds.genHVph0eta);
-	fOutTree->Branch(Form("%s_%i",hvds.s_genHVph0match.c_str(),ihvds), &hvds.genHVph0match);
-	fOutTree->Branch(Form("%s_%i",hvds.s_genHVph1E.c_str(),ihvds), &hvds.genHVph1E);
-	fOutTree->Branch(Form("%s_%i",hvds.s_genHVph1pt.c_str(),ihvds), &hvds.genHVph1pt);
-	fOutTree->Branch(Form("%s_%i",hvds.s_genHVph1phi.c_str(),ihvds), &hvds.genHVph1phi);
-	fOutTree->Branch(Form("%s_%i",hvds.s_genHVph1eta.c_str(),ihvds), &hvds.genHVph1eta);
-	fOutTree->Branch(Form("%s_%i",hvds.s_genHVph1match.c_str(),ihvds), &hvds.genHVph1match);
-      } // end loop over nvpions 
-    } // end block over hvds
-
-    if (fOutConfig.isToy)
-    {
-      fOutTree->Branch(fOutEvent.s_nToyPhs.c_str(), &fOutEvent.nToyPhs);
-      for (Int_t itoy = 0; itoy < Common::nToys; itoy++) 
-      {
-	auto & toy = fOutToys[itoy]; 
-	fOutTree->Branch(Form("%s_%i",toy.s_genphE.c_str(),itoy), &toy.genphE);
-	fOutTree->Branch(Form("%s_%i",toy.s_genphpt.c_str(),itoy), &toy.genphpt);
-	fOutTree->Branch(Form("%s_%i",toy.s_genphphi.c_str(),itoy), &toy.genphphi);
-	fOutTree->Branch(Form("%s_%i",toy.s_genpheta.c_str(),itoy), &toy.genpheta);
-	fOutTree->Branch(Form("%s_%i",toy.s_genphmatch.c_str(),itoy), &toy.genphmatch);
-	fOutTree->Branch(Form("%s_%i",toy.s_genphmatch_ptres.c_str(),itoy), &toy.genphmatch_ptres);
-	fOutTree->Branch(Form("%s_%i",toy.s_genphmatch_status.c_str(),itoy), &toy.genphmatch_status);
-      } // end loop over toy phos
-    } // end block over toyMC
-
-  } // end block over isMC
 
   fOutTree->Branch(fOutEvent.s_run.c_str(), &fOutEvent.run);
   fOutTree->Branch(fOutEvent.s_lumi.c_str(), &fOutEvent.lumi);
   fOutTree->Branch(fOutEvent.s_event.c_str(), &fOutEvent.event);
 
+  fOutTree->Branch("gZmass",&gZmass);
+  fOutTree->Branch("gdR",&gdR);
   fOutTree->Branch("bunch_crossing",&bunch_crossing);
   fOutTree->Branch("num_bunch",&num_bunch);
   fOutTree->Branch("subtrain_position",&subtrain_position);
@@ -2257,29 +1815,12 @@ void Skimmer::InitOutBranches()
     fOutTree->Branch(fOutJets.s_phi.c_str(), &fOutJets.phi_f);
     fOutTree->Branch(fOutJets.s_eta.c_str(), &fOutJets.eta_f);
     fOutTree->Branch(fOutJets.s_ID.c_str(), &fOutJets.ID_i);
-    // fOutTree->Branch(fOutJets.s_NHF.c_str(), &fOutJets.NHF_f);
-    // fOutTree->Branch(fOutJets.s_NEMF.c_str(), &fOutJets.NEMF_f);
-    // fOutTree->Branch(fOutJets.s_CHF.c_str(), &fOutJets.CHF_f);
-    // fOutTree->Branch(fOutJets.s_CEMF.c_str(), &fOutJets.CEMF_f);
-    // fOutTree->Branch(fOutJets.s_MUF.c_str(), &fOutJets.MUF_f);
-    // fOutTree->Branch(fOutJets.s_NHM.c_str(), &fOutJets.NHM_f);
-    // fOutTree->Branch(fOutJets.s_CHM.c_str(), &fOutJets.CHM_f);
   }
 
-  // fOutTree->Branch(fOutEvent.s_nelLowL.c_str(), &fOutEvent.nelLowL);
-  // fOutTree->Branch(fOutEvent.s_nelLowM.c_str(), &fOutEvent.nelLowM);
-  // fOutTree->Branch(fOutEvent.s_nelLowT.c_str(), &fOutEvent.nelLowT);
-  // fOutTree->Branch(fOutEvent.s_nelHighL.c_str(), &fOutEvent.nelHighL);
-  // fOutTree->Branch(fOutEvent.s_nelHighM.c_str(), &fOutEvent.nelHighM);
-  // fOutTree->Branch(fOutEvent.s_nelHighT.c_str(), &fOutEvent.nelHighT);
-  // fOutTree->Branch(fOutEvent.s_nmuLowL.c_str(), &fOutEvent.nmuLowL);
-  // fOutTree->Branch(fOutEvent.s_nmuLowM.c_str(), &fOutEvent.nmuLowM);
-  // fOutTree->Branch(fOutEvent.s_nmuLowT.c_str(), &fOutEvent.nmuLowT);
-  // fOutTree->Branch(fOutEvent.s_nmuHighL.c_str(), &fOutEvent.nmuHighL);
-  // fOutTree->Branch(fOutEvent.s_nmuHighM.c_str(), &fOutEvent.nmuHighM);
-  // fOutTree->Branch(fOutEvent.s_nmuHighT.c_str(), &fOutEvent.nmuHighT);
   
   fOutTree->Branch(fOutEvent.s_nrechits.c_str(), &fOutEvent.nrechits);
+  fOutTree->Branch("nurechits", &nurechits);
+  fOutTree->Branch("ndigis", &ndigis);
 
   fOutTree->Branch(fOutEvent.s_nphotons.c_str(), &fOutEvent.nphotons);
   for (auto ipho = 0; ipho < fNOutPhos; ipho++) 
@@ -2353,14 +1894,16 @@ void Skimmer::InitOutBranches()
     fOutTree->Branch(Form("%s_%i",pho.s_gedID.c_str(),ipho), &pho.gedID);
     fOutTree->Branch(Form("%s_%i",pho.s_ootID.c_str(),ipho), &pho.ootID);
 
-    if (fIsMC)
-    {
-      fOutTree->Branch(Form("%s_%i",pho.s_isGen.c_str(),ipho), &pho.isGen);
-      if (fOutConfig.isGMSB || fOutConfig.isHVDS)
-      {
-	fOutTree->Branch(Form("%s_%i",pho.s_isSignal.c_str(),ipho), &pho.isSignal);
-      }
-    }
+    fOutTree->Branch(Form("%s_%i",pho.s_ootA0.c_str(),ipho), &pho.ootA0);
+    fOutTree->Branch(Form("%s_%i",pho.s_ootA1.c_str(),ipho), &pho.ootA1);
+    fOutTree->Branch(Form("%s_%i",pho.s_ootA2.c_str(),ipho), &pho.ootA2);
+    fOutTree->Branch(Form("%s_%i",pho.s_ootA3.c_str(),ipho), &pho.ootA3);
+    fOutTree->Branch(Form("%s_%i",pho.s_ootA4.c_str(),ipho), &pho.ootA4);
+    fOutTree->Branch(Form("%s_%i",pho.s_ootA5.c_str(),ipho), &pho.ootA5);
+    fOutTree->Branch(Form("%s_%i",pho.s_ootA6.c_str(),ipho), &pho.ootA6);
+    fOutTree->Branch(Form("%s_%i",pho.s_ootA7.c_str(),ipho), &pho.ootA7);
+    fOutTree->Branch(Form("%s_%i",pho.s_ootA8.c_str(),ipho), &pho.ootA8);
+
 
     // Derived types
     fOutTree->Branch(Form("%s_%i",pho.s_seedTT.c_str(),ipho), &pho.seedTT);
