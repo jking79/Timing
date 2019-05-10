@@ -9,7 +9,8 @@ Skimmer::Skimmer(const TString & indir, const TString & outdir, const TString & 
   : fInDir(indir), fOutDir(outdir), fFileName(filename), fSkimConfig(skimconfig)
 {
 
-  hasUrecDigi = true;
+//  hasUrecDigi = true;
+    hasUrecDigi = false;
   // because root is dumb?
   gROOT->ProcessLine("#include <vector>");
 
@@ -17,8 +18,6 @@ Skimmer::Skimmer(const TString & indir, const TString & outdir, const TString & 
   // Get all the inputs //
   ////////////////////////
   std::cout << "Setting up inputs for skim" << std::endl;
-
-  hasUncalDigi = true;
 
   // Set skim config options 
   Skimmer::SetupDefaults();
@@ -225,6 +224,7 @@ void Skimmer::EventLoop()
 {
   // do loop over events, reading in branches as needed, skimming, filling output trees and hists
   const auto nEntries = fInTree->GetEntries();
+  //const auto nEntries = 1000;
   for (auto entry = 0U; entry < nEntries; entry++)
   {
     // dump status check
@@ -383,7 +383,7 @@ void Skimmer::EventLoop()
       // make sure within 30 GeV
       if ((phopair.mass < 60.f) || (phopair.mass > 150.f)) continue;
       gZmass = phopair.mass;
-      gdR = pbhopair.dR12;
+      gdR = phopair.dR12;
       fOutCutFlow   ->Fill((cutLabels["diPhoMZrange"]*1.f)-0.5f);
       fOutCutFlowWgt->Fill((cutLabels["diPhoMZrange"]*1.f)-0.5f,wgt);
       fOutCutFlowScl->Fill((cutLabels["diPhoMZrange"]*1.f)-0.5f,evtwgt);
@@ -391,7 +391,18 @@ void Skimmer::EventLoop()
       // re-order photons based on pairs
       auto & pho1 = fInPhos[phopair.ipho1];
       auto & pho2 = fInPhos[phopair.ipho2];
-      
+
+      pho1.b_seed->GetEntry(entry);
+      pho2.b_seed->GetEntry(entry);
+      fInRecHits.b_ID->GetEntry(entry);
+
+      auto id1 = (*fInRecHits.ID)[pho1.seed];
+      auto id2 = (*fInRecHits.ID)[pho2.seed];
+
+      nxtal_sep =  0;
+      //nxtal_sep =  Common::Xtal_Seperation(id1,id2);
+      //std::cout << " nxtal_sep : " << nxtal_sep << std::endl;
+ 
       pho1.b_pt->GetEntry(entry);
       pho2.b_pt->GetEntry(entry);
 
@@ -410,29 +421,15 @@ void Skimmer::EventLoop()
     } // end of ZeeSkim
     else if (fSkim == SkimType::DiXtal) // this is a hack selection, which mixes up seeds and photons --> do NOT use this for analysis
     {
+	//std::cout << "Start DiXtal "<< std::endl;
       // get rechits
       fInRecHits.b_E->GetEntry(entry);
       fInRecHits.b_ID->GetEntry(entry);
       fInRecHits.b_time->GetEntry(entry);
-     
-      if( hasUrecDigi ){
-	b_uRhId->GetEntry(entry);
-      	b_ootA0->GetEntry(entry);
-	b_ootA1->GetEntry(entry);
-	b_ootA2->GetEntry(entry);
-	b_ootA3->GetEntry(entry);
-	b_ootA4->GetEntry(entry);
-	b_ootA5->GetEntry(entry);
-	b_ootA6->GetEntry(entry);
-	b_ootA7->GetEntry(entry);
-	b_ootA8->GetEntry(entry);
-	b_ndigis->GetEntry(entry);
-	b_nurechits->GetEntry(entry);
-      }
 
       gZmass = 0.f;     
- 
-      for( auto idx = 0; idx < (*fInRecHits.ID).size(); idx++ ){
+      gdR = 0.f; 
+      for( UInt_t idx = 0; idx < (*fInRecHits.ID).size(); idx++ ){
                  //std::cout << "Filling first xtalRecHit " << id_i << " time with: " << t_i << std::endl;
          	 const auto id_i = (*fInRecHits.ID)[idx];
           	 const auto t_i = (*fInRecHits.time)[idx];		
@@ -486,6 +483,7 @@ void Skimmer::EventLoop()
 	    {
 	      good_pairs.emplace_back(rh_i,rh_j,ipho);
 	      isGoodPair = true;
+	      nxtal_sep = 1;
 	      break;
 	    } 
 	  } // end inner double loop over rechits
@@ -533,7 +531,7 @@ void Skimmer::EventLoop()
       std::cerr << "How did this happen?? Somehow SkimType Enum is not one that is specified... Exiting..."  << std::endl;
       exit(1);
     }
-    std::cout << "Finished proccessing skim type." << std::endl;
+    //std::cout << "Finished proccessing skim type." << std::endl;
 
     // common skim params for MC
     if (fSkim != SkimType::AlwaysTrue)
@@ -557,11 +555,11 @@ void Skimmer::EventLoop()
 //    if (fOutConfig.isHVDS) Skimmer::FillOutHVDSs(entry);
 //   if (fOutConfig.isToy)  Skimmer::FillOutToys(entry);
     Skimmer::FillOutEvent(entry,evtwgt);
-    std::cout << "Finished proccessing event info." << std::endl;
+    //std::cout << "Finished proccessing event info." << std::endl;
     //if (fSkim != SkimType::DiXtal) Skimmer::FillOutJets(entry);
     //std::cout << "Start proccessing phos info." << std::endl;
     Skimmer::FillOutPhos(entry);
-    std::cout << "Finished proccessing phos info." << std::endl;
+    //std::cout << "Finished proccessing phos info." << std::endl;
 //    if (fIsMC) Skimmer::CorrectMET();
 
     // fill the tree
@@ -571,7 +569,7 @@ void Skimmer::EventLoop()
   if (fSkim == SkimType::DiXtal){
 
 	  UInt_t offset = 100;
-	  std::cout << "Filling fOutAveXtalRecTime Hists and Maps. " << std::endl;
+	  //std::cout << "Filling fOutAveXtalRecTime Hists and Maps. " << std::endl;
 	  for( std::map<UInt_t,Float_t>::iterator it=sumXtalRecTime.begin(); it!=sumXtalRecTime.end(); ++it){
 		const auto & idinfo = Common::DetIDMap[it->first];
                 const auto & aveXtalTime = (it->second)/(numXtalRecTime[it->first]);
@@ -596,7 +594,7 @@ void Skimmer::EventLoop()
 		}
 	  }
 	
-	  std::cout << "Filling fOutAveXtalPhoRecTime Hists and Maps. " << std::endl;
+	  //std::cout << "Filling fOutAveXtalPhoRecTime Hists and Maps. " << std::endl;
 	  for( std::map<UInt_t,Float_t>::iterator it=sumXtalPhoRecTime.begin(); it!=sumXtalPhoRecTime.end(); ++it){
                 const auto & idinfo = Common::DetIDMap[it->first];
                 const auto & aveXtalTime = (it->second)/(numXtalPhoRecTime[it->first]);
@@ -686,7 +684,7 @@ void Skimmer::FillOutToys(const UInt_t entry)
 
 void Skimmer::FillOutEvent(const UInt_t entry, const Float_t evtwgt)
 {
-  std::cout << "Starting FillOutEvent" << std::endl;
+  //std::cout << "Starting FillOutEvent" << std::endl;
  // get input branches
   fInEvent.b_run->GetEntry(entry);
   fInEvent.b_lumi->GetEntry(entry);
@@ -712,32 +710,10 @@ void Skimmer::FillOutEvent(const UInt_t entry, const Float_t evtwgt)
   fInEvent.b_nrechits->GetEntry(entry);
   fInEvent.b_nphotons->GetEntry(entry);
 
-  std::cout << "clearing UncalDigi " << std::endl;
+  //std::cout << "clearing UncalDigi " << std::endl;
 
   nurechits = 0;
   ndigis = 0;
-  //uRhId->clear();
-  //outOfTimeAmplitude->clear();
-
-  std::cout << "clearing UncalDigi done" << std::endl;
- 
-  if( hasUncalDigi ){
-  	b_nurechits->GetEntry(entry);
-  	b_ndigis->GetEntry(entry);
-	b_uRhId->GetEntry(entry);
-	//b_outOfTimeAmplitude->GetEntry(entry);
-        b_ootA0->GetEntry(entry);
-        b_ootA1->GetEntry(entry);
-        b_ootA2->GetEntry(entry);
-        b_ootA3->GetEntry(entry);
-        b_ootA4->GetEntry(entry);
-        b_ootA5->GetEntry(entry);
-        b_ootA6->GetEntry(entry);
-        b_ootA7->GetEntry(entry);
-        b_ootA8->GetEntry(entry);
-  }
-
-  std::cout << "UncalDigi done" << std::endl;
 
    bunch_crossing = 0;
    num_bunch = 0;
@@ -756,7 +732,7 @@ void Skimmer::FillOutEvent(const UInt_t entry, const Float_t evtwgt)
    b_train_number->GetEntry(entry);   //!
    }
 
-  std::cout << "lhcinfo done" << std::endl;
+  //std::cout << "lhcinfo done" << std::endl;
   // isMC only conditions
   fOutEvent.run = fInEvent.run;
   fOutEvent.lumi = fInEvent.lumi;
@@ -884,7 +860,7 @@ void Skimmer::FillOutPhos(const UInt_t entry)
     inpho.b_scphi->GetEntry(entry);
     inpho.b_HoE->GetEntry(entry);
     inpho.b_r9->GetEntry(entry);
-    inpho.b_dz->GetEntry(entry);
+    if( hasUrecDigi ) inpho.b_tdz->GetEntry(entry);
     inpho.b_ChgHadIso->GetEntry(entry);
     inpho.b_NeuHadIso->GetEntry(entry);
     inpho.b_PhoIso->GetEntry(entry);
@@ -967,6 +943,22 @@ void Skimmer::FillOutPhos(const UInt_t entry)
     fInRecHits.b_pedrms1->GetEntry(entry);
   }
 
+        if( hasUrecDigi ){
+   //             std::cout << "Getting UrecDigi Info" << std::endl;
+                b_uRhId->GetEntry(entry);
+                b_ootA0->GetEntry(entry);
+                b_ootA1->GetEntry(entry);
+                b_ootA2->GetEntry(entry);
+                b_ootA3->GetEntry(entry);
+                b_ootA4->GetEntry(entry);
+                b_ootA5->GetEntry(entry);
+                b_ootA6->GetEntry(entry);
+                b_ootA7->GetEntry(entry);
+                b_ootA8->GetEntry(entry);
+                b_ndigis->GetEntry(entry);
+                b_nurechits->GetEntry(entry);
+ //               std::cout << "Filling ootAs" << std::endl;
+        }
   
 
   //std::cout << "Finished get entry" << std::endl;
@@ -985,7 +977,7 @@ void Skimmer::FillOutPhos(const UInt_t entry)
     outpho.scphi = inpho.scphi;
     outpho.HoE = inpho.HoE;
     outpho.r9 = inpho.r9;
-    outpho.dz = inpho.dz;
+    if( hasUrecDigi ) outpho.tdz = inpho.tdz;
     outpho.ChgHadIso = inpho.ChgHadIso;
     outpho.NeuHadIso = inpho.NeuHadIso;
     outpho.PhoIso = inpho.PhoIso;
@@ -1040,30 +1032,14 @@ void Skimmer::FillOutPhos(const UInt_t entry)
 	// outpho.seedID    = (*fInRecHits.ID)[seed];
 	// outpho.seedisOOT = (*fInRecHits.isOOT)[seed];
 
-	outpho.ootA0 = 0.0;
-        outpho.ootA1 = 0.0;
-        outpho.ootA2 = 0.0;
-        outpho.ootA3 = 0.0;
-        outpho.ootA4 = 0.0;
-        outpho.ootA5 = 0.0;
-        outpho.ootA6 = 0.0;
-        outpho.ootA7 = 0.0;
-
-        for( auto iurhid = 0; iurhid < (*uRhId).size(); ++iurhid ){
-		if( (*uRhId)[iurhid] == (*fInRecHits.ID)[seed] ){
-				outpho.ootA0 = (*ootA0)[seed];
-                                outpho.ootA1 = (*ootA1)[seed];
-                                outpho.ootA2 = (*ootA2)[seed];
-                                outpho.ootA3 = (*ootA3)[seed];
-                                outpho.ootA4 = (*ootA4)[seed];
-                                outpho.ootA5 = (*ootA5)[seed];
-                                outpho.ootA6 = (*ootA6)[seed];
-                                outpho.ootA7 = (*ootA7)[seed];
-                                outpho.ootA8 = (*ootA8)[seed];		
-				break;
-		}
-	}
-
+	outpho.seedootA0 = 0.0;
+        outpho.seedootA1 = 0.0;
+        outpho.seedootA2 = 0.0;
+        outpho.seedootA3 = 0.0;
+        outpho.seedootA4 = 0.0;
+        outpho.seedootA5 = 0.0;
+        outpho.seedootA6 = 0.0;
+        outpho.seedootA7 = 0.0;
 
 	outpho.seedisGS6 = (*fInRecHits.isGS6)[seed];
 	outpho.seedisGS1 = (*fInRecHits.isGS1)[seed];
@@ -1077,7 +1053,7 @@ void Skimmer::FillOutPhos(const UInt_t entry)
 	outpho.seedpedrms1  = (*fInRecHits.pedrms1) [seed];
 
         if( hasUrecDigi ){
-		for(const auto urseed = 0; urseed < (*uRhId).size(); urseed++ ){
+		for(UInt_t urseed = 0; urseed < (*uRhId).size(); urseed++ ){
 			if( (*uRhId)[urseed] == (*fInRecHits.ID)[seed] ){
 	        		outpho.seedootA0 = (*ootA0)[urseed];
 	        		outpho.seedootA1 = (*ootA1)[urseed];
@@ -1348,6 +1324,18 @@ void Skimmer::InitInBranchVecs()
   // fInJets.NHM = 0;
   // fInJets.CHM = 0;
 
+  if( hasUrecDigi ){
+   ootA0 = 0;
+   ootA1 = 0;
+   ootA2 = 0;
+   ootA3 = 0;
+   ootA4 = 0;
+   ootA5 = 0;
+   ootA6 = 0;
+   ootA7 = 0;
+   ootA8 = 0;
+   uRhId = 0;
+  }
 
   if (fInConfig.storeRecHits) 
   {
@@ -1484,7 +1472,7 @@ void Skimmer::InitInBranches()
    fInTree->SetBranchAddress("beam2_RF", beam2_RF, &b_beam2_RF);
    }
 
-  if( hasUncalDigi ){
+  if( hasUrecDigi ){
      fInTree->SetBranchAddress("nurechits", &nurechits, &b_nurechits);
      fInTree->SetBranchAddress("ndigis", &ndigis, &b_ndigis);
      fInTree->SetBranchAddress("uRhId", &uRhId, &b_uRhId);
@@ -1553,22 +1541,6 @@ void Skimmer::InitInBranches()
     fInTree->SetBranchAddress(fInRecHits.s_pedrms1.c_str(), &fInRecHits.pedrms1, &fInRecHits.b_pedrms1);
   }
 
-  if( hasUrecDigi ){
-     fInTree->SetBranchAddress("nurechits", nurechits, &b_nurechits);
-     fInTree->SetBranchAddress("ndigis", ndigis, &b_ndigis);
-     fInTree->SetBranchAddress("uRhId", uRhId, &b_uRhId);
-     fInTree->SetBranchAddress("ndigis", ndigis, &b_ndigis);
-     fInTree->SetBranchAddress("ootA0", ootA0, &b_ootA0);
-     fInTree->SetBranchAddress("ootA1", ootA1, &b_ootA1);
-     fInTree->SetBranchAddress("ootA2", ootA2, &b_ootA2);
-     fInTree->SetBranchAddress("ootA3", ootA3, &b_ootA3);
-     fInTree->SetBranchAddress("ootA4", ootA4, &b_ootA4);
-     fInTree->SetBranchAddress("ootA5", ootA5, &b_ootA5);
-     fInTree->SetBranchAddress("ootA6", ootA6, &b_ootA6);
-     fInTree->SetBranchAddress("ootA7", ootA7, &b_ootA7);
-     fInTree->SetBranchAddress("ootA8", ootA8, &b_ootA8);
-  }
-
   fInTree->SetBranchAddress(fInEvent.s_nphotons.c_str(), &fInEvent.nphotons, &fInEvent.b_nphotons);
   for (auto ipho = 0; ipho < Common::nPhotons; ipho++) 
   {
@@ -1582,7 +1554,7 @@ void Skimmer::InitInBranches()
     fInTree->SetBranchAddress(Form("%s_%i",pho.s_scphi.c_str(),ipho), &pho.scphi, &pho.b_scphi);
     fInTree->SetBranchAddress(Form("%s_%i",pho.s_HoE.c_str(),ipho), &pho.HoE, &pho.b_HoE);
     fInTree->SetBranchAddress(Form("%s_%i",pho.s_r9.c_str(),ipho), &pho.r9, &pho.b_r9);
-    fInTree->SetBranchAddress("tdz", &pho.dz, &pho.b_dz);
+    if( hasUrecDigi ) fInTree->SetBranchAddress(Form("%s_%i",pho.s_tdz.c_str(),ipho), &pho.tdz, &pho.b_tdz);
     fInTree->SetBranchAddress(Form("%s_%i",pho.s_ChgHadIso.c_str(),ipho), &pho.ChgHadIso, &pho.b_ChgHadIso);
     fInTree->SetBranchAddress(Form("%s_%i",pho.s_NeuHadIso.c_str(),ipho), &pho.NeuHadIso, &pho.b_NeuHadIso);
     fInTree->SetBranchAddress(Form("%s_%i",pho.s_PhoIso.c_str(),ipho), &pho.PhoIso, &pho.b_PhoIso);
@@ -1835,7 +1807,7 @@ void Skimmer::InitOutBranches()
     fOutTree->Branch(Form("%s_%i",pho.s_scphi.c_str(),ipho), &pho.scphi);
     fOutTree->Branch(Form("%s_%i",pho.s_HoE.c_str(),ipho), &pho.HoE);
     fOutTree->Branch(Form("%s_%i",pho.s_r9.c_str(),ipho), &pho.r9);
-    fOutTree->Branch(Form("%s_%i",pho.s_dz.c_str(),ipho), &pho.dz);
+    if( hasUrecDigi ) fOutTree->Branch(Form("%s_%i",pho.s_tdz.c_str(),ipho), &pho.tdz);
     fOutTree->Branch(Form("%s_%i",pho.s_ChgHadIso.c_str(),ipho), &pho.ChgHadIso);
     fOutTree->Branch(Form("%s_%i",pho.s_NeuHadIso.c_str(),ipho), &pho.NeuHadIso);
     fOutTree->Branch(Form("%s_%i",pho.s_PhoIso.c_str(),ipho), &pho.PhoIso);
@@ -1876,16 +1848,16 @@ void Skimmer::InitOutBranches()
     fOutTree->Branch(Form("%s_%i",pho.s_seedpedrms12.c_str(),ipho), &pho.seedpedrms12);
     fOutTree->Branch(Form("%s_%i",pho.s_seedpedrms6.c_str(),ipho), &pho.seedpedrms6);
     fOutTree->Branch(Form("%s_%i",pho.s_seedpedrms1.c_str(),ipho), &pho.seedpedrms1);
-    fOutTree->Branch(Form("%s_%i",pho.s_ootA0.c_str(),ipho), &pho.ootA0);
-    fOutTree->Branch(Form("%s_%i",pho.s_ootA1.c_str(),ipho), &pho.ootA1);
-    fOutTree->Branch(Form("%s_%i",pho.s_ootA2.c_str(),ipho), &pho.ootA2);
-    fOutTree->Branch(Form("%s_%i",pho.s_ootA3.c_str(),ipho), &pho.ootA3);
-    fOutTree->Branch(Form("%s_%i",pho.s_ootA4.c_str(),ipho), &pho.ootA4);
-    fOutTree->Branch(Form("%s_%i",pho.s_ootA5.c_str(),ipho), &pho.ootA5);
-    fOutTree->Branch(Form("%s_%i",pho.s_ootA6.c_str(),ipho), &pho.ootA6);
-    fOutTree->Branch(Form("%s_%i",pho.s_ootA7.c_str(),ipho), &pho.ootA7);
-    fOutTree->Branch(Form("%s_%i",pho.s_ootA8.c_str(),ipho), &pho.ootA8);
-    fOueTree->Branch(Form("%s_%i",pho.s_isOOT.c_str(),ipho), &pho.isOOT);
+    fOutTree->Branch(Form("%s_%i",pho.s_seedootA0.c_str(),ipho), &pho.seedootA0);
+    fOutTree->Branch(Form("%s_%i",pho.s_seedootA1.c_str(),ipho), &pho.seedootA1);
+    fOutTree->Branch(Form("%s_%i",pho.s_seedootA2.c_str(),ipho), &pho.seedootA2);
+    fOutTree->Branch(Form("%s_%i",pho.s_seedootA3.c_str(),ipho), &pho.seedootA3);
+    fOutTree->Branch(Form("%s_%i",pho.s_seedootA4.c_str(),ipho), &pho.seedootA4);
+    fOutTree->Branch(Form("%s_%i",pho.s_seedootA5.c_str(),ipho), &pho.seedootA5);
+    fOutTree->Branch(Form("%s_%i",pho.s_seedootA6.c_str(),ipho), &pho.seedootA6);
+    fOutTree->Branch(Form("%s_%i",pho.s_seedootA7.c_str(),ipho), &pho.seedootA7);
+    fOutTree->Branch(Form("%s_%i",pho.s_seedootA8.c_str(),ipho), &pho.seedootA8);
+    fOutTree->Branch(Form("%s_%i",pho.s_isOOT.c_str(),ipho), &pho.isOOT);
     fOutTree->Branch(Form("%s_%i",pho.s_isEB.c_str(),ipho), &pho.isEB);
     fOutTree->Branch(Form("%s_%i",pho.s_isHLT.c_str(),ipho), &pho.isHLT);
     fOutTree->Branch(Form("%s_%i",pho.s_isTrk.c_str(),ipho), &pho.isTrk);
@@ -1893,17 +1865,6 @@ void Skimmer::InitOutBranches()
     fOutTree->Branch(Form("%s_%i",pho.s_hasPixSeed.c_str(),ipho), &pho.hasPixSeed);
     fOutTree->Branch(Form("%s_%i",pho.s_gedID.c_str(),ipho), &pho.gedID);
     fOutTree->Branch(Form("%s_%i",pho.s_ootID.c_str(),ipho), &pho.ootID);
-
-    fOutTree->Branch(Form("%s_%i",pho.s_ootA0.c_str(),ipho), &pho.ootA0);
-    fOutTree->Branch(Form("%s_%i",pho.s_ootA1.c_str(),ipho), &pho.ootA1);
-    fOutTree->Branch(Form("%s_%i",pho.s_ootA2.c_str(),ipho), &pho.ootA2);
-    fOutTree->Branch(Form("%s_%i",pho.s_ootA3.c_str(),ipho), &pho.ootA3);
-    fOutTree->Branch(Form("%s_%i",pho.s_ootA4.c_str(),ipho), &pho.ootA4);
-    fOutTree->Branch(Form("%s_%i",pho.s_ootA5.c_str(),ipho), &pho.ootA5);
-    fOutTree->Branch(Form("%s_%i",pho.s_ootA6.c_str(),ipho), &pho.ootA6);
-    fOutTree->Branch(Form("%s_%i",pho.s_ootA7.c_str(),ipho), &pho.ootA7);
-    fOutTree->Branch(Form("%s_%i",pho.s_ootA8.c_str(),ipho), &pho.ootA8);
-
 
     // Derived types
     fOutTree->Branch(Form("%s_%i",pho.s_seedTT.c_str(),ipho), &pho.seedTT);
@@ -2083,6 +2044,12 @@ void Skimmer::SetupSkimConfig()
       str = Common::RemoveDelim(str,"isLHCInfo=");
       if( str == "true" ) isLHCInfo = true;
       if( str == "false" ) isLHCInfo = false;
+    }
+    else if (str.find("hasUrecDigi=") != std::string::npos)
+    {
+      str = Common::RemoveDelim(str,"hasUrecDigi=");
+      if( str == "true" ) hasUrecDigi = true;
+      if( str == "false" ) hasUrecDigi = false;
     }
     else
     {

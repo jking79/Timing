@@ -25,7 +25,7 @@ def getOptions():
 
     parser.add_option('-w', '--workArea',
                       dest = 'workArea',
-                      default = 'multicrab_dispho_SPH',
+                      default = 'myWorkArea',
                       help = "work area directory (only if CMD != 'submit')",
                       metavar = 'WAD')
 
@@ -63,8 +63,8 @@ def main():
         inputPaths   = 'HLTpathsWExtras.txt'
         inputFilters = 'HLTfilters.txt'
         inputFlags   = 'METflags.txt'
-        #inputJSON    = 'golden2017.json'
-        inputJSON    = 'golden2016.json'        
+        inputJSON    = 'golden2017.json'
+        #inputJSON    = 'golden2016.json'        
  
         #--------------------------------------------------------
         # This is the base config:
@@ -103,18 +103,25 @@ def main():
     #        ['/SinglePhoton/Run2017F-31Mar2018-v1/MINIAOD'],
 
     #        ['/SinglePhoton/Run2016C-17Jul2018-v1/MINIAOD'],
-            ['/SinglePhoton/Run2016D-17Jul2018-v1/MINIAOD'],
-            ['/SinglePhoton/Run2016E-17Jul2018-v1/MINIAOD'],
-            ['/SinglePhoton/Run2016F-17Jul2018-v1/MINIAOD'],
-            ['/SinglePhoton/Run2016G-17Jul2018-v1/MINIAOD'],
-            ['/SinglePhoton/Run2016H-17Jul2018-v1/MINIAOD'],
+    #        ['/SinglePhoton/Run2016D-17Jul2018-v1/MINIAOD'],
+    #        ['/SinglePhoton/Run2016E-17Jul2018-v1/MINIAOD'],
+    #        ['/SinglePhoton/Run2016F-17Jul2018-v1/MINIAOD'],
+    #        ['/SinglePhoton/Run2016G-17Jul2018-v1/MINIAOD'],
+    #        ['/SinglePhoton/Run2016H-17Jul2018-v1/MINIAOD'],
 
-    #        ['/DoubleEG/Run2017B-31Mar2018-v1/MINIAOD'],
-    #        ['/EGamma/Run2018C-PromptReco-v3/MINIAOD'],
+    #        ['/DoubleEG/Run2016B-17Jul2018_ver2-v1/MINIAOD'],
+    #        ['/DoubleEG/Run2016C-17Jul2018-v1/MINIAOD'],
+    #        ['/DoubleEG/Run2016D-17Jul2018-v1/MINIAOD'],
+    #        ['/DoubleEG/Run2016E-17Jul2018-v1/MINIAOD'],
+    #        ['/DoubleEG/Run2016F-17Jul2018-v1/MINIAOD'],
+    #        ['/DoubleEG/Run2016G-17Jul2018-v1/MINIAOD'],
+    #        ['/DoubleEG/Run2016H-17Jul2018-v1/MINIAOD'],
+
+            ['/DoubleEG/Run2017B-31Mar2018-v1/MINIAOD'],
+    #        ['/DoubleEG/Run2017C-31Mar2018-v1/MINIAOD'],
     #        ['/DoubleEG/Run2017D-31Mar2018-v1/MINIAOD'],
     #        ['/DoubleEG/Run2017E-31Mar2018-v1/MINIAOD'],
     #        ['/DoubleEG/Run2017F-31Mar2018-v1/MINIAOD'],
-
             ]
  
         for inDO in inputDataAndOpts:
@@ -124,8 +131,8 @@ def main():
 
             config.General.requestName   = primaryDataset+"_"+runEra
 
-#            config.JobType.pyCfgParams   = ['globalTag=94X_dataRun2_v6','nThreads='+str(config.JobType.numCores),
-#                                            'inputPaths='+inputPaths,'inputFilters='+inputFilters,'inputFlags='+inputFlags]
+            config.JobType.pyCfgParams   = ['globalTag=94X_dataRun2_v6','nThreads='+str(config.JobType.numCores),
+                                            'inputPaths='+inputPaths,'inputFilters='+inputFilters,'inputFlags='+inputFlags]
 
             config.Data.inputDataset     = inDO[0]
             config.Data.outputDatasetTag = '%s_%s' % (config.General.workArea, config.General.requestName)

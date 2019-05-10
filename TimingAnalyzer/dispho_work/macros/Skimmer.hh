@@ -198,32 +198,32 @@ private:
    Float_t         beam2_VC[3564];   //[num_bunch]
    Float_t         beam1_RF[3564];   //[num_bunch]
    Float_t         beam2_RF[3564];   //[num_bunch]
+   Float_t         gZmass;
+   Float_t         gdR;
 
-<<<<<<< HEAD
+
    Bool_t	   hasUrecDigi;
   
-   std::vector<float> uRhId;
-   UInt_t	   nxtal_sep;
-   UInt_t          nurechits;
-   UInt_t          ndigis;
+   //std::vector<float> uRhId;
+   Int_t	  nxtal_sep;
+   Int_t          nurechits;
+   Int_t          ndigis;
    //std::vector<float> ootA0, ootA1, ootA2, ootA3, ootA4, ootA5, ootA6, ootA7, ootA8;
-=======
-   Float_t	   Zmass;
+   //Float_t	   Zmass;
 
    //std::vector<std::vector<Float_t>> * outOfTimeAmplitude
-   std::vector<Float_t> * ootA0;
-   std::vector<Float_t> * ootA1;
-   std::vector<Float_t> * ootA2;
-   std::vector<Float_t> * ootA3;
-   std::vector<Float_t> * ootA4;
-   std::vector<Float_t> * ootA5;
-   std::vector<Float_t> * ootA6;
-   std::vector<Float_t> * ootA7;
-   std::vector<Float_t> * ootA8;
-   std::vector<UInt_t> * uRhId;
+   std::vector<float>  * ootA0;
+   std::vector<float>  * ootA1;
+   std::vector<float>  * ootA2;
+   std::vector<float>  * ootA3;
+   std::vector<float>  * ootA4;
+   std::vector<float>  * ootA5;
+   std::vector<float>  * ootA6;
+   std::vector<float>  * ootA7;
+   std::vector<float>  * ootA8;
+   std::vector<float>  * uRhId;
    //Int_t          nurechits;
    //Int_t          ndigis;
->>>>>>> 9XY
 
    //TBranch	  *b_aveRecTime;
    //TBranch        *b_numAveRecTime;
@@ -253,9 +253,9 @@ private:
    TBranch        *b_beam1_RF;   //!
    TBranch        *b_beam2_RF;   //!
    TBranch        *b_nxtal_sep;   //!
-   TBranch        *b_nurechits;   //!
-   TBranch        *b_ndigis;   //!
-   TBranch 	  *b_ootA0, *b_ootA1, *b_ootA2, *b_ootA3, *b_ootA4, *b_ootA5, *b_ootA6, *b_ootA7, *b_ootA8;
+  // TBranch        *b_nurechits;   //!
+  // TBranch        *b_ndigis;   //!
+//   TBranch 	  *b_ootA0, *b_ootA1, *b_ootA2, *b_ootA3, *b_ootA4, *b_ootA5, *b_ootA6, *b_ootA7, *b_ootA8;
 };
 
 #endif

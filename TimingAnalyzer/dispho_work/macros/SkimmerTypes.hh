@@ -493,7 +493,7 @@ struct Pho
   Float_t scphi;
   Float_t HoE;
   Float_t r9;
-  Float_t dz;
+  Float_t tdz;
   Float_t ChgHadIso;
   Float_t NeuHadIso;
   Float_t PhoIso;
@@ -570,16 +570,6 @@ struct Pho
   Float_t weightedtimeTOF;
   Float_t weightedtimeLT120TOF;
 
-  Float_t ootA0;
-  Float_t ootA1;
-  Float_t ootA2;
-  Float_t ootA3;
-  Float_t ootA4;
-  Float_t ootA5;
-  Float_t ootA6;
-  Float_t ootA7;
-  Float_t ootA8;
- 
   // branch names
   std::string s_E = "phoE";
   std::string s_pt = "phopt";
@@ -590,7 +580,7 @@ struct Pho
   std::string s_scphi = "phoscphi";
   std::string s_HoE = "phoHoE";
   std::string s_r9 = "phor9";
-  std::string s_dz = "tdz";
+  std::string s_tdz = "photdz";
   std::string s_ChgHadIso = "phoChgHadIso";
   std::string s_NeuHadIso = "phoNeuHadIso";
   std::string s_PhoIso = "phoPhoIso";
@@ -663,16 +653,6 @@ struct Pho
   std::string s_weightedtimeTOF = "phoweightedtimeTOF";
   std::string s_weightedtimeLT120TOF = "phoweightedtimeLT120TOF";
 
-  std::string s_ootA0 = "ootA0";
-  std::string s_ootA1 = "ootA1";
-  std::string s_ootA2 = "ootA2";
-  std::string s_ootA3 = "ootA3";
-  std::string s_ootA4 = "ootA4";
-  std::string s_ootA5 = "ootA5";
-  std::string s_ootA6 = "ootA6";
-  std::string s_ootA7 = "ootA7";
-  std::string s_ootA8 = "ootA8";
-
   // tbranches
   TBranch * b_E;
   TBranch * b_pt;
@@ -683,7 +663,7 @@ struct Pho
   TBranch * b_scphi;
   TBranch * b_HoE;
   TBranch * b_r9;
-  TBranch * b_dz;
+  TBranch * b_tdz;
   TBranch * b_ChgHadIso;
   TBranch * b_NeuHadIso;
   TBranch * b_PhoIso;

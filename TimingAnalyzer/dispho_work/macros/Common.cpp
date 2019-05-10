@@ -72,6 +72,44 @@ namespace Common
     return ((diff_i1 == 1 && diff_i2 == 0) || (diff_i1 == 0 && diff_i2 == 1));
   }
 
+  Int_t Xtal_Seperation(const UInt_t detid1, const UInt_t detid2)
+  {
+    Int_t sep = 0;
+    const auto & idinfo1 = Common::DetIDMap[detid1];
+    const auto & idinfo2 = Common::DetIDMap[detid2];
+
+    const auto diff_i1 = std::abs(idinfo1.i1-idinfo2.i1);
+    const auto diff_i2 = std::abs(idinfo1.i2-idinfo2.i2);
+    std::cout << "i1: (" << idinfo1.i1 << "," << idinfo1.i2 << ") i2: ( " << idinfo2.i1 << "," << idinfo2.i2 << ") " << std::endl;
+
+    if( (idinfo1.ecal == ECAL::EB) && (idinfo2.ecal == ECAL::EB) ){
+	const auto wdiff_i1 = ((diff_i1 >= 360) ? (diff_i1 - 360) : diff_i1); 
+	std::cout << " EB EB with " << wdiff_i1 << " : " << diff_i2 << std::endl;
+        sep = int(std::sqrt( wdiff_i1*wdiff_i1 + diff_i2*diff_i2 ));
+    }
+    else if( ((idinfo1.ecal == ECAL::EB) && (idinfo2.ecal == ECAL::EP)) || ((idinfo1.ecal == ECAL::EB) && (idinfo2.ecal == ECAL::EM)) ){
+        std::cout << " EB EP/M with " << idinfo1.i2 << " : " << 85 << std::endl;
+        if( idinfo2.ecal == ECAL::EM ) sep = int(std::abs( idinfo1.i2 + 85 ) + 1000);
+	else  sep = int(std::abs( idinfo1.i2 - 85 )  + 1000);
+    }
+    else if( ((idinfo1.ecal == ECAL::EP) && (idinfo2.ecal == ECAL::EB)) || ((idinfo1.ecal == ECAL::EM) && (idinfo2.ecal == ECAL::EB)) ){
+        std::cout << " EP/M EB with " << idinfo2.i2 << " : " << "85" << std::endl;
+        if( idinfo1.ecal == ECAL::EM ) sep = int(std::abs( idinfo2.i2 + 85 ) + 1000);
+        else  sep = int(std::abs( idinfo2.i2 - 85 ) + 1000);
+    }
+    else if( ((idinfo1.ecal == ECAL::EM) && (idinfo2.ecal == ECAL::EM)) || ((idinfo1.ecal == ECAL::EP) && (idinfo2.ecal == ECAL::EP)) ){
+        std::cout << " EP EP or EM EM with " << diff_i1 << " : " << diff_i2 << std::endl;
+        sep = int(std::sqrt( diff_i1*diff_i1 + diff_i2*diff_i2 ));
+    }
+    else { //( ((idinfo1.ecal == ECAL::EP) && (idinfo2.ecal == ECAL::EM)) || ((idinfo1.ecal == ECAL::EM) && (idinfo2.ecal == ECAL::EP)) )
+        std::cout << " EP EM or EM EP with " << diff_i1 << " : " << diff_i2 << std::endl;
+        sep = int(std::sqrt( diff_i1*diff_i1 + diff_i2*diff_i2 + 170*170 )) + 5000;
+    }
+
+    return sep; 
+
+  }
+
   Bool_t IsWithinRadius(const UInt_t detid1, const UInt_t detid2, const Int_t radius)
   {
     const auto & idinfo1 = Common::DetIDMap[detid1];

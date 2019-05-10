@@ -43,6 +43,8 @@ skimconfig=${4}
 #root -b -q -l runSkimmer.C\(\"/home/t3-ku/jaking/trees/ecal\",\"/home/t3-ku/jaking/trees/ecal/skimmed\",\"dispho_2017E.root\",\"skim_config/Zee_Skim.txt\"\)
 #root -b -q -l runSkimmer.C\(\"/home/t3-ku/jaking/trees/ecal\",\"/home/t3-ku/jaking/trees/ecal/skimmed\",\"dispho_2017F.root\",\"skim_config/Zee_Skim.txt\"\)
 
+root -b -q -l runSkimmer.C\(\"/home/t3-ku/jaking/trees/ecal\",\"/home/t3-ku/jaking/trees/ecal/skimmed\",\"veryshort_trial_run18A_dispho.root\",\"skim_config/Zee_Skim.txt\"\)
+
 #root -b -q -l runSkimmer.C\(\"/home/t3-ku/jaking/trees/ecal\",\"/home/t3-ku/jaking/trees/ecal/skimmed\",\"dispho_2018D_0000.root\",\"skim_config/Zee_lhc_Skim.txt\"\)
 #root -b -q -l runSkimmer.C\(\"/home/t3-ku/jaking/trees/ecal\",\"/home/t3-ku/jaking/trees/ecal/skimmed\",\"dispho_2018D_0001.root\",\"skim_config/Zee_lhc_Skim.txt\"\)
 #root -b -q -l runSkimmer.C\(\"/home/t3-ku/jaking/trees/ecal\",\"/home/t3-ku/jaking/trees/ecal/skimmed\",\"dispho_2018D_0002.root\",\"skim_config/Zee_lhc_Skim.txt\"\)
@@ -68,7 +70,7 @@ skimconfig=${4}
 
 #root -b -q -l runSkimmer.C\(\"/home/t3-ku/jaking/trees/ecal\",\"/home/t3-ku/jaking/trees/ecal/skimmed\",\"raw_output_62.root\",\"skim_config/DiXtal_Skim.txt\"\)
 
-root -b -q -l runSkimmer.C\(\"/home/t3-ku/jaking/trees/ecal\",\"/home/t3-ku/jaking/trees/ecal/dixtal_skims\",\"test_dispho.root\",\"skim_config/DiXtal_lhc_Skim.txt\"\)
+#root -b -q -l runSkimmer.C\(\"/home/t3-ku/jaking/trees/ecal\",\"/home/t3-ku/jaking/trees/ecal/zee_skims\",\"trial_run18A_dispho.root\",\"skim_config/Zee_Skim.txt\"\)
 #root -b -q -l runSkimmer.C\(\"/home/t3-ku/jaking/trees/ecal\",\"/home/t3-ku/jaking/trees/ecal/zee_skims\",\"test_dispho.root\",\"skim_config/Zee_Skim.txt\"\)
 
 

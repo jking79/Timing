@@ -122,6 +122,7 @@ namespace Common
   void SetupDetIDsEE();
   Int_t WrapIPhi(const Int_t iphi);
   Bool_t IsCrossNeighbor(const UInt_t detid1, const UInt_t detid2);
+  Int_t Xtal_Seperation(const UInt_t detid1, const UInt_t detid2);
   Bool_t IsWithinRadius(const UInt_t detid1, const UInt_t detid2, const Int_t radius);
   Int_t GetTriggerTower(const UInt_t detid);
 
