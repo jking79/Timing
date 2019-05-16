@@ -553,6 +553,7 @@ struct Pho
   Float_t seedootA6;
   Float_t seedootA7;
   Float_t seedootA8;
+  Float_t seedootA9;
 
   // MC types
   Bool_t  isGen;
@@ -639,6 +640,7 @@ struct Pho
   std::string s_seedootA6 = "phoseedootA6";
   std::string s_seedootA7 = "phoseedootA7";
   std::string s_seedootA8 = "phoseedootA8"; 
+  std::string s_seedootA9 = "phoseedootA9";
   std::string s_isGen = "phoisGen";
   std::string s_isSignal = "phoisSignal";
   std::string s_scaleAbs = "phoscaleAbs";
@@ -722,6 +724,7 @@ struct Pho
   TBranch * b_seedootA6;
   TBranch * b_seedootA7;
   TBranch * b_seedootA8;
+  TBranch * b_seedootA9;
   TBranch * b_isGen;
   TBranch * b_isSignal;
   TBranch * b_scaleAbs;
@@ -745,6 +748,7 @@ struct Pho
   TBranch * b_ootA6;
   TBranch * b_ootA7;
   TBranch * b_ootA8;
+  TBranch * b_ootA9;
 
 };
 typedef std::vector<Pho> PhoVec;
@@ -852,6 +856,7 @@ struct Hvds
   Float_t ootA6;
   Float_t ootA7;
   Float_t ootA8;
+  Float_t ootA9;
 
   std::string s_genvPionmass = "genvPionmass";
   std::string s_genvPionE = "genvPionE";
@@ -884,6 +889,7 @@ struct Hvds
   std::string s_ootA6 = "ootA6";
   std::string s_ootA7 = "ootA7";
   std::string s_ootA8 = "ootA8";
+  std::string s_ootA9 = "ootA9";
 
   TBranch * b_genvPionmass;
   TBranch * b_genvPionE;
@@ -916,6 +922,7 @@ struct Hvds
   TBranch * b_ootA6;
   TBranch * b_ootA7;
   TBranch * b_ootA8;
+  TBranch * b_ootA9;
 
 };
 typedef std::vector<Hvds> HvdsVec;

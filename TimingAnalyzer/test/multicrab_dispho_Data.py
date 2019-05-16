@@ -63,8 +63,8 @@ def main():
         inputPaths   = 'HLTpathsWExtras.txt'
         inputFilters = 'HLTfilters.txt'
         inputFlags   = 'METflags.txt'
-        inputJSON    = 'golden2017.json'
-        #inputJSON    = 'golden2016.json'        
+        #inputJSON    = 'golden2017.json'
+        inputJSON    = 'golden2016.json'        
  
         #--------------------------------------------------------
         # This is the base config:
@@ -109,15 +109,15 @@ def main():
     #        ['/SinglePhoton/Run2016G-17Jul2018-v1/MINIAOD'],
     #        ['/SinglePhoton/Run2016H-17Jul2018-v1/MINIAOD'],
 
-    #        ['/DoubleEG/Run2016B-17Jul2018_ver2-v1/MINIAOD'],
-    #        ['/DoubleEG/Run2016C-17Jul2018-v1/MINIAOD'],
-    #        ['/DoubleEG/Run2016D-17Jul2018-v1/MINIAOD'],
-    #        ['/DoubleEG/Run2016E-17Jul2018-v1/MINIAOD'],
-    #        ['/DoubleEG/Run2016F-17Jul2018-v1/MINIAOD'],
-    #        ['/DoubleEG/Run2016G-17Jul2018-v1/MINIAOD'],
-    #        ['/DoubleEG/Run2016H-17Jul2018-v1/MINIAOD'],
+            ['/DoubleEG/Run2016B-17Jul2018_ver2-v1/MINIAOD'],
+            ['/DoubleEG/Run2016C-17Jul2018-v1/MINIAOD'],
+            ['/DoubleEG/Run2016D-17Jul2018-v1/MINIAOD'],
+            ['/DoubleEG/Run2016E-17Jul2018-v1/MINIAOD'],
+            ['/DoubleEG/Run2016F-17Jul2018-v1/MINIAOD'],
+            ['/DoubleEG/Run2016G-17Jul2018-v1/MINIAOD'],
+            ['/DoubleEG/Run2016H-17Jul2018-v1/MINIAOD'],
 
-            ['/DoubleEG/Run2017B-31Mar2018-v1/MINIAOD'],
+    #        ['/DoubleEG/Run2017B-31Mar2018-v1/MINIAOD'],
     #        ['/DoubleEG/Run2017C-31Mar2018-v1/MINIAOD'],
     #        ['/DoubleEG/Run2017D-31Mar2018-v1/MINIAOD'],
     #        ['/DoubleEG/Run2017E-31Mar2018-v1/MINIAOD'],

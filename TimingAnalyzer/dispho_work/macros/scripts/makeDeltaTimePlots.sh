@@ -717,7 +717,7 @@ do
 				    rm ${jwk_outfile6}.root
 	                            jwk_plot5="tmp_difT_vs_nvtx_EBEB.txt"
 	                            jwk_outfile5="jwk_defT_v_nvtx_${outfile}"
-	 #                           ./scripts/runTreePlotter2D.sh "${skimdir}/${infile}.root" "${skimdir}/${insigfile}.root" "${cut}" "${varwgtconfigdir}/${varwgtmap}.${inTextExt}" "${jwk_plot5}" "${miscconfigdir}/${misc}.${inTextExt}" "${era}" "${jwk_outfile5}" "${outdir}"
+	                            ./scripts/runTreePlotter2D.sh "${skimdir}/${infile}.root" "${skimdir}/${insigfile}.root" "${cut}" "${varwgtconfigdir}/${varwgtmap}.${inTextExt}" "${jwk_plot5}" "${miscconfigdir}/${misc}.${inTextExt}" "${era}" "${jwk_outfile5}" "${outdir}"
                                     rm ${jwk_outfile5}.root
 				    ./scripts/runTreePlotter2D.sh "${skimdir}/${infile}.root" "${skimdir}/${insigfile}.root" "${cut}" "${varwgtconfigdir}/${varwgtmap}.${inTextExt}" "${plot2D}" "${miscconfigdir}/${misc}.${inTextExt}" "${era}" "${outfile2D}" "${outdir}"
 				    jwk_plot2D="tmp_A0_vs_A1_EBEB.TXT"
@@ -730,7 +730,7 @@ do
                                     rm ${jwk_time_outfile}.root
 	                            jwk_plot2="tmp_difT_vs_A_eff_EBEB.txt"
 	                            jwk_outfile2="jwk_dTvsAeff_${outfile}"
-	   #                         ./scripts/runTreePlotter2D.sh "${skimdir}/${infile}.root" "${skimdir}/${insigfile}.root" "${cut}" "${varwgtconfigdir}/${varwgtmap}.${inTextExt}" "${jwk_plot2}" "${miscconfigdir}/${misc}.${inTextExt}" "${era}" "${jwk_outfile2}" "${outdir}"
+	                            ./scripts/runTreePlotter2D.sh "${skimdir}/${infile}.root" "${skimdir}/${insigfile}.root" "${cut}" "${varwgtconfigdir}/${varwgtmap}.${inTextExt}" "${jwk_plot2}" "${miscconfigdir}/${misc}.${inTextExt}" "${era}" "${jwk_outfile2}" "${outdir}"
                                     rm ${jwk_outfile2}.root
 	                            jwk_plot3="tmp_E0_vs_dT_EBEB.txt"
 	                            jwk_outfile3="jwk_E0vsdT_${outfile}"

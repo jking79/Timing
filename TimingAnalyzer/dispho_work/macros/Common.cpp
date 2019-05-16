@@ -1,6 +1,7 @@
 #include "Common.hh"
 #include "TLatex.h"
 #include "TColor.h"
+#include <math.h>
 
 namespace Common
 {
@@ -72,6 +73,20 @@ namespace Common
     return ((diff_i1 == 1 && diff_i2 == 0) || (diff_i1 == 0 && diff_i2 == 1));
   }
 
+  float get_phi( int x, int y ){
+
+	int phi = 0;
+  	if( x  == 50 ){
+                if( y  < 50 ) phi = 270;
+                else phi = 90;
+        } else {
+                phi = std::atan(std::abs((y - 50)/(x - 50)))*(Common::RadToDeg);
+                if( x < 50 ){ if ( y < 50 ) phi = phi + 180; else phi = phi + 90;
+		} else if ( y < 50 ) phi = phi + 270; 
+        }
+	return phi;
+  }
+
   Int_t Xtal_Seperation(const UInt_t detid1, const UInt_t detid2)
   {
     Int_t sep = 0;
@@ -80,29 +95,39 @@ namespace Common
 
     const auto diff_i1 = std::abs(idinfo1.i1-idinfo2.i1);
     const auto diff_i2 = std::abs(idinfo1.i2-idinfo2.i2);
-    std::cout << "i1: (" << idinfo1.i1 << "," << idinfo1.i2 << ") i2: ( " << idinfo2.i1 << "," << idinfo2.i2 << ") " << std::endl;
+//    std::cout << "i1: (" << idinfo1.i1 << "," << idinfo1.i2 << ") i2: ( " << idinfo2.i1 << "," << idinfo2.i2 << ") " << std::endl;
 
     if( (idinfo1.ecal == ECAL::EB) && (idinfo2.ecal == ECAL::EB) ){
-	const auto wdiff_i1 = ((diff_i1 >= 360) ? (diff_i1 - 360) : diff_i1); 
-	std::cout << " EB EB with " << wdiff_i1 << " : " << diff_i2 << std::endl;
+	const auto wdiff_i1 = ((diff_i1 > 180) ? (diff_i1 - 180) : diff_i1); 
+//	std::cout << " EB EB with " << wdiff_i1 << " : " << diff_i2 << std::endl;
         sep = int(std::sqrt( wdiff_i1*wdiff_i1 + diff_i2*diff_i2 ));
     }
     else if( ((idinfo1.ecal == ECAL::EB) && (idinfo2.ecal == ECAL::EP)) || ((idinfo1.ecal == ECAL::EB) && (idinfo2.ecal == ECAL::EM)) ){
-        std::cout << " EB EP/M with " << idinfo1.i2 << " : " << 85 << std::endl;
-        if( idinfo2.ecal == ECAL::EM ) sep = int(std::abs( idinfo1.i2 + 85 ) + 1000);
-	else  sep = int(std::abs( idinfo1.i2 - 85 )  + 1000);
+        auto phi = Common::get_phi( idinfo2.i1, idinfo2.i1 );
+        auto rad = std::abs(50 - std::sqrt( (idinfo2.i1 - 50 )*(idinfo2.i1 - 50 ) + (idinfo2.i2 - 50 )*(idinfo2.i2 - 50 ) ));
+        auto dphi = std::abs( phi - idinfo1.i1 );
+	auto mz = std::abs( idinfo1.i2 - ((idinfo2.ecal == ECAL::EP) ? 85 : -85 )) + rad;
+        auto wphi = ((dphi > 180) ? (360 - dphi) : dphi);
+ //       std::cout << " Phi/Rad of " << phi << " : " << rad << std::endl;
+ //       std::cout << " EB EP/M with " << wphi << " : " << mz << std::endl;
+        sep = int(std::sqrt( wphi*wphi + mz*mz )) + 1000;
     }
     else if( ((idinfo1.ecal == ECAL::EP) && (idinfo2.ecal == ECAL::EB)) || ((idinfo1.ecal == ECAL::EM) && (idinfo2.ecal == ECAL::EB)) ){
-        std::cout << " EP/M EB with " << idinfo2.i2 << " : " << "85" << std::endl;
-        if( idinfo1.ecal == ECAL::EM ) sep = int(std::abs( idinfo2.i2 + 85 ) + 1000);
-        else  sep = int(std::abs( idinfo2.i2 - 85 ) + 1000);
+        float phi = Common::get_phi( idinfo1.i1, idinfo1.i2 );
+        auto rad = std::abs(50 - std::sqrt( (idinfo1.i1 - 50 )*(idinfo1.i1 - 50 ) + (idinfo1.i2 - 50 )*(idinfo1.i2 - 50 ) ));
+	auto dphi = std::abs( phi - idinfo2.i1 );
+        auto mz = std::abs( idinfo2.i2 - ((idinfo1.ecal == ECAL::EP) ? 85 : -85 )) + rad;
+        auto wphi = ((dphi > 180) ? (360 - dphi) : dphi);
+//	std::cout << " Phi/Rad of " << phi << " : " << rad << std::endl;
+//        std::cout << " EB EP/M with " << wphi << " : " << mz << std::endl;
+        sep = std::sqrt( wphi*wphi + mz*mz) + 1000;
     }
     else if( ((idinfo1.ecal == ECAL::EM) && (idinfo2.ecal == ECAL::EM)) || ((idinfo1.ecal == ECAL::EP) && (idinfo2.ecal == ECAL::EP)) ){
-        std::cout << " EP EP or EM EM with " << diff_i1 << " : " << diff_i2 << std::endl;
-        sep = int(std::sqrt( diff_i1*diff_i1 + diff_i2*diff_i2 ));
+//        std::cout << " EP EP or EM EM with " << diff_i1 << " : " << diff_i2 << std::endl;
+        sep = int(std::sqrt( diff_i1*diff_i1 + diff_i2*diff_i2 ) + 0);
     }
     else { //( ((idinfo1.ecal == ECAL::EP) && (idinfo2.ecal == ECAL::EM)) || ((idinfo1.ecal == ECAL::EM) && (idinfo2.ecal == ECAL::EP)) )
-        std::cout << " EP EM or EM EP with " << diff_i1 << " : " << diff_i2 << std::endl;
+//        std::cout << " EP EM or EM EP with " << diff_i1 << " : " << diff_i2 << std::endl;
         sep = int(std::sqrt( diff_i1*diff_i1 + diff_i2*diff_i2 + 170*170 )) + 5000;
     }
 

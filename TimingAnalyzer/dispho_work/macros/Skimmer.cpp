@@ -24,7 +24,8 @@ Skimmer::Skimmer(const TString & indir, const TString & outdir, const TString & 
   Skimmer::SetupSkimConfig();
 
   // get detids if skim needs it
-  if (fSkim == SkimType::DiXtal) Common::SetupDetIDs();
+  //if (fSkim == SkimType::DiXtal) 
+  Common::SetupDetIDs();
 
   // Get era info
   Common::SetupEras();
@@ -224,7 +225,7 @@ void Skimmer::EventLoop()
 {
   // do loop over events, reading in branches as needed, skimming, filling output trees and hists
   const auto nEntries = fInTree->GetEntries();
-  //const auto nEntries = 1000;
+  //const auto nEntries = 10000;
   for (auto entry = 0U; entry < nEntries; entry++)
   {
     // dump status check
@@ -297,9 +298,9 @@ void Skimmer::EventLoop()
       //      fInEvent.b_hltDiEle33MW->GetEntry(entry);
       
       //       if (!fInEvent.hltDiEle33MW) continue;
-      fOutCutFlow   ->Fill((cutLabels["diEleHLT"]*1.f)-0.5f);
-      fOutCutFlowWgt->Fill((cutLabels["diEleHLT"]*1.f)-0.5f,wgt);
-      fOutCutFlowScl->Fill((cutLabels["diEleHLT"]*1.f)-0.5f,evtwgt);
+      //fOutCutFlow   ->Fill((cutLabels["diEleHLT"]*1.f)-0.5f);
+      //fOutCutFlowWgt->Fill((cutLabels["diEleHLT"]*1.f)-0.5f,wgt);
+      //fOutCutFlowScl->Fill((cutLabels["diEleHLT"]*1.f)-0.5f,evtwgt);
 
       // build list of "good electrons"
       std::vector<Int_t> good_phos;
@@ -396,13 +397,22 @@ void Skimmer::EventLoop()
       pho2.b_seed->GetEntry(entry);
       fInRecHits.b_ID->GetEntry(entry);
 
-      auto id1 = (*fInRecHits.ID)[pho1.seed];
-      auto id2 = (*fInRecHits.ID)[pho2.seed];
+      auto seed1 = pho1.seed;
+      auto id1 = (*fInRecHits.ID)[seed1];
+      auto seed2 = pho2.seed;
+      auto id2 = (*fInRecHits.ID)[seed2];
 
-      nxtal_sep =  0;
-      //nxtal_sep =  Common::Xtal_Seperation(id1,id2);
-      //std::cout << " nxtal_sep : " << nxtal_sep << std::endl;
+  //    cout << "Seed1: " << seed1 << " ID: " << id1 << endl;
+  //    cout << "Seed2: " << seed2 << " ID: " << id2 << endl;
+
+  //    nxtal_sep =  0;
+      nxtal_sep =  Common::Xtal_Seperation(id1,id2);
+  //    std::cout << " nxtal_sep : " << nxtal_sep << std::endl;
  
+//            const auto rh_j = (*inpho.recHits)[j]; // position within event rec hits vector
+//            const auto E_j  = (*fInRecHits.E) [rh_j];
+//            const auto id_j = (*fInRecHits.ID)[rh_j];
+
       pho1.b_pt->GetEntry(entry);
       pho2.b_pt->GetEntry(entry);
 
@@ -546,8 +556,8 @@ void Skimmer::EventLoop()
 
       // fill cutflow
       fOutCutFlow   ->Fill((cutLabels["badPU"]*1.f)-0.5f);
-//      fOutCutFlowWgt->Fill((cutLabels["badPU"]*1.f)-0.5f,wgt);
-//      fOutCutFlowScl->Fill((cutLabels["badPU"]*1.f)-0.5f,evtwgt);
+      fOutCutFlowWgt->Fill((cutLabels["badPU"]*1.f)-0.5f,wgt);
+      fOutCutFlowScl->Fill((cutLabels["badPU"]*1.f)-0.5f,evtwgt);
     }
 
     // end of skim, now copy... dropping rechits
@@ -624,8 +634,8 @@ void Skimmer::EventLoop()
   // write out the output!
   fOutFile->cd();
   fOutCutFlow->Write();
-//  fOutCutFlowWgt->Write();
-//  fOutCutFlowScl->Write();
+  fOutCutFlowWgt->Write();
+  fOutCutFlowScl->Write();
 
   fOutAveXtalRecTimeHist->Write();
   fOutAveXtalOccHist->Write();
@@ -955,6 +965,7 @@ void Skimmer::FillOutPhos(const UInt_t entry)
                 b_ootA6->GetEntry(entry);
                 b_ootA7->GetEntry(entry);
                 b_ootA8->GetEntry(entry);
+                b_ootA9->GetEntry(entry);
                 b_ndigis->GetEntry(entry);
                 b_nurechits->GetEntry(entry);
  //               std::cout << "Filling ootAs" << std::endl;
@@ -1040,6 +1051,8 @@ void Skimmer::FillOutPhos(const UInt_t entry)
         outpho.seedootA5 = 0.0;
         outpho.seedootA6 = 0.0;
         outpho.seedootA7 = 0.0;
+        outpho.seedootA8 = 0.0;
+        outpho.seedootA9 = 0.0;
 
 	outpho.seedisGS6 = (*fInRecHits.isGS6)[seed];
 	outpho.seedisGS1 = (*fInRecHits.isGS1)[seed];
@@ -1064,6 +1077,7 @@ void Skimmer::FillOutPhos(const UInt_t entry)
 	        		outpho.seedootA6 = (*ootA6)[urseed];
 	        		outpho.seedootA7 = (*ootA7)[urseed];
 	        		outpho.seedootA8 = (*ootA8)[urseed];
+                                outpho.seedootA9 = (*ootA9)[urseed];
 				break;
 			}
 		}
@@ -1334,6 +1348,7 @@ void Skimmer::InitInBranchVecs()
    ootA6 = 0;
    ootA7 = 0;
    ootA8 = 0;
+   ootA9 = 0;
    uRhId = 0;
   }
 
@@ -1485,6 +1500,7 @@ void Skimmer::InitInBranches()
      fInTree->SetBranchAddress("ootA6", &ootA6, &b_ootA6);
      fInTree->SetBranchAddress("ootA7", &ootA7, &b_ootA7);
      fInTree->SetBranchAddress("ootA8", &ootA8, &b_ootA8);
+     fInTree->SetBranchAddress("ootA9", &ootA9, &b_ootA9);
   }
 
   fInTree->SetBranchAddress(fInEvent.s_hltSignal.c_str(), &fInEvent.hltSignal, &fInEvent.b_hltSignal);
@@ -1857,6 +1873,7 @@ void Skimmer::InitOutBranches()
     fOutTree->Branch(Form("%s_%i",pho.s_seedootA6.c_str(),ipho), &pho.seedootA6);
     fOutTree->Branch(Form("%s_%i",pho.s_seedootA7.c_str(),ipho), &pho.seedootA7);
     fOutTree->Branch(Form("%s_%i",pho.s_seedootA8.c_str(),ipho), &pho.seedootA8);
+    fOutTree->Branch(Form("%s_%i",pho.s_seedootA9.c_str(),ipho), &pho.seedootA9);
     fOutTree->Branch(Form("%s_%i",pho.s_isOOT.c_str(),ipho), &pho.isOOT);
     fOutTree->Branch(Form("%s_%i",pho.s_isEB.c_str(),ipho), &pho.isEB);
     fOutTree->Branch(Form("%s_%i",pho.s_isHLT.c_str(),ipho), &pho.isHLT);

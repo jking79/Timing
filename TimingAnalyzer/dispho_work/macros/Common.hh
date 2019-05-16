@@ -121,6 +121,7 @@ namespace Common
   void SetupDetIDsEB();
   void SetupDetIDsEE();
   Int_t WrapIPhi(const Int_t iphi);
+  float get_phi( int x, int y );
   Bool_t IsCrossNeighbor(const UInt_t detid1, const UInt_t detid2);
   Int_t Xtal_Seperation(const UInt_t detid1, const UInt_t detid2);
   Bool_t IsWithinRadius(const UInt_t detid1, const UInt_t detid2, const Int_t radius);
@@ -145,8 +146,8 @@ namespace Common
   static const TString eosDir         = "/eos/cms/store/group/phys_exotica/displacedPhotons/nTuples/2017/analysis";
   static const TString baseDir        = "skims";
   static const TString tupleFileName  = "tree.root";
-  //static const TString rootdir        = "tree";
-  static const TString rootdir        = "dispho";
+  static const TString rootdir        = "tree";
+  //static const TString rootdir        = "dispho";
   static const TString configtreename = "configtree";
   static const TString disphotreename = "disphotree";
   static const TString h_cutflowname  = "h_cutflow";
