@@ -103,24 +103,26 @@ namespace Common
         sep = int(std::sqrt( wdiff_i1*wdiff_i1 + diff_i2*diff_i2 ));
     }
     else if( ((idinfo1.ecal == ECAL::EB) && (idinfo2.ecal == ECAL::EP)) || ((idinfo1.ecal == ECAL::EB) && (idinfo2.ecal == ECAL::EM)) ){
-        auto phi = Common::get_phi( idinfo2.i1, idinfo2.i1 );
-        auto rad = std::abs(50 - std::sqrt( (idinfo2.i1 - 50 )*(idinfo2.i1 - 50 ) + (idinfo2.i2 - 50 )*(idinfo2.i2 - 50 ) ));
-        auto dphi = std::abs( phi - idinfo1.i1 );
-	auto mz = std::abs( idinfo1.i2 - ((idinfo2.ecal == ECAL::EP) ? 85 : -85 )) + rad;
-        auto wphi = ((dphi > 180) ? (360 - dphi) : dphi);
+        //auto phi = Common::get_phi( idinfo2.i1, idinfo2.i1 );
+        //auto rad = std::abs(50 - std::sqrt( (idinfo2.i1 - 50 )*(idinfo2.i1 - 50 ) + (idinfo2.i2 - 50 )*(idinfo2.i2 - 50 ) ));
+        //auto dphi = std::abs( phi - idinfo1.i1 );
+	//auto mz = std::abs( idinfo1.i2 - ((idinfo2.ecal == ECAL::EP) ? 85 : -85 )) + rad;
+        //auto wphi = ((dphi > 180) ? (360 - dphi) : dphi);
  //       std::cout << " Phi/Rad of " << phi << " : " << rad << std::endl;
  //       std::cout << " EB EP/M with " << wphi << " : " << mz << std::endl;
-        sep = int(std::sqrt( wphi*wphi + mz*mz )) + 1000;
+        //sep = int(std::sqrt( wphi*wphi + mz*mz )) + 1000;
+	sep = 1000;
     }
     else if( ((idinfo1.ecal == ECAL::EP) && (idinfo2.ecal == ECAL::EB)) || ((idinfo1.ecal == ECAL::EM) && (idinfo2.ecal == ECAL::EB)) ){
-        float phi = Common::get_phi( idinfo1.i1, idinfo1.i2 );
-        auto rad = std::abs(50 - std::sqrt( (idinfo1.i1 - 50 )*(idinfo1.i1 - 50 ) + (idinfo1.i2 - 50 )*(idinfo1.i2 - 50 ) ));
-	auto dphi = std::abs( phi - idinfo2.i1 );
-        auto mz = std::abs( idinfo2.i2 - ((idinfo1.ecal == ECAL::EP) ? 85 : -85 )) + rad;
-        auto wphi = ((dphi > 180) ? (360 - dphi) : dphi);
+        //float phi = Common::get_phi( idinfo1.i1, idinfo1.i2 );
+        //auto rad = std::abs(50 - std::sqrt( (idinfo1.i1 - 50 )*(idinfo1.i1 - 50 ) + (idinfo1.i2 - 50 )*(idinfo1.i2 - 50 ) ));
+	//auto dphi = std::abs( phi - idinfo2.i1 );
+        //auto mz = std::abs( idinfo2.i2 - ((idinfo1.ecal == ECAL::EP) ? 85 : -85 )) + rad;
+        //auto wphi = ((dphi > 180) ? (360 - dphi) : dphi);
 //	std::cout << " Phi/Rad of " << phi << " : " << rad << std::endl;
 //        std::cout << " EB EP/M with " << wphi << " : " << mz << std::endl;
-        sep = std::sqrt( wphi*wphi + mz*mz) + 1000;
+        //sep = std::sqrt( wphi*wphi + mz*mz) + 1000;
+	sep = 1000;
     }
     else if( ((idinfo1.ecal == ECAL::EM) && (idinfo2.ecal == ECAL::EM)) || ((idinfo1.ecal == ECAL::EP) && (idinfo2.ecal == ECAL::EP)) ){
 //        std::cout << " EP EP or EM EM with " << diff_i1 << " : " << diff_i2 << std::endl;
@@ -128,7 +130,8 @@ namespace Common
     }
     else { //( ((idinfo1.ecal == ECAL::EP) && (idinfo2.ecal == ECAL::EM)) || ((idinfo1.ecal == ECAL::EM) && (idinfo2.ecal == ECAL::EP)) )
 //        std::cout << " EP EM or EM EP with " << diff_i1 << " : " << diff_i2 << std::endl;
-        sep = int(std::sqrt( diff_i1*diff_i1 + diff_i2*diff_i2 + 170*170 )) + 5000;
+        //sep = int(std::sqrt( diff_i1*diff_i1 + diff_i2*diff_i2 + 170*170 )) + 5000;
+	sep = 5000;
     }
 
     return sep; 

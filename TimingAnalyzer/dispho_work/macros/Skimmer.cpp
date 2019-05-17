@@ -988,7 +988,7 @@ void Skimmer::FillOutPhos(const UInt_t entry)
     outpho.scphi = inpho.scphi;
     outpho.HoE = inpho.HoE;
     outpho.r9 = inpho.r9;
-    if( hasUrecDigi ) outpho.tdz = inpho.tdz;
+    if( hasUrecDigi ) outpho.tdz = inpho.tdz; else outpho.tdz = 0;
     outpho.ChgHadIso = inpho.ChgHadIso;
     outpho.NeuHadIso = inpho.NeuHadIso;
     outpho.PhoIso = inpho.PhoIso;
@@ -1823,7 +1823,7 @@ void Skimmer::InitOutBranches()
     fOutTree->Branch(Form("%s_%i",pho.s_scphi.c_str(),ipho), &pho.scphi);
     fOutTree->Branch(Form("%s_%i",pho.s_HoE.c_str(),ipho), &pho.HoE);
     fOutTree->Branch(Form("%s_%i",pho.s_r9.c_str(),ipho), &pho.r9);
-    if( hasUrecDigi ) fOutTree->Branch(Form("%s_%i",pho.s_tdz.c_str(),ipho), &pho.tdz);
+    fOutTree->Branch(Form("%s_%i",pho.s_tdz.c_str(),ipho), &pho.tdz);
     fOutTree->Branch(Form("%s_%i",pho.s_ChgHadIso.c_str(),ipho), &pho.ChgHadIso);
     fOutTree->Branch(Form("%s_%i",pho.s_NeuHadIso.c_str(),ipho), &pho.NeuHadIso);
     fOutTree->Branch(Form("%s_%i",pho.s_PhoIso.c_str(),ipho), &pho.PhoIso);
