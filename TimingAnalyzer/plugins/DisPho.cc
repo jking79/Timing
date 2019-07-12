@@ -1,6 +1,10 @@
 #include "Timing/TimingAnalyzer/plugins/DisPho.hh"
+using namespace std;
 
-DisPho::DisPho(const edm::ParameterSet& iConfig): 
+DisPho::DisPho(const edm::ParameterSet & iConfig) :
+  // LHC Info 
+  lhcInfoValid (iConfig.existsAs<bool>("lhcInfoValid")  ? iConfig.getParameter<bool>("lhcInfoValid")  : false),
+
   // blinding cuts
   blindSF(iConfig.existsAs<int>("blindSF") ? iConfig.getParameter<int>("blindSF") : 1000),
   applyBlindSF(iConfig.existsAs<bool>("applyBlindSF") ? iConfig.getParameter<bool>("applyBlindSF") : false),
@@ -17,6 +21,7 @@ DisPho::DisPho(const edm::ParameterSet& iConfig):
 
   // object extra pruning cuts
   seedTimemin(iConfig.existsAs<double>("seedTimemin") ? iConfig.getParameter<double>("seedTimemin") : -25.f),
+  nPhosmax(iConfig.existsAs<int>("nPhosmax") ? iConfig.getParameter<int>("nPhosmax") : 2),
 
   // photon storing
   splitPho(iConfig.existsAs<bool>("splitPho") ? iConfig.getParameter<bool>("splitPho") : false),
@@ -37,8 +42,8 @@ DisPho::DisPho(const edm::ParameterSet& iConfig):
   minHT(iConfig.existsAs<double>("minHT") ? iConfig.getParameter<double>("minHT") : 400.f),
   applyHT(iConfig.existsAs<bool>("applyHT") ? iConfig.getParameter<bool>("applyHT") : false),
   phgoodpTmin(iConfig.existsAs<double>("phgoodpTmin") ? iConfig.getParameter<double>("phgoodpTmin") : 70.f),
-  phgoodIDmin(iConfig.existsAs<std::string>("phgoodIDmin") ? iConfig.getParameter<std::string>("phgoodIDmin") : "loose"),
-  applyPhGood(iConfig.existsAs<bool>("applyPhGood") ? iConfig.getParameter<bool>("applyPhGood") : false),
+  phgoodIDmin(iConfig.existsAs<std::string>("phgoodIDmin") ? iConfig.getParameter<std::string>("phgoodIDmin") : "loose"), 
+  applyPhGood(iConfig.existsAs<bool>("applyPhGood") ? iConfig.getParameter<bool>("applyPhGood") : false), 
 
   // matching criteria
   dRmin(iConfig.existsAs<double>("dRmin") ? iConfig.getParameter<double>("dRmin") : 0.3),
@@ -71,8 +76,8 @@ DisPho::DisPho(const edm::ParameterSet& iConfig):
   // vertices
   verticesTag(iConfig.getParameter<edm::InputTag>("vertices")),
 
-  // rhos
-  rhosTag(iConfig.getParameter<edm::InputTag>("rhos")),
+  // rho
+  rhoTag(iConfig.getParameter<edm::InputTag>("rho")),
 
   // mets
   metsTag(iConfig.getParameter<edm::InputTag>("mets")),  
@@ -90,38 +95,55 @@ DisPho::DisPho(const edm::ParameterSet& iConfig):
   recHitsEBTag(iConfig.getParameter<edm::InputTag>("recHitsEB")),  
   recHitsEETag(iConfig.getParameter<edm::InputTag>("recHitsEE")),
 
-  // photons + ids
+  // uncalibrated recHits
+  uncalibratedRecHitsEBTag(iConfig.getParameter<edm::InputTag>("uncalibratedRecHitsEB")),
+  uncalibratedRecHitsEETag(iConfig.getParameter<edm::InputTag>("uncalibratedRecHitsEE")),
+
+  // digis
+  ecalDigisEBTag(iConfig.getParameter<edm::InputTag>("EBdigiCollection")),
+  ecalDigisEETag(iConfig.getParameter<edm::InputTag>("EEdigiCollection")),
+
+  // gedphotons
   gedPhotonsTag(iConfig.getParameter<edm::InputTag>("gedPhotons")),
 
-  // ootPhotons + ids
+  // ootPhotons
   ootPhotonsTag(iConfig.getParameter<edm::InputTag>("ootPhotons")),
 
-  ///////////// GEN INFO
-  // isMC or Data --> default Data
+  // isMC
   isGMSB(iConfig.existsAs<bool>("isGMSB") ? iConfig.getParameter<bool>("isGMSB") : false),
   isHVDS(iConfig.existsAs<bool>("isHVDS") ? iConfig.getParameter<bool>("isHVDS") : false),
   isBkgd(iConfig.existsAs<bool>("isBkgd") ? iConfig.getParameter<bool>("isBkgd") : false),
   isToy (iConfig.existsAs<bool>("isToy")  ? iConfig.getParameter<bool>("isToy")  : false),
   isADD (iConfig.existsAs<bool>("isADD")  ? iConfig.getParameter<bool>("isADD")  : false),
   
+  // MC config
   xsec(iConfig.existsAs<double>("xsec") ? iConfig.getParameter<double>("xsec") : 1.0),
   filterEff(iConfig.existsAs<double>("filterEff") ? iConfig.getParameter<double>("filterEff") : 1.0),
-  BR(iConfig.existsAs<double>("BR") ? iConfig.getParameter<double>("BR") : 1.0)
+  BR(iConfig.existsAs<double>("BR") ? iConfig.getParameter<double>("BR") : 1.0),
+
+  // gen objects
+  genEvtInfoTag(iConfig.getParameter<edm::InputTag>("genEvt")),
+  gent0Tag(iConfig.getParameter<edm::InputTag>("gent0")),
+  genxyz0Tag(iConfig.getParameter<edm::InputTag>("genxyz0")),
+  pileupInfosTag(iConfig.getParameter<edm::InputTag>("pileups")),
+  genParticlesTag(iConfig.getParameter<edm::InputTag>("genParticles")),
+  genJetsTag(iConfig.getParameter<edm::InputTag>("genJets"))
 {
+  // internal setup
   usesResource();
   usesResource("TFileService");
 
+  // set isMC
+  if (isGMSB || isHVDS || isBkgd || isToy || isADD) isMC = true;
+  else                                              isMC = false;             
+
+  // setup tokens
+  DisPho::ConsumeTokens();
+
   // labels for cut flow histogram
   std::vector<std::string> cutflowLabelVec = {"All","nEvBlinding","METBlinding","Trigger","H_{T}","Good Photon"};
-  int ibin = 0;
-  for (const auto & cutflowLabel : cutflowLabelVec)
-  {
-    cutflowLabelMap[cutflowLabel] = ibin++;
-  }
-
-  // triggers
-  triggerResultsToken = consumes<edm::TriggerResults> (triggerResultsTag);
-  triggerObjectsToken = consumes<std::vector<pat::TriggerObjectStandAlone> > (triggerObjectsTag);
+  auto ibin = 0;
+  for (const auto & cutflowLabel : cutflowLabelVec) cutflowLabelMap[cutflowLabel] = ibin++;
 
   // read in from a stream the trigger paths for saving
   oot::ReadInTriggerNames(inputPaths,pathNames,triggerBitMap);
@@ -129,12 +151,19 @@ DisPho::DisPho(const edm::ParameterSet& iConfig):
   // read in from a stream the hlt objects/labels to match to
   oot::ReadInFilterNames(inputFilters,filterNames,triggerObjectsByFilterMap);
 
+  // read in from a stream the trigger paths for saving
+  oot::ReadInTriggerNames(inputFlags,flagNames,triggerFlagMap);
+}
+
+void DisPho::ConsumeTokens()
+{
+  // triggers
+  triggerResultsToken = consumes<edm::TriggerResults> (triggerResultsTag);
+  triggerObjectsToken = consumes<std::vector<pat::TriggerObjectStandAlone> > (triggerObjectsTag);
+
   // MET flags
   triggerFlagsToken     = consumes<edm::TriggerResults> (triggerFlagsTag);
   ecalBadCalibFlagToken = consumes<bool> (ecalBadCalibFlagTag);
-
-  // read in from a stream the trigger paths for saving
-  oot::ReadInTriggerNames(inputFlags,flagNames,triggerFlagMap);
 
   // tracks 
   tracksToken = consumes<std::vector<reco::Track> > (tracksTag);
@@ -142,8 +171,8 @@ DisPho::DisPho(const edm::ParameterSet& iConfig):
   // vertices
   verticesToken = consumes<std::vector<reco::Vertex> > (verticesTag);
 
-  // rhos
-  rhosToken = consumes<double> (rhosTag);
+  // rho
+  rhoToken = consumes<double> (rhoTag);
 
   // mets
   metsToken = consumes<std::vector<pat::MET> > (metsTag);
@@ -151,211 +180,534 @@ DisPho::DisPho(const edm::ParameterSet& iConfig):
   // jets
   jetsToken = consumes<std::vector<pat::Jet> > (jetsTag);
 
-  // electrons
+  // leptons
   electronsToken = consumes<std::vector<pat::Electron> > (electronsTag);
-
-  // muons
   muonsToken = consumes<std::vector<pat::Muon> > (muonsTag);
 
   // rechits
   recHitsEBToken = consumes<edm::SortedCollection<EcalRecHit,edm::StrictWeakOrdering<EcalRecHit> > > (recHitsEBTag);
   recHitsEEToken = consumes<edm::SortedCollection<EcalRecHit,edm::StrictWeakOrdering<EcalRecHit> > > (recHitsEETag);
 
-  // photons + ids
+  // uncalibrated recHits
+  uncalibratedRecHitsEBToken = consumes<edm::SortedCollection<EcalUncalibratedRecHit,edm::StrictWeakOrdering<EcalUncalibratedRecHit> > > (uncalibratedRecHitsEBTag);
+  uncalibratedRecHitsEEToken = consumes<edm::SortedCollection<EcalUncalibratedRecHit,edm::StrictWeakOrdering<EcalUncalibratedRecHit> > > (uncalibratedRecHitsEETag);
+  
+  // digis
+  //ecalDigisEBToken = consumes<edm::SortedCollection<EcalTimeDigi,edm::StrictWeakOrdering<EcalTimeDigi> > > (ecalDigisEBTag);
+  //ecalDigisEEToken = consumes<edm::SortedCollection<EcalTimeDigi,edm::StrictWeakOrdering<EcalTimeDigi> > > (ecalDigisEETag);
+  ebDigiCollectionToken_ = consumes<EBDigiCollection> (ecalDigisEBTag);
+  eeDigiCollectionToken_ = consumes<EEDigiCollection> (ecalDigisEETag);
+
+  // photons
   gedPhotonsToken = consumes<std::vector<pat::Photon> > (gedPhotonsTag);
   ootPhotonsToken = consumes<std::vector<pat::Photon> > (ootPhotonsTag);
 
   // only for simulated samples
-  if (isGMSB || isHVDS || isBkgd || isToy || isADD)
+  if (isMC)
   {
-    isMC = true;
-    genevtInfoToken = consumes<GenEventInfoProduct>             (iConfig.getParameter<edm::InputTag>("genevt"));
-    gent0Token      = consumes<float>                           (iConfig.getParameter<edm::InputTag>("gent0"));
-    genxyz0Token    = consumes<Point3D>                         (iConfig.getParameter<edm::InputTag>("genxyz0"));
-    pileupInfoToken = consumes<std::vector<PileupSummaryInfo> > (iConfig.getParameter<edm::InputTag>("pileup"));
-    genpartsToken   = consumes<std::vector<reco::GenParticle> > (iConfig.getParameter<edm::InputTag>("genparts"));
-    genjetsToken    = consumes<std::vector<reco::GenJet> >      (iConfig.getParameter<edm::InputTag>("genjets"));
-  }
-  else 
-  {
-    isMC = false;
+    genEvtInfoToken   = consumes<GenEventInfoProduct>             (genEvtInfoTag);
+    gent0Token        = consumes<float>                           (gent0Tag);
+    genxyz0Token      = consumes<Point3D>                         (genxyz0Tag);
+    pileupInfosToken  = consumes<std::vector<PileupSummaryInfo> > (pileupInfosTag);
+    genParticlesToken = consumes<std::vector<reco::GenParticle> > (genParticlesTag);
+    genJetsToken      = consumes<std::vector<reco::GenJet> >      (genJetsTag);
   }
 }
 
 DisPho::~DisPho() {}
 
-void DisPho::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) 
+void DisPho::analyze(const edm::Event & iEvent, const edm::EventSetup & iSetup)
 {
-  ////////////////////////
-  //                    //
-  // Get Object Handles //
-  //                    //
-  ////////////////////////
-  // TRIGGERS
-  edm::Handle<edm::TriggerResults> triggerResultsH;
-  iEvent.getByToken(triggerResultsToken, triggerResultsH);
 
-  edm::Handle<std::vector<pat::TriggerObjectStandAlone> > triggerObjectsH;
-  iEvent.getByToken(triggerObjectsToken, triggerObjectsH);
+
+  /////////////////
+  // Get Objects //
+  /////////////////
+
+  if (!DisPho::GetObjects(iEvent,iSetup)) return;
+
+  ////////////////////////
+  // Initialize Objects //
+  ////////////////////////  
+
+  DisPho::InitializeObjects(iEvent);
+
+  /////////////////
+  /// LHC Info ///
+  /////////////////
+
+  //DisPho::GetLHCInfo(iEvent,iSetup);
+
+  /////////////////
+  // Get Weights //
+  /////////////////
+
+  DisPho::GetWeights();
+
+  ///////////////////////
+  // Always fill hists //
+  ///////////////////////
+
+  DisPho::AlwaysFillHists();
+
+  ////////////////////
+  // Apply Blinding //
+  ////////////////////
+
+  if (applyBlindSF && DisPho::ApplyBlindSF()) return;
+  DisPho::FillBlindSF();
+
+  // Get MET corrected in time for apply blinding MET --> early object prep
+  oot::PrepPhotonsCorrectMET(gedPhotonsH,ootPhotonsH,photons,t1pfMET,rho,dRmin,phpTmin,phIDmin);
+
+  if (applyBlindMET && DisPho::ApplyBlindMET()) return;
+  DisPho::FillBlindMET();
+
+  //////////////////
+  // Prep Objects //
+  //////////////////
+
+  DisPho::PrepObjects(iEvent);
+
+  /////////////////////////
+  // Apply pre-selection //
+  /////////////////////////
+
+  if (applyTrigger && DisPho::ApplyPreSelectionTrigger()) return;
+  DisPho::FillPreSelectionTrigger();
+
+  if (applyHT && DisPho::ApplyPreSelectionHT()) return;
+  DisPho::FillPreSelectionHT();
+
+  if (applyPhGood && DisPho::ApplyPreSelectionGoodPhoton()) return;
+
+  DisPho::FillPreSelectionGoodPhoton();
+
+  ////////////////////////////
+  // Fill Tree From Objects //
+  ////////////////////////////
+
+  DisPho::FillTreeFromObjects(iEvent);
+
+}
+
+///////////////////////////
+// Object Prep Functions //
+///////////////////////////
+
+// get handles from tokens --> ensure they exist!
+bool DisPho::GetObjects(const edm::Event & iEvent, const edm::EventSetup & iSetup)
+{
+  //////////////////////
+  // Standard Objects //
+  //////////////////////
+
+  if (!DisPho::GetStandardObjects(iEvent)) return false;
+
+  ///////////////////////////
+  // Calibration Constants //
+  ///////////////////////////
+  
+  if (!DisPho::GetCalibrationConstants(iSetup)) return false;
+
+  ////////////////
+  // MC Objects //
+  ////////////////
+
+  if (isMC)
+  {
+    if (!DisPho::GetMCObjects(iEvent)) return false;
+  }
+
+  // if no bad handles, return true
+  return true;
+}
+
+//bool DisPho::GetLHCInfo(const edm::Event & iEvent, const edm::EventSetup & iSetup)
+//{
+//
+//  bool first_zero( true );
+//  bool first_notzero( true );
+//  unsigned int zero(0);
+//  unsigned int notzero(0);
+//  unsigned int longnotzero(0);
+//  unsigned int count(0);
+//  unsigned int longcount(0);
+//
+//  train_zero.clear();
+//  train_notzero.clear();
+//  long_train_notzero.clear();
+//  subtrain_num.clear();
+//  train_num.clear();
+//
+//  // Get event information
+//  fBX = iEvent.bunchCrossing() - 1; // Force the LHC info to match with the CMS convention
+//
+//  // Get LHCInfo handle
+//  edm::ESHandle<LHCInfo> lhcInfo;
+//  iSetup.get<LHCInfoRcd>().get(lhcInfo);
+//
+//  // Verify LHC Info
+//  if(!lhcInfoValid) {
+//    //throw cms::Exception("ProductNotValid") << "LHCInfo product not valid";
+//    //std::cout << "LHCInfo not found?\n" << std::endl;
+//    return false;
+//  }
+//  else{
+//    
+//    const LHCInfo* info = lhcInfo.product();
+//    
+//    fXangle = info->crossingAngle();
+//
+//    // Beam 1 VC
+//    fBunchNum = 0;
+//    std::vector<float> ( info->beam1VC() );
+//    for (vector<float>::const_iterator i = info->beam1VC().begin(); i != info->beam1VC().end(); ++i) {
+//      fBeam1VC[fBunchNum] = *i;
+//      fBunchNum++;
+//    }
+//    
+//    // Beam 2 VC
+//    fBunchNum = 0;
+//    std::vector<float> ( info->beam2VC() );
+//    for (vector<float>::const_iterator i = info->beam2VC().begin(); i != info->beam2VC().end(); ++i) {
+//      fBeam2VC[fBunchNum] = *i;
+//      fBunchNum++;
+//    }
+//    
+//    // Beam 1 RF
+//    fBunchNum = 0;
+//    std::vector<float> ( info->beam1RF() );
+//    for (vector<float>::const_iterator i = info->beam1RF().begin(); i != info->beam1RF().end(); ++i) {
+//      fBeam1RF[fBunchNum] = *i;
+//      fBunchNum++;
+//    }
+//    
+//    // Beam 2 RF
+//    fBunchNum = 0;
+//    std::vector<float> ( info->beam2RF() );
+//    for (vector<float>::const_iterator i = info->beam2RF().begin(); i != info->beam2RF().end(); ++i) {
+//      fBeam2RF[fBunchNum] = *i;
+//      fBunchNum++;
+//    }
+//
+//    // Get train position
+//    for( unsigned int i = 0; i < info->beam1VC().size(); i++ ){
+//      if( info->beam1VC()[i] == 0.0 ) {
+//	if( first_zero == true ) {
+//	  first_zero = false;
+//	  first_notzero = true;
+//	  zero = 0;
+//	}
+//	zero++;
+//      }
+//      else {
+//	if( first_notzero == true ) {
+//	  first_notzero = false;
+//	  first_zero = true;
+//	  notzero = 0;
+//	  if( zero > 10 ){
+//	    longnotzero = 0;
+//	    longcount++;
+//	  }
+//	  count++;
+//	}
+//	notzero++;
+//	longnotzero++;
+//      }
+//      train_zero.push_back(zero);
+//      train_notzero.push_back(notzero);
+//      long_train_notzero.push_back(longnotzero);
+//      subtrain_num.push_back(count);
+//      train_num.push_back(longcount);
+//    }
+//
+//    // Store train positions for tree
+//    subtrain_position = train_notzero[fBX];
+//    
+//    train_position = long_train_notzero[fBX];
+//    subtrain_number = subtrain_num[fBX];
+//    train_number = train_num[fBX];
+//
+//    // Store beam conditions for bx
+//    beam1_RF = fBeam1RF[fBX];
+//    beam2_RF = fBeam2RF[fBX];
+//    beam1_VC = fBeam1VC[fBX];
+//    beam2_VC = fBeam2VC[fBX];
+//    
+//  }
+//
+//  return true;
+//}
+
+bool DisPho::GetStandardObjects(const edm::Event & iEvent)
+{
+  // TRIGGER RESULTS
+  //jwk iEvent.getByToken(triggerResultsToken,triggerResultsH);
+  //jwk if (oot::BadHandle(triggerResultsH,"triggerResults")) return false;
+      
+  // TRIGGER OBJECTS
+  //jwk iEvent.getByToken(triggerObjectsToken,triggerObjectsH);
+  //jwk if (oot::BadHandle(triggerObjectsH,"triggerObjects")) return false;
 
   // MET FLAGS
-  edm::Handle<edm::TriggerResults> triggerFlagsH;
-  iEvent.getByToken(triggerFlagsToken, triggerFlagsH);
-  edm::Handle<bool> ecalBadCalibFlagH;
-  iEvent.getByToken(ecalBadCalibFlagToken, ecalBadCalibFlagH);
+  //iEvent.getByToken(triggerFlagsToken,triggerFlagsH);
+  //if (oot::BadHandle(triggerFlagsH,"triggerFlags")) return false;
+
+  //jwk iEvent.getByToken(ecalBadCalibFlagToken,ecalBadCalibFlagH);
+  //jwk if (oot::BadHandle(ecalBadCalibFlagH,"ecalBadCalibFlag")) return false;
 
   // TRACKS
-  edm::Handle<std::vector<reco::Track> > tracksH;
-  iEvent.getByToken(tracksToken, tracksH);
+  iEvent.getByToken(tracksToken,tracksH);
+  if (oot::BadHandle(tracksH,"tracks")) return false;
 
   // VERTICES
-  edm::Handle<std::vector<reco::Vertex> > verticesH;
-  iEvent.getByToken(verticesToken, verticesH);
-  
-  // RHOS
-  edm::Handle<double> rhosH;
-  iEvent.getByToken(rhosToken, rhosH);
+  iEvent.getByToken(verticesToken,verticesH);
+  if (oot::BadHandle(verticesH,"vertices")) return false;
 
-  // MET
-  edm::Handle<std::vector<pat::MET> > metsH;
-  iEvent.getByToken(metsToken, metsH);
+  // RHO
+  iEvent.getByToken(rhoToken,rhoH);
+  if (oot::BadHandle(rhoH,"rho")) return false;
+
+  // METS
+  //iEvent.getByToken(metsToken,metsH);
+  //if (oot::BadHandle(metsH,"mets")) return false;
 
   // JETS
-  edm::Handle<std::vector<pat::Jet> > jetsH;
-  iEvent.getByToken(jetsToken, jetsH);
-  std::vector<pat::Jet> jets; jets.reserve(jetsH->size());
+  //iEvent.getByToken(jetsToken,jetsH);
+  //if (oot::BadHandle(jetsH,"jets")) return false;
 
-  // ELECTRONS
-  edm::Handle<std::vector<pat::Electron> > electronsH;
-  iEvent.getByToken(electronsToken, electronsH);
-  std::vector<pat::Electron> electrons; electrons.reserve(electronsH->size());
+  // LEPTONS
+  iEvent.getByToken(electronsToken,electronsH);
+  if (oot::BadHandle(electronsH,"electrons")) return false;
 
-  // MUONS
-  edm::Handle<std::vector<pat::Muon> > muonsH;
-  iEvent.getByToken(muonsToken, muonsH);
-  std::vector<pat::Muon> muons; muons.reserve(muonsH->size());
+  iEvent.getByToken(muonsToken,muonsH);
+  if (oot::BadHandle(muonsH,"muons")) return false;
 
   // ECAL RECHITS
-  edm::Handle<edm::SortedCollection<EcalRecHit,edm::StrictWeakOrdering<EcalRecHit> > > recHitsEBH;
-  iEvent.getByToken(recHitsEBToken, recHitsEBH);
-  const EcalRecHitCollection * recHitsEB = recHitsEBH.product();
-  edm::Handle<edm::SortedCollection<EcalRecHit,edm::StrictWeakOrdering<EcalRecHit> > > recHitsEEH;
-  iEvent.getByToken(recHitsEEToken, recHitsEEH);
-  const EcalRecHitCollection * recHitsEE = recHitsEEH.product();
-  uiiumap recHitMap;
+  iEvent.getByToken(recHitsEBToken,recHitsEBH);
+  if (oot::BadHandle(recHitsEBH,"recHitsEB")) return false;
 
-  /////////////
-  // PHOTONS //
-  /////////////
+  iEvent.getByToken(recHitsEEToken,recHitsEEH);
+  if (oot::BadHandle(recHitsEEH,"recHitsEE")) return false;
 
-  // GEDPHOTONS + IDS
-  edm::Handle<std::vector<pat::Photon> > gedPhotonsH;
-  iEvent.getByToken(gedPhotonsToken, gedPhotonsH);
- 
-  // OOTPHOTONS + IDS
-  edm::Handle<std::vector<pat::Photon> > ootPhotonsH;
-  iEvent.getByToken(ootPhotonsToken, ootPhotonsH);
- 
-  // how many total photons
-  const int phosize = gedPhotonsH->size() + ootPhotonsH->size();
+  // ECAL UNCALIBRATED RECHITS
+  iEvent.getByToken(uncalibratedRecHitsEBToken,uncalibratedRecHitsEBH);
+  if (oot::BadHandle(uncalibratedRecHitsEBH,"uncalibratedRecHitsEB")) return false;
 
-  // total photons vector
-  std::vector<oot::Photon> photons; photons.reserve(phosize);
+  iEvent.getByToken(uncalibratedRecHitsEEToken,uncalibratedRecHitsEEH);
+  if (oot::BadHandle(uncalibratedRecHitsEEH,"uncalibratedRecHitsEE")) return false;
 
+  // DIGIS
+  iEvent.getByToken(ebDigiCollectionToken_,pEBDigis);
+  if (oot::BadHandle(pEBDigis,"EBdigiCollection")) return false;
+
+  iEvent.getByToken(eeDigiCollectionToken_,pEEDigis);
+  if (oot::BadHandle(pEEDigis,"EEdigiCollection")) return false;
+
+  // PHOTONS
+  iEvent.getByToken(gedPhotonsToken,gedPhotonsH);
+  if (oot::BadHandle(gedPhotonsH,"gedPhotons")) return false;
+
+  iEvent.getByToken(ootPhotonsToken,ootPhotonsH);
+  if (oot::BadHandle(ootPhotonsH,"ootPhotons")) return false;
+
+  // if no bad handles, return true
+  return true;
+}
+
+bool DisPho::GetCalibrationConstants(const edm::EventSetup & iSetup)
+{
   // GEOMETRY : https://gitlab.cern.ch/shervin/ECALELF
-  edm::ESHandle<CaloGeometry> caloGeoH;
   iSetup.get<CaloGeometryRecord>().get(caloGeoH);
-  const CaloSubdetectorGeometry * barrelGeometry = caloGeoH->getSubdetectorGeometry(DetId::Ecal, EcalBarrel);
-  const CaloSubdetectorGeometry * endcapGeometry = caloGeoH->getSubdetectorGeometry(DetId::Ecal, EcalEndcap);
+  if (oot::BadHandle(caloGeoH,"caloGeo")) return false;
 
   //////////////////
   // ECAL RECORDS // 
   //////////////////
 
   // Laser constants : http://cmslxr.fnal.gov/source/RecoEcal/EgammaCoreTools/interface/EcalClusterLazyTools.h
-  edm::ESHandle<EcalLaserDbService> laserH;
   iSetup.get<EcalLaserDbRecord>().get(laserH);
+  if (oot::BadHandle(laserH,"laser")) return false;
 
   // Intercalibration constants : http://cmslxr.fnal.gov/source/RecoEcal/EgammaCoreTools/interface/EcalClusterLazyTools.h
-  edm::ESHandle<EcalIntercalibConstants> interCalibH;
-  const EcalIntercalibConstantMap *      interCalibMap;
   iSetup.get<EcalIntercalibConstantsRcd>().get(interCalibH);
-  interCalibMap = &interCalibH->getMap();
+  if (oot::BadHandle(interCalibH,"interCalib")) return false;
   
   // ADCToGeV : http://cmslxr.fnal.gov/source/RecoEcal/EgammaCoreTools/interface/EcalClusterLazyTools.h
-  edm::ESHandle<EcalADCToGeVConstant> adcToGeVH;
   iSetup.get<EcalADCToGeVConstantRcd>().get(adcToGeVH);
+  if (oot::BadHandle(adcToGeVH,"adcToGeV")) return false;
 
   // Pedestals : https://github.com/ferriff/usercode/blob/master/DBDump/plugins/DBDump.cc
-  edm::ESHandle<EcalPedestals> pedestalsH;
   iSetup.get<EcalPedestalsRcd>().get(pedestalsH);
+  if (oot::BadHandle(pedestalsH,"pedestals")) return false;
 
   /////////////////
   // JET DB INFO //
   /////////////////
 
   // JECs : https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookJetEnergyCorrections#CorrPatJets  
-  edm::ESHandle<JetCorrectorParametersCollection> jetCorrH;
   iSetup.get<JetCorrectionsRecord>().get("AK4PFchs",jetCorrH); 
-  JetCorrectionUncertainty jetCorrUnc((*jetCorrH)["Uncertainty"]);
+  if (oot::BadHandle(jetCorrH,"jetCorr")) return false;
 
   // JERs : https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookJetEnergyResolution#Accessing_factors_from_Global_Ta
-  JME::JetResolution jetRes = JME::JetResolution::get(iSetup, "AK4PFchs_pt");
-  JME::JetResolutionScaleFactor jetRes_sf = JME::JetResolutionScaleFactor::get(iSetup, "AK4PFchs");
+  jetRes = JME::JetResolution::get(iSetup,"AK4PFchs_pt");
+  jetRes_sf = JME::JetResolutionScaleFactor::get(iSetup,"AK4PFchs");
 
+  // if no bad handles, return true
+  return true;
+}
+
+bool DisPho::GetMCObjects(const edm::Event & iEvent)
+{
   //////////////
   // GEN INFO //
   //////////////
 
-  edm::Handle<GenEventInfoProduct> genevtInfoH;
-  edm::Handle<float>   gent0H;
-  edm::Handle<Point3D> genxyz0H;
-  edm::Handle<std::vector<PileupSummaryInfo> > pileupInfoH;
-  edm::Handle<std::vector<reco::GenParticle> > genparticlesH;
-  edm::Handle<std::vector<reco::GenJet> > genjetsH;
-  genPartVec neutralinos;
-  genPartVec vPions;
-  genPartVec toys;
+  iEvent.getByToken(genEvtInfoToken,genEvtInfoH);
+  if (oot::BadHandle(genEvtInfoH,"genEvtInfo")) return false;
+  
+  iEvent.getByToken(gent0Token,gent0H);
+  if (oot::BadHandle(gent0H,"gent0")) return false;
+  
+  iEvent.getByToken(genxyz0Token,genxyz0H);
+  if (oot::BadHandle(genxyz0H,"genxyz0")) return false;
+  
+  iEvent.getByToken(pileupInfosToken,pileupInfosH);
+  if (oot::BadHandle(pileupInfosH,"pileupInfos")) return false;
+  
+  iEvent.getByToken(genParticlesToken,genParticlesH);
+  if (oot::BadHandle(genParticlesH,"genParticles")) return false;
+  
+  iEvent.getByToken(genJetsToken,genJetsH);
+  if (oot::BadHandle(genJetsH,"genJets")) return false;
 
+  // no bad handles, so return that everything is ok!
+  return true;
+}
+
+void DisPho::InitializeObjects(const edm::Event & iEvent)
+{
+
+  // INPUT + OUTPUT RHO
+  rho = *(rhoH.product());
+
+  // OUTPUT MET
+  //t1pfMET = pat::MET(metsH->front());
+
+  // OUPUT JETS
+  //jets.clear(); 
+  //jets.reserve(jetsH->size());
+
+  // OUTPUT ELECTRONS
+  electrons.clear(); 
+  electrons.reserve(electronsH->size());
+
+  // OUTPUT MUONS
+  muons.clear(); 
+  muons.reserve(muonsH->size());
+
+  // INPUT ECAL RECHITS
+  recHitsEB = recHitsEBH.product();
+  recHitsEE = recHitsEEH.product();
+
+  // OUTPUT RECHIT MAP
+  recHitMap.clear();
+
+  // INPUT ECAL UNCALIBRATED RECHITS
+  uncalibratedRecHitsEB = uncalibratedRecHitsEBH.product();
+  uncalibratedRecHitsEE = uncalibratedRecHitsEEH.product();
+
+  // OUTPUT UNCALIBRATED RECHIT MAP
+  uncalibratedRecHitMap.clear();
+
+  // INPUT ECAL DIGIS
+  EBdigiCollection = pEBDigis.product();
+  EEdigiCollection = pEEDigis.product();
+
+  // OUTPUT ECAL DIGIS
+  digiMap.clear();
+
+  // OUTPUT PHOTONS
+  photons.clear();
+  photons.reserve(gedPhotonsH->size()+ootPhotonsH->size());
+
+  // GEOMETRY
+  barrelGeometry = caloGeoH->getSubdetectorGeometry(DetId::Ecal, EcalSubdetector::EcalBarrel);
+  endcapGeometry = caloGeoH->getSubdetectorGeometry(DetId::Ecal, EcalSubdetector::EcalEndcap);
+
+  // LASER
+  evTime = iEvent.time();
+
+  // INTERCALIB
+  interCalibMap = &interCalibH->getMap();
+  
+  // ADCTOGEV
+  adcToGeVEB = adcToGeVH->getEBValue();
+  adcToGeVEE = adcToGeVH->getEEValue();
+  
+  // GEN INFO
   if (isMC)
   {
-    iEvent.getByToken(genevtInfoToken, genevtInfoH);
-    iEvent.getByToken(genxyz0Token   , genxyz0H);
-    iEvent.getByToken(gent0Token     , gent0H);
-    iEvent.getByToken(pileupInfoToken, pileupInfoH);
-    iEvent.getByToken(genpartsToken  , genparticlesH);
-    iEvent.getByToken(genjetsToken   , genjetsH);
-
-    ///////////////////////
-    //                   //
-    // Event weight info //
-    //                   //
-    ///////////////////////
-    DisPho::InitializeGenEvtBranches();
-    if (genevtInfoH.isValid()) 
-    {
-      DisPho::SetGenEvtBranches(genevtInfoH);
-    }
-
-    /////////////////////
-    //                 //
-    // Gen pileup info //
-    //                 //
-    /////////////////////
-    DisPho::InitializeGenPUBranches();
-    if (pileupInfoH.isValid()) // standard check for pileup
-    {
-      DisPho::SetGenPUBranches(pileupInfoH);
-    } // end check over pileup
+    if (isGMSB) neutralinos.clear();
+    if (isHVDS) vPions.clear();
+    if (isToy) toys.clear();
   }
+}
+
+void DisPho::GetWeights()
+{
+
+
+  /////////////////
+  // gen weights //
+  /////////////////
+
+  if (isMC)
+  {  
+    ///////////////////////
+    // Event weight info //
+    ///////////////////////
+
+    genwgt = genEvtInfoH->weight();
+    
+    /////////////////////
+    // Gen pileup info //
+    /////////////////////
+
+    DisPho::InitializeGenPUBranches();
+    DisPho::SetGenPUBranches();
+  } // end check on isMC
 
   //////////////////////
-  //                  //
   // Set Event Weight //
-  //                  //
   //////////////////////
-  const Float_t wgt = (isMC ? genwgt : 1.f);
 
+  wgt = (isMC ? genwgt : 1.f);
+}
+
+void DisPho::InitializeGenPUBranches()
+{
+  genpuobs = -9999; 
+  genputrue = -9999;
+}
+
+void DisPho::SetGenPUBranches()
+{
+  for (const auto & pileupInfo : *pileupInfosH)
+  {
+    if (pileupInfo.getBunchCrossing() == 0) 
+    {
+      genpuobs  = pileupInfo.getPU_NumInteractions();
+      genputrue = pileupInfo.getTrueNumInteractions();
+      
+      break;
+    } // end check over correct BX
+  } // end loop over PU
+}
+
+void DisPho::AlwaysFillHists()
+{
   // Fill total cutflow regardless of cuts
   h_cutflow    ->Fill((cutflowLabelMap["All"]*1.f));
   h_cutflow_wgt->Fill((cutflowLabelMap["All"]*1.f),wgt);
@@ -368,367 +720,320 @@ void DisPho::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     h_genputrue    ->Fill(genputrue);
     h_genputrue_wgt->Fill(genputrue,wgt);
   }
+}
 
-  //////////////
-  //          //
-  // Blinding //
-  //          //
-  //////////////
-  if (event%blindSF!=0 && applyBlindSF) return;
-  h_cutflow    ->Fill((cutflowLabelMap["nEvBlinding"]*1.f));
-  h_cutflow_wgt->Fill((cutflowLabelMap["nEvBlinding"]*1.f),wgt);
-
-  if (metsH.isValid())
-  {
-    if ((*metsH).front().pt() > blindMET && applyBlindMET) return;
-  }  
-  h_cutflow    ->Fill((cutflowLabelMap["METBlinding"]*1.f));
-  h_cutflow_wgt->Fill((cutflowLabelMap["METBlinding"]*1.f),wgt);
-
-  /////////
-  //     //
-  // Rho //
-  //     //
-  /////////
-  DisPho::InitializeRhoBranches();
-  if (rhosH.isValid())
-  {
-    DisPho::SetRhoBranches(rhosH);
-  }
-
+void DisPho::PrepObjects(const edm::Event & iEvent)
+{
+  
   /////////////////////
-  //                 //
   // Object Prepping //
-  //                 //
   /////////////////////
-  if (isGMSB) oot::PrepNeutralinos(genparticlesH,neutralinos);
-  if (isHVDS) oot::PrepVPions(genparticlesH,vPions);
-  if (isToy)  oot::PrepToys(genparticlesH,toys);
-  oot::PrepTriggerBits(triggerResultsH,iEvent,triggerBitMap);
-  oot::PrepTriggerBits(triggerFlagsH,iEvent,triggerFlagMap);
-  oot::PrepTriggerObjects(triggerResultsH,triggerObjectsH,iEvent,triggerObjectsByFilterMap);
-  oot::PrepJets(jetsH,jets,jetpTmin,jetEtamax,jetIDmin);
+
+  if (isGMSB) oot::PrepNeutralinos(genParticlesH,neutralinos);
+  if (isHVDS) oot::PrepVPions(genParticlesH,vPions);
+  if (isToy)  oot::PrepToys(genParticlesH,toys);
+
+  //jwk oot::PrepTriggerBits(triggerResultsH,iEvent,triggerBitMap);
+
+  //oot::PrepTriggerBits(triggerFlagsH,iEvent,triggerFlagMap);
+
+  //jwk oot::PrepTriggerObjects(triggerResultsH,triggerObjectsH,iEvent,triggerObjectsByFilterMap);
+
+  //oot::PrepJets(jetsH,jets,jetpTmin,jetEtamax,jetIDmin);
+
   oot::PrepRecHits(recHitsEB,recHitsEE,recHitMap,rhEmin);
-  oot::PrepPhotons(gedPhotonsH,ootPhotonsH,photons,rho,phpTmin,phIDmin);
+  oot::PrepURecHits(uncalibratedRecHitsEB,uncalibratedRecHitsEE,uncalibratedRecHitMap);
+  oot::PrepDigis(EBdigiCollection,EEdigiCollection,digiMap);
 
   ///////////////////
-  //               //
   // Extra Pruning //
-  //               //
   ///////////////////
+
   oot::PrunePhotons(photons,recHitsEB,recHitsEE,seedTimemin);
-  oot::PruneJets(jets,photons,dRmin);
+  oot::PruneJets(jets,photons,nPhosmax,dRmin);
 
   /////////////////////////////
-  //                         //
   // Photon Storing Options  //
-  //                         //
   /////////////////////////////
+
   if (splitPho) oot::SplitPhotons(photons,Config::nPhotons/2);     // split photons by OOT and GED (store at most nPhotons/2 of each)
   if (onlyGED)  oot::StoreOnlyPho(photons,Config::nPhotons,false); // store only GED photons, top nPhotons only
   if (onlyOOT)  oot::StoreOnlyPho(photons,Config::nPhotons,true);  // store only OOT photons, top nPhotons only
 
   /////////////////////
-  //                 //
   // Lepton Prepping //
-  //                 //
   /////////////////////
 
   oot::PrepLeptons(electronsH,electrons,photons,ellowpTmin,leptondRmin); // consider only electrons NOT matched to our photons
   oot::PrepLeptons(muonsH,muons,photons,mulowpTmin,leptondRmin); // consider only muons NOT matched to our photons
-		
-  ///////////////////////////////
-  //                           //
-  // Object Counts for Storing //
-  //                           //
-  ///////////////////////////////
-  const int nJets    = std::min(int(jets.size()),Config::nJets);
-  const int nRecHits = recHitMap.size();
-  const int nPhotons = std::min(int(photons.size()),Config::nPhotons);
 
-  /////////////////////////
-  //                     //
-  // Apply pre-selection //
-  //                     //
-  /////////////////////////
-  // trigger pre-selection
-  bool triggered = false;
+  ///////////////////////////////
+  // Object Counts for Storing //
+  ///////////////////////////////
+
+  //nJets    = std::min(int(jets.size()),Config::nJets);
+  nRecHits = recHitMap.size();
+  nURecHits = uncalibratedRecHitMap.size();
+  nDigis = digiMap.size();
+  nPhotons = std::min(int(photons.size()),Config::nPhotons);
+}
+
+////////////////////////////////
+// Blinding and Pre-Selection //
+////////////////////////////////
+
+inline bool DisPho::ApplyBlindSF()
+{
+  return (event%blindSF!=0);
+}
+
+void DisPho::FillBlindSF()
+{
+  h_cutflow    ->Fill((cutflowLabelMap["nEvBlinding"]*1.f));
+  h_cutflow_wgt->Fill((cutflowLabelMap["nEvBlinding"]*1.f),wgt);
+}
+
+inline bool DisPho::ApplyBlindMET()
+{
+  return (t1pfMET.pt() > blindMET);
+}
+
+void DisPho::FillBlindMET()
+{
+  h_cutflow    ->Fill((cutflowLabelMap["METBlinding"]*1.f));
+  h_cutflow_wgt->Fill((cutflowLabelMap["METBlinding"]*1.f),wgt);
+}
+
+bool DisPho::ApplyPreSelectionTrigger()
+{
+  auto triggered = false;
+  
   for (const auto & triggerBitPair : triggerBitMap)
   {
     if (triggerBitPair.second) {triggered = true; break;}
   }
-  if (!triggered && applyTrigger) return;
+  
+  return !triggered;
+}
+
+void DisPho::FillPreSelectionTrigger()
+{
   h_cutflow    ->Fill((cutflowLabelMap["Trigger"]*1.f));
   h_cutflow_wgt->Fill((cutflowLabelMap["Trigger"]*1.f),wgt);
+}
 
-  // HT pre-selection
+bool DisPho::ApplyPreSelectionHT()
+{
   auto jetHT = 0.f;
   for (auto ijet = 0; ijet < nJets; ijet++) jetHT += jets[ijet].pt();
-  if (jetHT < minHT && applyHT) return;
+  return (jetHT < minHT);
+}
+
+void DisPho::FillPreSelectionHT()
+{
   h_cutflow    ->Fill((cutflowLabelMap["H_{T}"]*1.f));
   h_cutflow_wgt->Fill((cutflowLabelMap["H_{T}"]*1.f),wgt);
+}
 
+bool DisPho::ApplyPreSelectionGoodPhoton()
+{
   // photon pre-selection: at least one good photon in event
-  bool isphgood = false;
-  if (gedPhotonsH.isValid() || ootPhotonsH.isValid()) 
+  auto isphgood = false;
+  
+  for (auto iphoton = 0; iphoton < nPhotons; iphoton++)
   {
-    for (auto iphoton = 0; iphoton < nPhotons; iphoton++)
+    const auto & photon = photons[iphoton];
+    
+    //      if (iphoton > 0) break; // only consider first photon
+    
+    const auto pt = oot::GetPhotonPt(photon);
+    if (pt < phgoodpTmin) continue;
+    
+    // const float sceta = std::abs(photon.superCluster()->eta());
+    // if (sceta > Config::etaEBcutoff) continue;
+    
+    if (phgoodIDmin != "none")
     {
-      const auto & photon = photons[iphoton];
-      const auto & pho = photon.photon();
+      if (!*(photon.userData<bool>("isOOT")) && !photon.photonID(phgoodIDmin+"-ged")) continue;
+      if ( *(photon.userData<bool>("isOOT")) && !photon.photonID(phgoodIDmin+"-oot")) continue;
+    }
+    
+    isphgood = true; break;
+  } // end loop over photons
 
-      //      if (iphoton > 0) break; // only consider first photon
+  
+  return !isphgood;
+}
 
-      const auto pt = pho.pt() * pho.pat::Photon::userFloat("ecalEnergyPostCorr") / pho.pat::Photon::energy();
-      if (pt < phgoodpTmin) continue;
-
-      // const float sceta = std::abs(pho.superCluster()->eta());
-      // if (sceta > Config::etaEBcutoff) continue;
-
-      if (phgoodIDmin != "none")
-      {
-	if (!photon.isOOT() && !pho.photonID(phgoodIDmin+"-ged")) continue;
-	if ( photon.isOOT() && !pho.photonID(phgoodIDmin+"-oot")) continue;
-      }
-      
-      isphgood = true; break;
-    } 
-  } // end check
-  if (!isphgood && applyPhGood) return;
+void DisPho::FillPreSelectionGoodPhoton()
+{
   h_cutflow    ->Fill((cutflowLabelMap["Good Photon"]*1.f));
   h_cutflow_wgt->Fill((cutflowLabelMap["Good Photon"]*1.f),wgt);
+}
+
+//////////////////////////////////////
+// Fill Tree from Objects Functions //
+//////////////////////////////////////
+
+void DisPho::FillTreeFromObjects(const edm::Event & iEvent)
+{
 
   /////////////
-  //         //
   // MC Info //
-  //         //
   /////////////
-  if (isMC) 
-  {
-    ////////////////
-    //            //
-    // xyzt0 info //
-    //            //
-    ////////////////
-    DisPho::InitializeGenPointBranches();
-    if (genxyz0H.isValid()) // standard check 3D point
-    {
-      DisPho::SetGenXYZ0Branches(genxyz0H);
-    }
-    if (gent0H.isValid()) // standard check on t0
-    {
-      DisPho::SetGenT0Branches(gent0H);
-    }
-      
-    ///////////////////////
-    //                   //
-    // Gen particle info //
-    //                   //
-    ///////////////////////
-    // GMSB
-    if (isGMSB) 
-    {
-      DisPho::InitializeGMSBBranches();
-      if (genparticlesH.isValid() && (gedPhotonsH.isValid() || ootPhotonsH.isValid()))
-      {
-	DisPho::SetGMSBBranches(neutralinos,photons,nPhotons);
-      } // check genparticles are okay
-    } // isGMSB
 
-    // HVDS
-    if (isHVDS) 
-    {
-      DisPho::InitializeHVDSBranches();
-      if (genparticlesH.isValid() && (gedPhotonsH.isValid() || ootPhotonsH.isValid()))
-      {
-	DisPho::SetHVDSBranches(vPions,photons,nPhotons);
-      } // check genparticles are okay
-    } // isHVDS
-
-    // ToyMC
-    if (isToy) 
-    {
-      DisPho::InitializeToyBranches();
-      if (genparticlesH.isValid() && (gedPhotonsH.isValid() || ootPhotonsH.isValid()))
-      {
-	DisPho::SetToyBranches(toys,photons,nPhotons);
-      } // check genparticles are okay
-    } // isHVDS
-  } // isMC
+  if (isMC) DisPho::SetMCInfo();
 
   ///////////////////////////
-  //                       //
   // Event, lumi, run info //
-  //                       //
   ///////////////////////////
+
   DisPho::SetRecordInfo(iEvent);
 
   //////////////////
-  //              //
   // Trigger Info //
-  //              //
   //////////////////
+
   DisPho::SetTriggerBranches();
 
   /////////////////////
-  //                 //
   // MET Filter Info //
-  //                 //
   /////////////////////
-  DisPho::SetMETFilterBranches(ecalBadCalibFlagH);
+
+  DisPho::SetMETFilterBranches();
 
   /////////////////////////
-  //                     //   
   // Primary Vertex info //
-  //                     //
   /////////////////////////
+
   DisPho::InitializePVBranches();
-  if (verticesH.isValid())
-  {
-    DisPho::SetPVBranches(verticesH);
-  }
+
+  DisPho::SetPVBranches();
 
   //////////////////
-  //              //
   // Type1 PF Met //
-  //              //
   //////////////////
+
   DisPho::InitializeMETBranches();
-  if (metsH.isValid())
+  DisPho::SetMETBranches();
+
+  if (isMC) 
   {
-    const auto & t1pfMET = (*metsH).front();
-    
-    DisPho::SetMETBranches(t1pfMET);
+    DisPho::InitializeMETBranchesMC();
+    DisPho::SetMETBranchesMC();
   }
 
   /////////////////////////
-  //                     //
   // Jets (AK4 standard) //
-  //                     //
   /////////////////////////
-  DisPho::InitializeJetBranches(nJets);
-  if (isMC) DisPho::InitializeJetBranchesMC(nJets);
-  if (jetsH.isValid()) // check to make sure reco jets exist
+
+  //DisPho::InitializeJetBranches();
+  //DisPho::SetJetBranches();
+
+  if (isMC)
   {
-    DisPho::SetJetBranches(jets,nJets);
-    if (isMC && jetCorrH.isValid() && genjetsH.isValid()) DisPho::SetJetBranchesMC(jets,nJets,genjetsH,jetCorrUnc,jetRes,jetRes_sf);
+    DisPho::InitializeJetBranchesMC();
+    DisPho::SetJetBranchesMC();
   }
 
   ///////////////
-  //           //
   // Electrons //
-  //           //
   ///////////////
+
   DisPho::InitializeElectronBranches();
-  if (electronsH.isValid())
-  {
-    DisPho::SetElectronBranches(electrons);
-  }
+  DisPho::SetElectronBranches();
 
   ///////////
-  //       //
   // Muons //
-  //       //
   ///////////
+
   DisPho::InitializeMuonBranches();
-  if (muonsH.isValid())
-  {
-    DisPho::SetMuonBranches(muons);
-  }
+  DisPho::SetMuonBranches();
 
   //////////////
-  //          //
   // Rec Hits //
-  //          //
   //////////////
-  DisPho::InitializeRecHitBranches(nRecHits);
-  if (recHitsEBH.isValid() && recHitsEEH.isValid() && caloGeoH.isValid() && adcToGeVH.isValid() && laserH.isValid() && interCalibH.isValid() && pedestalsH.isValid())
-  {
-    DisPho::SetRecHitBranches(recHitsEB,barrelGeometry,recHitsEE,endcapGeometry,
-			      recHitMap,iEvent,laserH,interCalibMap,adcToGeVH,pedestalsH);
-  }
+
+  DisPho::InitializeRecHitBranches();
+  DisPho::SetRecHitBranches();
+
+  DisPho::InitializeDigiBranches();
+  DisPho::SetDigiBranches();
 
   //////////////////
-  //              //
   // Reco Photons //
-  //              //
   //////////////////
+
   DisPho::InitializePhoBranches();
-  if (isMC) DisPho::InitializePhoBranchesMC();
-  if ((gedPhotonsH.isValid() || ootPhotonsH.isValid()) && recHitsEBH.isValid() && recHitsEEH.isValid() && tracksH.isValid()) // standard handle check
+  DisPho::SetPhoBranches();
+  if (isMC) 
   {
-    DisPho::SetPhoBranches(photons,nPhotons,recHitMap,recHitsEB,recHitsEE,tracksH);
-    if (isMC && genparticlesH.isValid()) DisPho::SetPhoBranchesMC(photons,nPhotons,genparticlesH);
+    DisPho::InitializePhoBranchesMC();
+    DisPho::SetPhoBranchesMC();
   }
 
   ///////////////
-  //           //
   // Fill Tree //
-  //           //
   ///////////////
+
+  cout << "Filling the tree" << endl;
+
   disphotree->Fill();
 }
 
-void DisPho::InitializeRhoBranches()
+void DisPho::SetMCInfo()
 {
-  rho = 0.f;
-}
+  ////////////////
+  // xyzt0 info //
+  ////////////////
+  
+  DisPho::InitializeGenPointBranches();
+  DisPho::SetGenT0Branches();
+  DisPho::SetGenXYZ0Branches();
+  
+  ///////////////////////
+  // Gen particle info //
+  ///////////////////////
 
-void DisPho::SetRhoBranches(const edm::Handle<double> & rhosH)
-{
-  rho = *(rhosH.product());
-}
+  if (isGMSB) 
+  {
+    DisPho::InitializeGMSBBranches();
+    DisPho::SetGMSBBranches();
+  } // isGMSB
 
-void DisPho::InitializeGenEvtBranches()
-{
-  genwgt = -9999.f;
-}
+  if (isHVDS) 
+  {
+    DisPho::InitializeHVDSBranches();
+    DisPho::SetHVDSBranches();
+  } // isHVDS
 
-void DisPho::SetGenEvtBranches(const edm::Handle<GenEventInfoProduct> & genevtInfoH)
-{
-  genwgt = genevtInfoH->weight();
+  if (isToy) 
+  {
+    DisPho::InitializeToyBranches();
+    DisPho::SetToyBranches();
+  } // isHVDS
 }
 
 void DisPho::InitializeGenPointBranches()
 {
+  gent0 = -9999.f;
   genx0 = -9999.f;
   geny0 = -9999.f;
   genz0 = -9999.f;
-  gent0 = -9999.f;
 }
 
-void DisPho::SetGenXYZ0Branches(const edm::Handle<Point3D> & genxyz0H)
+void DisPho::SetGenT0Branches()
+{
+  gent0 = *(gent0H.product());
+}
+
+void DisPho::SetGenXYZ0Branches()
 {
   const auto & genxyz0 = *(genxyz0H.product());
 
   genx0 = genxyz0.X();
   geny0 = genxyz0.Y();
   genz0 = genxyz0.Z();
-}
-
-void DisPho::SetGenT0Branches(const edm::Handle<float> & gent0H)
-{
-  gent0 = *(gent0H.product());
-}
-
-void DisPho::InitializeGenPUBranches()
-{
-  genpuobs = -9999; 
-  genputrue = -9999;
-}
-
-void DisPho::SetGenPUBranches(const edm::Handle<std::vector<PileupSummaryInfo> > & pileupInfoH)
-{
-  for (const auto & puinfo : *pileupInfoH)
-  {
-    if (puinfo.getBunchCrossing() == 0) 
-    {
-      genpuobs  = puinfo.getPU_NumInteractions();
-      genputrue = puinfo.getTrueNumInteractions();
-      
-      break;
-    } // end check over correct BX
-  } // end loop over PU
 }
 
 void DisPho::InitializeGMSBBranches()
@@ -748,7 +1053,7 @@ void DisPho::InitializeGMSBBranches()
   }
 } 
 
-void DisPho::SetGMSBBranches(const std::vector<reco::GenParticle> & neutralinos, const std::vector<oot::Photon> & photons, const int nPhotons)
+void DisPho::SetGMSBBranches()
 {
   nNeutoPhGr = neutralinos.size();
   
@@ -791,11 +1096,11 @@ void DisPho::SetGMSBBranches(const std::vector<reco::GenParticle> & neutralinos,
     {
       const auto & photon = photons[iphoton];
       
-      if (photon.pt() < ((1.f-genpTres) * gmsbBranch.genphpt_)) continue;
-      if (photon.pt() > ((1.f+genpTres) * gmsbBranch.genphpt_)) continue;
+      if (oot::GetPhotonPt(photon) < ((1.f-genpTres) * gmsbBranch.genphpt_)) continue;
+      if (oot::GetPhotonPt(photon) > ((1.f+genpTres) * gmsbBranch.genphpt_)) continue;
       
       const auto delR = reco::deltaR(genphoton,photon);
-      if (delR < mindR) 
+      if (delR < mindR)
       {
 	mindR = delR;
 	gmsbBranch.genphmatch_ = iphoton;
@@ -831,7 +1136,7 @@ void DisPho::InitializeHVDSBranches()
   }
 }
 
-void DisPho::SetHVDSBranches(const std::vector<reco::GenParticle> & vPions, const std::vector<oot::Photon> & photons, const int nPhotons)
+void DisPho::SetHVDSBranches()
 {
   nvPions = vPions.size();
   
@@ -882,7 +1187,7 @@ void DisPho::SetHVDSBranches(const std::vector<reco::GenParticle> & vPions, cons
     for (auto iphoton = 0; iphoton < nPhotons; iphoton++)
     {
       const auto & photon = photons[iphoton];
-      const auto tmppt = photon.pt();
+      const auto tmppt = oot::GetPhotonPt(photon);
 
       // check gen photon 0
       if (tmppt < ((1.f-genpTres) * hvdsBranch.genHVph0pt_)) continue;
@@ -932,7 +1237,7 @@ void DisPho::InitializeToyBranches()
   }
 }
 
-void DisPho::SetToyBranches(const std::vector<reco::GenParticle> & toys, const std::vector<oot::Photon> & photons, const int nPhotons)
+void DisPho::SetToyBranches()
 {
   nToyPhs = toys.size();
   
@@ -959,7 +1264,7 @@ void DisPho::SetToyBranches(const std::vector<reco::GenParticle> & toys, const s
 	toyBranch.genphmatch_ = iphoton; 
       } // end check over deltaR
       
-      if ( (photon.pt() >= ((1.f-genpTres) * toyBranch.genphpt_)) && (photon.pt() <= ((1.f+genpTres) * toyBranch.genphpt_)) )
+      if ( (oot::GetPhotonPt(photon) >= ((1.f-genpTres) * toyBranch.genphpt_)) && (oot::GetPhotonPt(photon) <= ((1.f+genpTres) * toyBranch.genphpt_)) )
       {
 	const auto delR_ptres = reco::deltaR(toy,photon);
 	if (delR_ptres < mindR_ptres) 
@@ -1005,7 +1310,7 @@ void DisPho::SetTriggerBranches()
   hltJet500 = (triggerBitMap.count(Config::Jet500Path) ? triggerBitMap[Config::Jet500Path] : false);
 }
 
-void DisPho::SetMETFilterBranches(const edm::Handle<bool> & ecalBadCalibFlagH)
+void DisPho::SetMETFilterBranches()
 {
   metPV = (triggerFlagMap.count(Config::PVFlag) ? triggerFlagMap[Config::PVFlag] : false);
   metBeamHalo = (triggerFlagMap.count(Config::BeamHaloFlag) ? triggerFlagMap[Config::BeamHaloFlag] : false);
@@ -1018,7 +1323,7 @@ void DisPho::SetMETFilterBranches(const edm::Handle<bool> & ecalBadCalibFlagH)
   metECALCalib = (triggerFlagMap.count(Config::ECALCalibFlag) ? triggerFlagMap[Config::ECALCalibFlag] : false);
 
   // special remade calib flag
-  metECALBadCalib = (ecalBadCalibFlagH.isValid() ? *(ecalBadCalibFlagH.product()) : false);
+  //metECALBadCalib = *(ecalBadCalibFlagH.product());
 }
 
 void DisPho::InitializePVBranches()
@@ -1029,15 +1334,17 @@ void DisPho::InitializePVBranches()
   vtxZ = -9999.f;
 }
 
-void DisPho::SetPVBranches(const edm::Handle<std::vector<reco::Vertex> > & verticesH)
+void DisPho::SetPVBranches()
 {
+
   nvtx = verticesH->size();
-  
-  const auto & primevtx = (*verticesH).front();
+
+  const auto & primevtx = verticesH->front();
 
   vtxX = primevtx.position().x();
   vtxY = primevtx.position().y();
   vtxZ = primevtx.position().z();
+
 }
 
 void DisPho::InitializeMETBranches()
@@ -1047,14 +1354,28 @@ void DisPho::InitializeMETBranches()
   t1pfMETsumEt = -9999.f;
 }
 
-void DisPho::SetMETBranches(const pat::MET & t1pfMET)
+void DisPho::SetMETBranches()
 {
   t1pfMETpt    = t1pfMET.pt();
   t1pfMETphi   = t1pfMET.phi();
-  t1pfMETsumEt = t1pfMET.sumEt();
+  t1pfMETsumEt = t1pfMET.userFloat("sumEt");
+}
+
+void DisPho::InitializeMETBranchesMC()
+{
+  genMETpt    = -9999.f;
+  genMETphi   = -9999.f;
+}
+
+void DisPho::SetMETBranchesMC()
+{
+  const auto & genMET = *(t1pfMET.genMET());
+
+  genMETpt  = genMET.pt();
+  genMETphi = genMET.phi();
 }
 			    
-void DisPho::InitializeJetBranches(const int nJets)
+void DisPho::InitializeJetBranches()
 {
   jetE.clear();
   jetpt.clear();
@@ -1101,7 +1422,7 @@ void DisPho::InitializeJetBranches(const int nJets)
   }
 }
 
-void DisPho::SetJetBranches(const std::vector<pat::Jet> & jets, const int nJets)
+void DisPho::SetJetBranches()
 {
   njets = jets.size();
 
@@ -1114,7 +1435,7 @@ void DisPho::SetJetBranches(const std::vector<pat::Jet> & jets, const int nJets)
     jetphi[ijet] = jet.phi();
     jeteta[ijet] = jet.eta();
 
-    jetID [ijet] = oot::GetPFJetID(jet);
+    jetID [ijet] = jet.userInt("jetID");
 
     jetNHF [ijet] = jet.neutralHadronEnergyFraction();
     jetNEMF[ijet] = jet.neutralEmEnergyFraction();
@@ -1126,7 +1447,7 @@ void DisPho::SetJetBranches(const std::vector<pat::Jet> & jets, const int nJets)
   }
 }
 
-void DisPho::InitializeJetBranchesMC(const int nJets)
+void DisPho::InitializeJetBranchesMC()
 {
   jetscaleRel.clear();
   jetsmearSF.clear();
@@ -1152,9 +1473,11 @@ void DisPho::InitializeJetBranchesMC(const int nJets)
   }
 }
 
-void DisPho::SetJetBranchesMC(const std::vector<pat::Jet> & jets, const int nJets, const edm::Handle<std::vector<reco::GenJet> > & genjetsH, 
-			      JetCorrectionUncertainty & jetCorrUnc, const JME::JetResolution & jetRes, const JME::JetResolutionScaleFactor & jetRes_sf)
+void DisPho::SetJetBranchesMC()
 {
+  // JEC : ugh to do this here
+  JetCorrectionUncertainty jetCorrUnc((*jetCorrH)["Uncertainty"]);
+
   // JER procedure explanation from https://twiki.cern.ch/twiki/bin/viewauth/CMS/JetResolution#Smearing_procedures
   // JER implementation copied from https://github.com/cms-sw/cmssw/blob/master/PhysicsTools/PatUtils/interface/SmearedJetProducerT.h#L208-L215
   const auto runNum_uint = static_cast <unsigned int> (run);
@@ -1162,9 +1485,6 @@ void DisPho::SetJetBranchesMC(const std::vector<pat::Jet> & jets, const int nJet
   const auto evNum_uint = static_cast <unsigned int> (event);
   const auto jet0eta = uint32_t(jets.empty() ? 0 : jets.front().eta()/0.01);
   std::mt19937 mt_rand(1 + jet0eta + (lumiNum_uint<<10) + (runNum_uint<<20) + evNum_uint);
-
-  // get genjets
-  const auto & genjets = *(genjetsH);
 
   // loop over jets to get scale and smearings
   for (auto ijet = 0; ijet < nJets; ijet++)
@@ -1186,11 +1506,12 @@ void DisPho::SetJetBranchesMC(const std::vector<pat::Jet> & jets, const int nJet
     const auto jer_sf_up   = jetRes_sf.getScaleFactor({{JME::Binning::JetEta, eta}}, Variation::UP);
 
     // get genjet
-    auto igenjet = DisPho::GenJetMatcher(jet,genjets,jer);
+    auto igenjet = DisPho::GenJetMatcher(jet,genJetsH,jer);
 
     if (igenjet > 0) // if matched, use scaling method
     {
-      const auto ptres = 1.f - (genjets[igenjet].pt() / pt);
+      const auto & genJet = (*genJetsH)[igenjet];
+      const auto ptres = 1.f - (genJet.pt() / pt);
 
       jetsmearSF    [ijet] = 1.f + ((jer_sf      - 1.f) * ptres);
       jetsmearDownSF[ijet] = 1.f + ((jer_sf_down - 1.f) * ptres);
@@ -1215,27 +1536,30 @@ void DisPho::SetJetBranchesMC(const std::vector<pat::Jet> & jets, const int nJet
   }
 }
 
-int DisPho::GenJetMatcher(const pat::Jet & jet, const std::vector<reco::GenJet> & genjets, const float jer)
+int DisPho::GenJetMatcher(const pat::Jet & jet, const edm::Handle<std::vector<reco::GenJet> > & genJetsH, const float jer)
 {
-  auto igenjet = -1;
   auto mindR = genjetdRmin;
 
-  for (auto i = 0U; i < genjets.size(); i++)
+  auto igenjet = 0; // counter
+  auto matchedjet = -1; // return value
+  for (const auto & genJet : *genJetsH)
   {
-    const auto & genjet = genjets[i];
-    const auto delR = reco::deltaR(jet, genjet);
+    const auto delR = reco::deltaR(jet, genJet);
     
     if (delR < mindR)
     {
-      if (std::abs(genjet.pt() - jet.pt()) < (genjetpTfactor * jer * jet.pt()))
+      if (std::abs(genJet.pt() - jet.pt()) < (genjetpTfactor * jer * jet.pt()))
       {
 	mindR = delR;
-	igenjet = i;
+	matchedjet = igenjet;
       }
     }
+
+    // increment jet counter
+    igenjet++;
   }
   
-  return igenjet;
+  return matchedjet;
 }
 
 void DisPho::GetStochasticSmear(std::mt19937 & mt_rand, const float jer, const float jer_sf, float & jet_smear)
@@ -1266,7 +1590,7 @@ void DisPho::InitializeElectronBranches()
   nelHighT = 0;
 }
 
-void DisPho::SetElectronBranches(const std::vector<pat::Electron> & electrons)
+void DisPho::SetElectronBranches()
 {
   // loop over prepped electrons: know that loose is subset of medium which is a subset of tight
   for (const auto & electron : electrons)
@@ -1313,7 +1637,7 @@ void DisPho::InitializeMuonBranches()
   nmuHighT = 0;
 }
 
-void DisPho::SetMuonBranches(const std::vector<pat::Muon> & muons)
+void DisPho::SetMuonBranches()
 {
   // loop over muons, check if passed ID && loose PF iso, from MEZ
   //  --> unclear if medium is subset of tight... so have to do this inefficiently
@@ -1347,7 +1671,7 @@ void DisPho::SetMuonBranches(const std::vector<pat::Muon> & muons)
   }
 }
 
-void DisPho::InitializeRecHitBranches(const int nRecHits)
+void DisPho::InitializeRecHitBranches()
 {
   rhX.clear();
   rhY.clear();
@@ -1368,6 +1692,29 @@ void DisPho::InitializeRecHitBranches(const int nRecHits)
   rhpedrms6.clear();
   rhpedrms1.clear();
 
+  uRhId.clear();
+  amplitude.clear();
+  amplitudeError.clear();
+  pedestal.clear();
+  jitter.clear();
+  chi2.clear();
+  //outOfTimeAmplitude.clear();
+  //for (unsigned int i; i<SAMPLES; i++) outOfTimeAmplitude[i].clear();
+  ootA0.clear();
+  ootA1.clear();
+  ootA2.clear();
+  ootA3.clear();
+  ootA4.clear();
+  ootA5.clear();
+  ootA6.clear();
+  ootA7.clear();
+  ootA8.clear();
+  ootA9.clear();
+  jitterError.clear();
+  isSaturated.clear();
+  isJitterValid.clear();
+  isJitterErrorValid.clear();
+
   rhX.resize(nRecHits);
   rhY.resize(nRecHits);
   rhZ.resize(nRecHits);
@@ -1386,6 +1733,29 @@ void DisPho::InitializeRecHitBranches(const int nRecHits)
   rhpedrms12.resize(nRecHits);
   rhpedrms6.resize(nRecHits);
   rhpedrms1.resize(nRecHits);
+
+  uRhId.resize(nURecHits);
+  amplitude.resize(nURecHits);
+  amplitudeError.resize(nURecHits);
+  pedestal.resize(nURecHits);
+  jitter.resize(nURecHits);
+  chi2.resize(nURecHits);
+  //outOfTimeAmplitude.resize(nURecHits);
+  ootA0.resize(nURecHits);
+  ootA1.resize(nURecHits);
+  ootA2.resize(nURecHits);
+  ootA3.resize(nURecHits);
+  ootA4.resize(nURecHits);
+  ootA5.resize(nURecHits);
+  ootA6.resize(nURecHits);
+  ootA7.resize(nURecHits);
+  ootA8.resize(nURecHits);
+  ootA9.resize(nURecHits);
+  //for (auto i = 0; i<nURecHits; i++) outOfTimeAmplitude[i].resize(SAMPLES);
+  jitterError.resize(nURecHits);
+  isSaturated.resize(nURecHits);
+  isJitterValid.resize(nURecHits);
+  isJitterErrorValid.resize(nURecHits);
 
   for (auto i = 0; i < nRecHits; i++)
   {
@@ -1414,24 +1784,74 @@ void DisPho::InitializeRecHitBranches(const int nRecHits)
     rhpedrms6 [i] = -9999.f;
     rhpedrms1 [i] = -9999.f;
   }
+
+
+  for (auto i = 0; i < nURecHits; i++)
+    {
+      uRhId[i] = 0;
+      amplitude[i] = -9999.f;
+      amplitudeError[i] = -9999.f;
+      pedestal[i] = -9999.f;
+      jitter[i] = -9999.f;
+      chi2[i] = -9999.f;
+      //for (unsigned int j; j<SAMPLES; j++) outOfTimeAmplitude[i][j] = -9999.f;
+      ootA0[i] = -9999.f;
+      ootA1[i] = -9999.f;
+      ootA2[i] = -9999.f;
+      ootA3[i] = -9999.f;
+      ootA4[i] = -9999.f;
+      ootA5[i] = -9999.f;
+      ootA6[i] = -9999.f;
+      ootA7[i] = -9999.f;
+      ootA8[i] = -9999.f;
+      ootA9[i] = -9999.f;
+      jitterError[i] = -9999.f;
+      isSaturated[i] = false;
+      isJitterValid[i] = false;
+      isJitterErrorValid[i] = false;
+    }
+
+  }  
+
+void DisPho::InitializeDigiBranches()
+{
+
+  digiID.clear();
+  digiData.clear();
+
+  digiID.resize(nDigis);
+  digiData.resize(nDigis);
+  for (auto i = 0; i<nDigis; i++) digiData[i].resize(SAMPLES);
+
+  for (auto i = 0; i < nRecHits; i++)
+    {
+      digiID[i] = 0.;
+      for (unsigned int j; j<SAMPLES; j++) digiData[i][j] = -9999.f;
+    }
 }
 
-void DisPho::SetRecHitBranches(const EcalRecHitCollection * recHitsEB, const CaloSubdetectorGeometry * barrelGeometry,
-			       const EcalRecHitCollection * recHitsEE, const CaloSubdetectorGeometry * endcapGeometry,
-			       const uiiumap & recHitMap, const edm::Event & iEvent,
-			       const edm::ESHandle<EcalLaserDbService> & laserH, const EcalIntercalibConstantMap * interCalibMap, 
-			       const edm::ESHandle<EcalADCToGeVConstant> & adcToGeVH, const edm::ESHandle<EcalPedestals> & pedestalsH)
+void DisPho::SetRecHitBranches()
 {
   nrechits = recHitMap.size();
-  
-  DisPho::SetRecHitBranches(recHitsEB,barrelGeometry,recHitMap,iEvent,laserH,interCalibMap,adcToGeVH->getEBValue(),pedestalsH);
-  DisPho::SetRecHitBranches(recHitsEE,endcapGeometry,recHitMap,iEvent,laserH,interCalibMap,adcToGeVH->getEEValue(),pedestalsH);
+
+  DisPho::SetRecHitBranches(recHitsEB,barrelGeometry,adcToGeVEB);
+  DisPho::SetRecHitBranches(recHitsEE,endcapGeometry,adcToGeVEE);
+
+  nurechits = uncalibratedRecHitMap.size();
+
+  DisPho::SetURecHitBranches(uncalibratedRecHitsEB,barrelGeometry);
+  DisPho::SetURecHitBranches(uncalibratedRecHitsEE,endcapGeometry);
+
 }
 
-void DisPho::SetRecHitBranches(const EcalRecHitCollection * recHits, const CaloSubdetectorGeometry * geometry,
-			       const uiiumap & recHitMap, const edm::Event & iEvent, 
-			       const edm::ESHandle<EcalLaserDbService> & laserH, const EcalIntercalibConstantMap * interCalibMap,
-			       const float adcToGeV, const edm::ESHandle<EcalPedestals> & pedestalsH)
+void DisPho::SetDigiBranches()
+{
+  ndigis = digiMap.size();
+
+  DisPho::SetDigiBranches(EBdigiCollection,EEdigiCollection,barrelGeometry);
+}
+
+void DisPho::SetRecHitBranches(const EcalRecHitCollection * recHits, const CaloSubdetectorGeometry * geometry, const float adcToGeV)
 {
   for (const auto recHit : *recHits)
   {
@@ -1464,7 +1884,7 @@ void DisPho::SetRecHitBranches(const EcalRecHitCollection * recHits, const CaloS
       rhisGS1[pos] = recHit.checkFlag(EcalRecHit::kHasSwitchToGain1);
 
       // adcToGeVInfo : http://cmslxr.fnal.gov/source/RecoEcal/EgammaCoreTools/src/EcalClusterLazyTools.cc#0204
-      const auto laser = laserH->getLaserCorrection(recHitId,iEvent.time());
+      const auto laser = laserH->getLaserCorrection(recHitId,evTime);
       const auto interCalibIter = interCalibMap->find(recHitId);
       const auto interCalib = ((interCalibIter != interCalibMap->end()) ? (*interCalibIter) : - 1.f);
       if ((laser > 0.f) && (interCalib > 0.f) && (adcToGeV > 0.f)) rhadcToGeV[pos] = (laser*interCalib*adcToGeV);
@@ -1485,6 +1905,96 @@ void DisPho::SetRecHitBranches(const EcalRecHitCollection * recHits, const CaloS
       }
     }
   }
+}
+
+void DisPho::SetURecHitBranches(const EcalUncalibratedRecHitCollection * recHits, const CaloSubdetectorGeometry * geometry)
+{
+  for (const auto recHit : *recHits)
+    {
+      const auto recHitId(recHit.id());
+      //const auto rawId = recHitId.rawId();
+      if (uncalibratedRecHitMap.count(recHitId))
+	{
+	  const auto pos = uncalibratedRecHitMap.at(recHitId);
+	  
+	  // Assign values
+	  uRhId[pos] = recHitId;
+	  amplitude[pos] = recHit.amplitude();
+	  amplitudeError[pos] = recHit.amplitudeError();
+	  pedestal[pos] = recHit.pedestal();
+	  jitter[pos] = recHit.jitter();
+	  chi2[pos] = recHit.chi2();
+	  //for (int i=0; i<SAMPLES; i++) {
+	  //  outOfTimeAmplitude[pos][i] = recHit.outOfTimeAmplitude(i);
+	  //}
+
+          ootA0[pos] = recHit.outOfTimeAmplitude(0);
+          ootA1[pos] = recHit.outOfTimeAmplitude(1);
+          ootA2[pos] = recHit.outOfTimeAmplitude(2);
+          ootA3[pos] = recHit.outOfTimeAmplitude(3);
+          ootA4[pos] = recHit.outOfTimeAmplitude(4);
+          ootA5[pos] = recHit.outOfTimeAmplitude(5);
+          ootA6[pos] = recHit.outOfTimeAmplitude(6);
+          ootA7[pos] = recHit.outOfTimeAmplitude(7);
+          ootA8[pos] = recHit.outOfTimeAmplitude(8);
+          ootA9[pos] = recHit.outOfTimeAmplitude(9);
+
+	  jitterError[pos] = recHit.jitterError();
+	  isSaturated[pos] = recHit.isSaturated();
+	  isJitterValid[pos] = recHit.isJitterValid();
+	  isJitterErrorValid[pos] = recHit.isJitterErrorValid();
+	  
+	  // Print elements of OOTamp vectors
+	  //for (auto k = outOfTimeAmplitude[pos].begin(); k!=outOfTimeAmplitude[pos].end(); k++) cout << "Element: " << *k << endl;
+	  
+	}
+    }
+}
+
+void DisPho::SetDigiBranches(const EBDigiCollection * ebDigis, const EEDigiCollection * eeDigis,  const CaloSubdetectorGeometry * geometry)
+{
+
+  for (const auto digi : *ebDigis)
+    {
+      const auto digiId(digi.id());
+      //const auto rawId = digiId;.rawId();
+      if (digiMap.count(digiId))
+	{
+
+	  const auto pos = digiMap.at(digiId);
+
+	  // Assign values
+	  digiID[pos] = digiId;
+
+	  for ( unsigned int i=0; i<SAMPLES; i++ ) { 
+	    EBDataFrame df( digi );
+	    digiData[pos][i] = df.sample( i );
+	  }
+
+	  //for (auto k = digiData[pos].begin(); k!=digiData[pos].end(); k++) cout << "Element: " << *k << endl;
+
+	}
+    }
+  
+    for (const auto digi : *eeDigis)
+    {
+
+      const auto digiId(digi.id());
+      //const auto rawId = digiId.rawId();
+      if (digiMap.count(digiId))
+	{
+	  const auto pos = digiMap.at(digiId);
+	  
+	  // Assign values
+	  digiID[pos] = digiId;
+	  
+	  for (unsigned int i=0; i<SAMPLES; i++ ) {
+	    EEDataFrame df( digi );
+	    digiData[pos][i] = df.sample( i );
+	  }
+
+	}
+    }
 }
 
 void DisPho::InitializePhoBranches()
@@ -1537,6 +2047,10 @@ void DisPho::InitializePhoBranches()
     {
       phoBranch.seed_ = -1;
       phoBranch.recHits_.clear();
+
+      // Fix me maybe?
+      phoBranch.uncalibratedRecHits_.clear();
+      phoBranch.digis_.clear();
     }
     else
     {
@@ -1574,9 +2088,7 @@ void DisPho::InitializePhoBranches()
   }
 }
 
-void DisPho::SetPhoBranches(const std::vector<oot::Photon> photons, const int nPhotons, const uiiumap & recHitMap,
-			    const EcalRecHitCollection * recHitsEB, const EcalRecHitCollection * recHitsEE,
-			    const edm::Handle<std::vector<reco::Track> > & tracksH)
+void DisPho::SetPhoBranches()
 {
   nphotons = photons.size();
   
@@ -1585,39 +2097,45 @@ void DisPho::SetPhoBranches(const std::vector<oot::Photon> photons, const int nP
     // get objects
     const auto & photon = photons[iphoton];
     auto & phoBranch = phoBranches[iphoton];
-    const auto & pho = photon.photon();
-    
+
+    //std::cout << "Getting track" << std::endl;
+    auto track = photon.bestTrack();
+    //std::cout << "Setting dz" << std::endl;
+    if ( track != nullptr ) phoBranch.dz_  = track->dz();
+    else phoBranch.dz_  = 0.f;
+    //std::cout << "Done" << std::endl;
+
     // basic kinematic with v2: https://twiki.cern.ch/twiki/bin/viewauth/CMS/EgammaMiniAODV2#Applying_the_Energy_Scale_and_sm
-    const auto phop4 = pho.p4() * (pho.pat::Photon::userFloat("ecalEnergyPostCorr") / pho.pat::Photon::energy());
+    const auto phop4 = photon.p4(); //* (photon.userFloat("ecalEnergyPostCorr") / photon.energy());
     phoBranch.E_   = phop4.energy();
     phoBranch.pt_  = phop4.pt();
     phoBranch.phi_ = phop4.phi();
     phoBranch.eta_ = phop4.eta();
 
     // super cluster info from photon
-    const auto & phosc = pho.superCluster().isNonnull() ? pho.superCluster() : pho.parentSuperCluster();
+    const auto & phosc = photon.superCluster().isNonnull() ? photon.superCluster() : photon.parentSuperCluster();
 
     phoBranch.scE_   = phosc->energy();
     phoBranch.scphi_ = phosc->phi();
     phoBranch.sceta_ = phosc->eta();
 
     // save pt, SC eta for later use
-    const auto phoPt = phoBranch.pt_;
+    const auto phoPt = photon.pt(); // use uncorrected pT for isolations
     const auto scEta = std::abs(phoBranch.sceta_);
 
     // ID-like variables
-    phoBranch.HoE_ = pho.hadTowOverEm(); // used in ID + trigger (single tower HoverE)
-    phoBranch.r9_  = pho.r9(); // used in slimming in PAT + trigger
+    phoBranch.HoE_ = photon.hadTowOverEm(); // used in ID + trigger (single tower HoverE)
+    phoBranch.r9_  = photon.r9(); // used in slimming in PAT + trigger
 
     // PF Isolations : GED ID
-    phoBranch.ChgHadIso_ = pho.chargedHadronIso();
-    phoBranch.NeuHadIso_ = pho.neutralHadronIso();
-    phoBranch.PhoIso_    = pho.photonIso();
+    phoBranch.ChgHadIso_ = photon.chargedHadronIso();
+    phoBranch.NeuHadIso_ = photon.neutralHadronIso();
+    phoBranch.PhoIso_    = photon.photonIso();
 
     // PF Cluster Isos : OOT ID
-    phoBranch.EcalPFClIso_ = pho.ecalPFClusterIso();
-    phoBranch.HcalPFClIso_ = pho.hcalPFClusterIso();
-    phoBranch.TrkIso_      = pho.trkSumPtHollowConeDR03();
+    phoBranch.EcalPFClIso_ = photon.ecalPFClusterIso();
+    phoBranch.HcalPFClIso_ = photon.hcalPFClusterIso();
+    phoBranch.TrkIso_      = photon.trkSumPtHollowConeDR03();
 
     // corrected values for isolations
     phoBranch.ChgHadIsoC_ = std::max(phoBranch.ChgHadIso_ - (rho * oot::GetChargedHadronEA(scEta))                                              ,0.f);
@@ -1629,7 +2147,7 @@ void DisPho::SetPhoBranches(const std::vector<oot::Photon> photons, const int nP
     phoBranch.TrkIsoC_      = std::max(phoBranch.TrkIso_      - (rho * oot::GetTrackEA   (scEta)) - (oot::GetTrackPtScale   (scEta,phoPt)),0.f);
 
     // Shower Shape Objects
-    const auto & phoshape = pho.full5x5_showerShapeVariables(); 
+    const auto & phoshape = photon.full5x5_showerShapeVariables(); 
 
     // cluster shape variables
     phoBranch.sieie_ = phoshape.sigmaIetaIeta;
@@ -1644,8 +2162,9 @@ void DisPho::SetPhoBranches(const std::vector<oot::Photon> photons, const int nP
     // use seed to get geometry and recHits
     const auto & seedDetId = phosc->seed()->seed(); // seed detid
     const auto seedRawId = seedDetId.rawId(); // crystal number
-    const bool isEB = (seedDetId.subdetId() == EcalBarrel); // which subdet
+    const auto isEB = (seedDetId.subdetId() == EcalBarrel); // which subdet
     const auto recHits = (isEB ? recHitsEB : recHitsEE); 
+    
 
     // 2nd moments from official calculation
     if (recHits->size() > 0)
@@ -1655,7 +2174,7 @@ void DisPho::SetPhoBranches(const std::vector<oot::Photon> photons, const int nP
       phoBranch.smaj_  = ph2ndMoments.sMaj;
       phoBranch.smin_  = ph2ndMoments.sMin;
       phoBranch.alpha_ = ph2ndMoments.alpha;
-    }
+    } // end check over non-zero recHits
 
     // map of rec hit ids
     uiiumap phrhIDmap;
@@ -1678,9 +2197,13 @@ void DisPho::SetPhoBranches(const std::vector<oot::Photon> photons, const int nP
     if (storeRecHits)
     {
       for (auto rhiter = phrhIDmap.begin(); rhiter != phrhIDmap.end(); ++rhiter) // loop over only good rec hit ids
-      {
-	phoBranch.recHits_.emplace_back(rhiter->first);
-      }
+	{
+	  phoBranch.recHits_.emplace_back(rhiter->first);
+
+	  // Fix me maybe?
+	  //phoBranch.uncalibratedRecHits_.emplace_back(rhiter->first);
+	  //phoBranch.digis_.emplace_back(rhiter->first);
+	}
 
       //  sort rec hit list in photon by rechitE which is already stored for this event
       std::sort(phoBranch.recHits_.begin(),phoBranch.recHits_.end(),
@@ -1688,7 +2211,7 @@ void DisPho::SetPhoBranches(const std::vector<oot::Photon> photons, const int nP
 		{
 		  return (rhE[rh1] > rhE[rh2]);
 		});
-    }
+    } // end check over storing recHits
   
     // save seed info + swiss cross
     if (recHitMap.count(seedRawId)) 
@@ -1719,40 +2242,46 @@ void DisPho::SetPhoBranches(const std::vector<oot::Photon> photons, const int nP
 	phoBranch.seedpedrms12_ = rhpedrms12[seedpos];
 	phoBranch.seedpedrms6_ = rhpedrms6[seedpos];
 	phoBranch.seedpedrms1_ = rhpedrms1[seedpos];
-      }
+      } // end check over storing rechits 
     
       // swiss cross
       if (recHits->size() > 0) phoBranch.suisseX_ = EcalTools::swissCross(seedDetId, *recHits, rhEmin);
     } // end check over if seed exists
     
     // some standard booleans
-    phoBranch.isOOT_ = photon.isOOT();
+    phoBranch.isOOT_ = *(photon.userData<bool>("isOOT"));
     phoBranch.isEB_  = isEB;
 
     // HLT Matching!
     strBitMap isHLTMatched;
-    for (const auto & filter : filterNames) isHLTMatched[filter] = false;
+    oot::InitializeBitMap(filterNames,isHLTMatched);
     oot::HLTToObjectMatching(triggerObjectsByFilterMap,isHLTMatched,photon,pTres,dRmin);
-    const std::string filter = Config::DispIDFilter;
+    const auto filter = Config::DispIDFilter;
     phoBranch.isHLT_ = (isHLTMatched.count(filter) ? isHLTMatched[filter] : false);
 
     // check for simple track veto
-    phoBranch.isTrk_ = oot::TrackToObjectMatching(tracksH,photon,trackpTmin,trackdRmin);
+    //phoBranch.isTrk_ = oot::TrackToObjectMatching(tracksH,photon,trackpTmin,trackdRmin,temp_dz);
+    for (const auto & track : *tracksH){
+      if (track.pt() < trackpTmin) continue;
+      if (reco::deltaR(photon,track) < trackdRmin){
+        phoBranch.tdz_ = track.dz();
+      } // end check over deltaR
+    } // end loop over tracks
 
     // other track vetoes
-    phoBranch.passEleVeto_ = pho.passElectronVeto();
-    phoBranch.hasPixSeed_  = pho.hasPixelSeed();
+    phoBranch.passEleVeto_ = photon.passElectronVeto();
+    phoBranch.hasPixSeed_  = photon.hasPixelSeed();
   
     // 0 --> did not pass anything, 1 --> loose pass, 2 --> medium pass, 3 --> tight pass
     // GED first
-    if      (pho.photonID("tight-ged"))  {phoBranch.gedID_ = 3;}
-    else if (pho.photonID("medium-ged")) {phoBranch.gedID_ = 2;}
-    else if (pho.photonID("loose-ged"))  {phoBranch.gedID_ = 1;}
-    else                                 {phoBranch.gedID_ = 0;}
+    if      (photon.photonID("tight-ged"))  {phoBranch.gedID_ = 3;}
+    else if (photon.photonID("medium-ged")) {phoBranch.gedID_ = 2;}
+    else if (photon.photonID("loose-ged"))  {phoBranch.gedID_ = 1;}
+    else                                    {phoBranch.gedID_ = 0;}
     // OOT second
-    if      (pho.photonID("tight-oot"))  {phoBranch.ootID_ = 3;}
-    else if (pho.photonID("loose-oot"))  {phoBranch.ootID_ = 1;}
-    else                                 {phoBranch.ootID_ = 0;}
+    if      (photon.photonID("tight-oot"))  {phoBranch.ootID_ = 3;}
+    else if (photon.photonID("loose-oot"))  {phoBranch.ootID_ = 1;}
+    else                                    {phoBranch.ootID_ = 0;}
   } // end loop over nPhotons
 }
 
@@ -1770,15 +2299,13 @@ void DisPho::InitializePhoBranchesMC()
   }
 }
 
-void DisPho::SetPhoBranchesMC(const std::vector<oot::Photon> photons, const int nPhotons, 
-			      const edm::Handle<std::vector<reco::GenParticle> > & genparticlesH)
+void DisPho::SetPhoBranchesMC()
 {
   for (auto iphoton = 0; iphoton < nPhotons; iphoton++)
   {
     // get objects
     const auto & photon = photons[iphoton];
     auto & phoBranch = phoBranches[iphoton];
-    const auto & pho = photon.photon();
     
     // extra info for gen matching
     if (isGMSB)
@@ -1813,30 +2340,34 @@ void DisPho::SetPhoBranchesMC(const std::vector<oot::Photon> photons, const int 
     } // end block over is HVDS
   
     // standard dR matching
-    phoBranch.isGen_ = oot::GenToObjectMatching(photon,genparticlesH,genpTres,gendRmin);
+    phoBranch.isGen_ = oot::GenToObjectMatching(genParticlesH,photon,genpTres,gendRmin);
     
     // scale and smearing uncs
     const auto phoE = phoBranch.E_; // assumed this already set!!!
       
     // eval up/down, then save bigger one (diff is order of one of MeV's...
-    const auto down_scale = std::abs(phoE-pho.pat::Photon::userFloat("energyScaleDown"));
-    const auto up_scale   = std::abs(pho.pat::Photon::userFloat("energyScaleUp")-phoE);
+    const auto down_scale = std::abs(phoE-photon.userFloat("energyScaleDown"));
+    const auto up_scale   = std::abs(photon.userFloat("energyScaleUp")-phoE);
     phoBranch.scaleAbs_   = (up_scale > down_scale ? up_scale : down_scale);
 
     // eval up/down, then save bigger one (diff is order of one of MeV's...
-    const auto down_smear = std::abs(phoE-pho.pat::Photon::userFloat("energySigmaDown"));
-    const auto up_smear   = std::abs(pho.pat::Photon::userFloat("energySigmaUp")-phoE);
+    const auto down_smear = std::abs(phoE-photon.userFloat("energySigmaDown"));
+    const auto up_smear   = std::abs(photon.userFloat("energySigmaUp")-phoE);
     phoBranch.smearAbs_   = (up_smear > down_smear ? up_smear : down_smear);
   }
 }
 
-int DisPho::CheckMatchHVDS(const int iphoton, const hvdsStruct& hvdsBranch)
+int DisPho::CheckMatchHVDS(const int iphoton, const hvdsStruct & hvdsBranch)
 {
   if      (iphoton == hvdsBranch.genHVph0match_ && iphoton != hvdsBranch.genHVph1match_) return 1;
   else if (iphoton != hvdsBranch.genHVph0match_ && iphoton == hvdsBranch.genHVph1match_) return 2;
   else if (iphoton == hvdsBranch.genHVph0match_ && iphoton == hvdsBranch.genHVph1match_) return 3;
   else                                                                                   return 0;
 }
+
+//////////////////////////////////////////
+// Internal and Analyzer Prep Functions //
+//////////////////////////////////////////
 
 void DisPho::beginJob() 
 {
@@ -1908,120 +2439,122 @@ void DisPho::MakeAndFillConfigTree()
   // so have to "capture" configs in temps... has to be better way to do this
 
   // blinding
-  unsigned int blindSF_tmp = blindSF;
-  bool applyBlindSF_tmp = applyBlindSF;
-  float blindMET_tmp = blindMET;
-  bool applyBlindMET_tmp = applyBlindMET;
-  configtree->Branch("blindSF", &blindSF_tmp, "blindSF/i");
-  configtree->Branch("applyBlindSF", &applyBlindSF_tmp, "applyBlindSF/O");
-  configtree->Branch("blindMET", &blindMET_tmp, "blindMET/F");
-  configtree->Branch("applyBlindMET", &applyBlindMET_tmp, "applyBlindMET/O");
+  auto blindSF_tmp = blindSF;
+  auto applyBlindSF_tmp = applyBlindSF;
+  auto blindMET_tmp = blindMET;
+  auto applyBlindMET_tmp = applyBlindMET;
+  configtree->Branch("blindSF", &blindSF_tmp);
+  configtree->Branch("applyBlindSF", &applyBlindSF_tmp);
+  configtree->Branch("blindMET", &blindMET_tmp);
+  configtree->Branch("applyBlindMET", &applyBlindMET_tmp);
 
   // object prep
-  float jetpTmin_tmp = jetpTmin;
-  float jetEtamax_tmp = jetEtamax;
-  int jetIDmin_tmp = jetIDmin;
-  float rhEmin_tmp = rhEmin;
-  float phpTmin_tmp = phpTmin;
-  std::string phIDmin_tmp = phIDmin;
-  configtree->Branch("jetpTmin", &jetpTmin_tmp, "jetpTmin/F");
-  configtree->Branch("jetEtamax", &jetEtamax_tmp, "jetEtamax/F");
-  configtree->Branch("jetIDmin", &jetIDmin_tmp, "jetIDmin/I");
-  configtree->Branch("rhEmin", &rhEmin_tmp, "rhEmin/F");
-  configtree->Branch("phpTmin", &phpTmin_tmp, "phpTmin/F");
+  auto jetpTmin_tmp = jetpTmin;
+  auto jetEtamax_tmp = jetEtamax;
+  auto jetIDmin_tmp = jetIDmin;
+  auto rhEmin_tmp = rhEmin;
+  auto phpTmin_tmp = phpTmin;
+  auto phIDmin_tmp = phIDmin;
+  configtree->Branch("jetpTmin", &jetpTmin_tmp);
+  configtree->Branch("jetEtamax", &jetEtamax_tmp);
+  configtree->Branch("jetIDmin", &jetIDmin_tmp);
+  configtree->Branch("rhEmin", &rhEmin_tmp);
+  configtree->Branch("phpTmin", &phpTmin_tmp);
   configtree->Branch("phIDmin", &phIDmin_tmp);
 
   // object extra pruning
-  float seedTimemin_tmp = seedTimemin;
-  configtree->Branch("seedTimemin", &seedTimemin_tmp, "seedTimemin/F");
+  auto seedTimemin_tmp = seedTimemin;
+  auto nPhosmax_tmp = nPhosmax;
+  configtree->Branch("seedTimemin", &seedTimemin_tmp);
+  configtree->Branch("nPhosmax", &nPhosmax_tmp);
 
   // photon storing options
-  bool splitPho_tmp = splitPho;
-  bool onlyGED_tmp = onlyGED;
-  bool onlyOOT_tmp = onlyOOT;
-  configtree->Branch("splitPho", &splitPho_tmp, "splitPho/O");
-  configtree->Branch("onlyGED", &onlyGED_tmp, "onlyGED/O");
-  configtree->Branch("onlyOOT", &onlyOOT_tmp, "onlyOOT/O");
+  auto splitPho_tmp = splitPho;
+  auto onlyGED_tmp = onlyGED;
+  auto onlyOOT_tmp = onlyOOT;
+  configtree->Branch("splitPho", &splitPho_tmp);
+  configtree->Branch("onlyGED", &onlyGED_tmp);
+  configtree->Branch("onlyOOT", &onlyOOT_tmp);
 
   // lepton prep cuts
-  float ellowpTmin_tmp = ellowpTmin;
-  float elhighpTmin_tmp = elhighpTmin;
-  float mulowpTmin_tmp = mulowpTmin;
-  float muhighpTmin_tmp = muhighpTmin;
-  configtree->Branch("ellowpTmin", &ellowpTmin_tmp, "ellowpTmin/F");
-  configtree->Branch("elhighpTmin", &elhighpTmin_tmp, "elhighpTmin/F");
-  configtree->Branch("mulowpTmin", &mulowpTmin_tmp, "mulowpTmin/F");
-  configtree->Branch("muhighpTmin", &muhighpTmin_tmp, "muhighpTmin/F");
+  auto ellowpTmin_tmp = ellowpTmin;
+  auto elhighpTmin_tmp = elhighpTmin;
+  auto mulowpTmin_tmp = mulowpTmin;
+  auto muhighpTmin_tmp = muhighpTmin;
+  configtree->Branch("ellowpTmin", &ellowpTmin_tmp);
+  configtree->Branch("elhighpTmin", &elhighpTmin_tmp);
+  configtree->Branch("mulowpTmin", &mulowpTmin_tmp);
+  configtree->Branch("muhighpTmin", &muhighpTmin_tmp);
 
   // rec hit storing options
-  bool storeRecHits_tmp = storeRecHits;
-  configtree->Branch("storeRecHits", &storeRecHits_tmp, "storeRecHits/O");
+  auto storeRecHits_tmp = storeRecHits;
+  configtree->Branch("storeRecHits", &storeRecHits_tmp);
 
   // pre-selection vars
-  bool applyTrigger_tmp = applyTrigger;
-  float minHT_tmp = minHT;
-  bool applyHT_tmp = applyHT;
-  float phgoodpTmin_tmp = phgoodpTmin;
-  std::string phgoodIDmin_tmp = phgoodIDmin;
-  bool applyPhGood_tmp = applyPhGood;
-  configtree->Branch("applyTrigger", &applyTrigger_tmp, "applyTrigger/O");
-  configtree->Branch("minHT", &minHT_tmp, "minHT/F");
-  configtree->Branch("applyHT", &applyHT_tmp, "applyHT/O");
-  configtree->Branch("phgoodpTmin", &phgoodpTmin_tmp, "phgoodpTmin/F");
+  auto applyTrigger_tmp = applyTrigger;
+  auto minHT_tmp = minHT;
+  auto applyHT_tmp = applyHT;
+  auto phgoodpTmin_tmp = phgoodpTmin;
+  auto phgoodIDmin_tmp = phgoodIDmin;
+  auto applyPhGood_tmp = applyPhGood;
+  configtree->Branch("applyTrigger", &applyTrigger_tmp);
+  configtree->Branch("minHT", &minHT_tmp);
+  configtree->Branch("applyHT", &applyHT_tmp);
+  configtree->Branch("phgoodpTmin", &phgoodpTmin_tmp);
   configtree->Branch("phgoodIDmin", &phgoodIDmin_tmp);
-  configtree->Branch("applyPhGood", &applyPhGood_tmp, "applyPhGood/O");
+  configtree->Branch("applyPhGood", &applyPhGood_tmp);
 
   // dR matching criteria
-  float dRmin_tmp = dRmin;
-  float pTres_tmp = pTres;
-  float gendRmin_tmp = gendRmin;
-  float genpTres_tmp = genpTres;
-  float trackdRmin_tmp = trackdRmin;
-  float trackpTmin_tmp = trackpTmin;
-  float genjetdRmin_tmp = genjetdRmin;
-  float genjetpTfactor_tmp = genjetpTfactor;
-  float leptondRmin_tmp = leptondRmin;
-  configtree->Branch("dRmin", &dRmin_tmp, "dRmin/F");
-  configtree->Branch("pTres", &pTres_tmp, "pTres/F");
-  configtree->Branch("gendRmin", &gendRmin_tmp, "gendRmin/F");
-  configtree->Branch("genpTres", &genpTres_tmp, "genpTres/F");
-  configtree->Branch("trackdRmin", &trackdRmin_tmp, "trackdRmin/F");
-  configtree->Branch("trackpTmin", &trackpTmin_tmp, "trackpTmin/F");
-  configtree->Branch("genjetdRmin", &genjetdRmin_tmp, "genjetdRmin/F");
-  configtree->Branch("genjetpTfactor", &genjetpTfactor_tmp, "genjetpTfactor/F");
-  configtree->Branch("leptondRmin", &leptondRmin_tmp, "leptondRmin/F");
+  auto dRmin_tmp = dRmin;
+  auto pTres_tmp = pTres;
+  auto gendRmin_tmp = gendRmin;
+  auto genpTres_tmp = genpTres;
+  auto trackdRmin_tmp = trackdRmin;
+  auto trackpTmin_tmp = trackpTmin;
+  auto genjetdRmin_tmp = genjetdRmin;
+  auto genjetpTfactor_tmp = genjetpTfactor;
+  auto leptondRmin_tmp = leptondRmin;
+  configtree->Branch("dRmin", &dRmin_tmp);
+  configtree->Branch("pTres", &pTres_tmp);
+  configtree->Branch("gendRmin", &gendRmin_tmp);
+  configtree->Branch("genpTres", &genpTres_tmp);
+  configtree->Branch("trackdRmin", &trackdRmin_tmp);
+  configtree->Branch("trackpTmin", &trackpTmin_tmp);
+  configtree->Branch("genjetdRmin", &genjetdRmin_tmp);
+  configtree->Branch("genjetpTfactor", &genjetpTfactor_tmp);
+  configtree->Branch("leptondRmin", &leptondRmin_tmp);
 
   // JER extra info
-  float smearjetEmin_tmp = smearjetEmin;
-  configtree->Branch("smearjetEmin", &smearjetEmin_tmp, "smearjetEmin/F");
+  auto smearjetEmin_tmp = smearjetEmin;
+  configtree->Branch("smearjetEmin", &smearjetEmin_tmp);
 
   // trigger info
-  std::string inputPaths_tmp = inputPaths;
-  std::string inputFilters_tmp = inputFilters;
+  auto inputPaths_tmp = inputPaths;
+  auto inputFilters_tmp = inputFilters;
   configtree->Branch("inputPaths", &inputPaths_tmp);
   configtree->Branch("inputFilters", &inputFilters_tmp);
 
   // met flag info
-  std::string inputFlags_tmp = inputFlags;
+  auto inputFlags_tmp = inputFlags;
   configtree->Branch("inputFlags", &inputFlags_tmp);
 
   // MC info
-  bool isGMSB_tmp = isGMSB;
-  bool isHVDS_tmp = isHVDS;
-  bool isBkgd_tmp = isBkgd;
-  bool isToy_tmp  = isToy;
-  bool isADD_tmp  = isADD;
-  float xsec_tmp = xsec;
-  float filterEff_tmp = filterEff;
-  float BR_tmp = BR;
-  configtree->Branch("isGMSB", &isGMSB_tmp, "isGMSB/O");
-  configtree->Branch("isHVDS", &isHVDS_tmp, "isHVDS/O");
-  configtree->Branch("isBkgd", &isBkgd_tmp, "isBkgd/O");
-  configtree->Branch("isToy" , &isToy_tmp , "isToy/O");
-  configtree->Branch("isADD" , &isADD_tmp , "isADD/O");
-  configtree->Branch("xsec", &xsec_tmp, "xsec/F");
-  configtree->Branch("filterEff", &filterEff_tmp, "filterEff/F");
-  configtree->Branch("BR", &BR_tmp, "BR/F");
+  auto isGMSB_tmp = isGMSB;
+  auto isHVDS_tmp = isHVDS;
+  auto isBkgd_tmp = isBkgd;
+  auto isToy_tmp  = isToy;
+  auto isADD_tmp  = isADD;
+  auto xsec_tmp = xsec;
+  auto filterEff_tmp = filterEff;
+  auto BR_tmp = BR;
+  configtree->Branch("isGMSB", &isGMSB_tmp);
+  configtree->Branch("isHVDS", &isHVDS_tmp);
+  configtree->Branch("isBkgd", &isBkgd_tmp);
+  configtree->Branch("isToy" , &isToy_tmp);
+  configtree->Branch("isADD" , &isADD_tmp);
+  configtree->Branch("xsec", &xsec_tmp);
+  configtree->Branch("filterEff", &filterEff_tmp);
+  configtree->Branch("BR", &BR_tmp);
 
   // Fill tree just once, after configs have been read in
   configtree->Fill();
@@ -2030,161 +2563,184 @@ void DisPho::MakeAndFillConfigTree()
 void DisPho::MakeEventTree()
 {
   // rho info
-  disphotree->Branch("rho", &rho, "rho/F");
+  disphotree->Branch("rho", &rho);
 
   // Generic MC Info
   if (isMC)
   {
-    disphotree->Branch("genwgt", &genwgt, "genwgt/F");
-    disphotree->Branch("genx0", &genx0, "genx0/F");
-    disphotree->Branch("geny0", &geny0, "geny0/F");
-    disphotree->Branch("genz0", &genz0, "genz0/F");
-    disphotree->Branch("gent0", &gent0, "gent0/F");
-    disphotree->Branch("genpuobs", &genpuobs, "genpuobs/I");
-    disphotree->Branch("genputrue", &genputrue, "genputrue/I");
+    disphotree->Branch("genwgt", &genwgt);
+    disphotree->Branch("genpuobs", &genpuobs);
+    disphotree->Branch("genputrue", &genputrue);
+
+    disphotree->Branch("gent0", &gent0);
+    disphotree->Branch("genx0", &genx0);
+    disphotree->Branch("geny0", &geny0);
+    disphotree->Branch("genz0", &genz0);
   }
 
   // GMSB Info
   if (isGMSB)
   {
-    disphotree->Branch("nNeutoPhGr", &nNeutoPhGr, "nNeutoPhGr/I");
+    disphotree->Branch("nNeutoPhGr", &nNeutoPhGr);
 
     gmsbBranches.resize(Config::nGMSBs);
     for (auto igmsb = 0; igmsb < Config::nGMSBs; igmsb++)
     {
       auto & gmsbBranch = gmsbBranches[igmsb];
 
-      disphotree->Branch(Form("genNmass_%i",igmsb), &gmsbBranch.genNmass_, Form("genNmass_%i/F",igmsb));
-      disphotree->Branch(Form("genNE_%i",igmsb), &gmsbBranch.genNE_, Form("genNE_%i/F",igmsb));
-      disphotree->Branch(Form("genNpt_%i",igmsb), &gmsbBranch.genNpt_, Form("genNpt_%i/F",igmsb));
-      disphotree->Branch(Form("genNphi_%i",igmsb), &gmsbBranch.genNphi_, Form("genNphi_%i/F",igmsb));
-      disphotree->Branch(Form("genNeta_%i",igmsb), &gmsbBranch.genNeta_, Form("genNeta_%i/F",igmsb));
+      disphotree->Branch(Form("genNmass_%i",igmsb), &gmsbBranch.genNmass_);
+      disphotree->Branch(Form("genNE_%i",igmsb), &gmsbBranch.genNE_);
+      disphotree->Branch(Form("genNpt_%i",igmsb), &gmsbBranch.genNpt_);
+      disphotree->Branch(Form("genNphi_%i",igmsb), &gmsbBranch.genNphi_);
+      disphotree->Branch(Form("genNeta_%i",igmsb), &gmsbBranch.genNeta_);
       
-      disphotree->Branch(Form("genNprodvx_%i",igmsb), &gmsbBranch.genNprodvx_, Form("genNprodvx_%i/F",igmsb));
-      disphotree->Branch(Form("genNprodvy_%i",igmsb), &gmsbBranch.genNprodvy_, Form("genNprodvy_%i/F",igmsb));
-      disphotree->Branch(Form("genNprodvz_%i",igmsb), &gmsbBranch.genNprodvz_, Form("genNprodvz_%i/F",igmsb));
+      disphotree->Branch(Form("genNprodvx_%i",igmsb), &gmsbBranch.genNprodvx_);
+      disphotree->Branch(Form("genNprodvy_%i",igmsb), &gmsbBranch.genNprodvy_);
+      disphotree->Branch(Form("genNprodvz_%i",igmsb), &gmsbBranch.genNprodvz_);
       
-      disphotree->Branch(Form("genNdecayvx_%i",igmsb), &gmsbBranch.genNdecayvx_, Form("genNdecayvx_%i/F",igmsb));
-      disphotree->Branch(Form("genNdecayvy_%i",igmsb), &gmsbBranch.genNdecayvy_, Form("genNdecayvy_%i/F",igmsb));
-      disphotree->Branch(Form("genNdecayvz_%i",igmsb), &gmsbBranch.genNdecayvz_, Form("genNdecayvz_%i/F",igmsb));
+      disphotree->Branch(Form("genNdecayvx_%i",igmsb), &gmsbBranch.genNdecayvx_);
+      disphotree->Branch(Form("genNdecayvy_%i",igmsb), &gmsbBranch.genNdecayvy_);
+      disphotree->Branch(Form("genNdecayvz_%i",igmsb), &gmsbBranch.genNdecayvz_);
 
-      disphotree->Branch(Form("genphE_%i",igmsb), &gmsbBranch.genphE_, Form("genphE_%i/F",igmsb));
-      disphotree->Branch(Form("genphpt_%i",igmsb), &gmsbBranch.genphpt_, Form("genphpt_%i/F",igmsb));
-      disphotree->Branch(Form("genphphi_%i",igmsb), &gmsbBranch.genphphi_, Form("genphphi_%i/F",igmsb));
-      disphotree->Branch(Form("genpheta_%i",igmsb), &gmsbBranch.genpheta_, Form("genpheta_%i/F",igmsb));
-      disphotree->Branch(Form("genphmatch_%i",igmsb), &gmsbBranch.genphmatch_, Form("genphmatch_%i/I",igmsb));
+      disphotree->Branch(Form("genphE_%i",igmsb), &gmsbBranch.genphE_);
+      disphotree->Branch(Form("genphpt_%i",igmsb), &gmsbBranch.genphpt_);
+      disphotree->Branch(Form("genphphi_%i",igmsb), &gmsbBranch.genphphi_);
+      disphotree->Branch(Form("genpheta_%i",igmsb), &gmsbBranch.genpheta_);
+      disphotree->Branch(Form("genphmatch_%i",igmsb), &gmsbBranch.genphmatch_);
       
-      disphotree->Branch(Form("gengrmass_%i",igmsb), &gmsbBranch.gengrmass_, Form("gengrmass_%i/F",igmsb));
-      disphotree->Branch(Form("gengrE_%i",igmsb), &gmsbBranch.gengrE_, Form("gengrE_%i/F",igmsb));
-      disphotree->Branch(Form("gengrpt_%i",igmsb), &gmsbBranch.gengrpt_, Form("gengrpt_%i/F",igmsb));
-      disphotree->Branch(Form("gengrphi_%i",igmsb), &gmsbBranch.gengrphi_, Form("gengrphi_%i/F",igmsb));
-      disphotree->Branch(Form("gengreta_%i",igmsb), &gmsbBranch.gengreta_, Form("gengreta_%i/F",igmsb));
+      disphotree->Branch(Form("gengrmass_%i",igmsb), &gmsbBranch.gengrmass_);
+      disphotree->Branch(Form("gengrE_%i",igmsb), &gmsbBranch.gengrE_);
+      disphotree->Branch(Form("gengrpt_%i",igmsb), &gmsbBranch.gengrpt_);
+      disphotree->Branch(Form("gengrphi_%i",igmsb), &gmsbBranch.gengrphi_);
+      disphotree->Branch(Form("gengreta_%i",igmsb), &gmsbBranch.gengreta_);
     } // end loop over nGBMBs
   } // end block over isGMSB
 
   // HVDS Info
   if (isHVDS)
   {
-    disphotree->Branch("nvPions", &nvPions, "nvPions/I");
+    disphotree->Branch("nvPions", &nvPions);
 
     hvdsBranches.resize(Config::nHVDSs);
     for (auto ihvds = 0; ihvds < Config::nHVDSs; ihvds++)
     {
       auto & hvdsBranch = hvdsBranches[ihvds];
 
-      disphotree->Branch(Form("genvPionmass_%i",ihvds), &hvdsBranch.genvPionmass_, Form("genvPionmass_%i/F",ihvds));
-      disphotree->Branch(Form("genvPionE_%i",ihvds), &hvdsBranch.genvPionE_, Form("genvPionE_%i/F",ihvds));
-      disphotree->Branch(Form("genvPionpt_%i",ihvds), &hvdsBranch.genvPionpt_, Form("genvPionpt_%i/F",ihvds));
-      disphotree->Branch(Form("genvPionphi_%i",ihvds), &hvdsBranch.genvPionphi_, Form("genvPionphi_%i/F",ihvds));
-      disphotree->Branch(Form("genvPioneta_%i",ihvds), &hvdsBranch.genvPioneta_, Form("genvPioneta_%i/F",ihvds));
+      disphotree->Branch(Form("genvPionmass_%i",ihvds), &hvdsBranch.genvPionmass_);
+      disphotree->Branch(Form("genvPionE_%i",ihvds), &hvdsBranch.genvPionE_);
+      disphotree->Branch(Form("genvPionpt_%i",ihvds), &hvdsBranch.genvPionpt_);
+      disphotree->Branch(Form("genvPionphi_%i",ihvds), &hvdsBranch.genvPionphi_);
+      disphotree->Branch(Form("genvPioneta_%i",ihvds), &hvdsBranch.genvPioneta_);
       
-      disphotree->Branch(Form("genvPionprodvx_%i",ihvds), &hvdsBranch.genvPionprodvx_, Form("genvPionprodvx_%i/F",ihvds));
-      disphotree->Branch(Form("genvPionprodvy_%i",ihvds), &hvdsBranch.genvPionprodvy_, Form("genvPionprodvy_%i/F",ihvds));
-      disphotree->Branch(Form("genvPionprodvz_%i",ihvds), &hvdsBranch.genvPionprodvz_, Form("genvPionprodvz_%i/F",ihvds));
+      disphotree->Branch(Form("genvPionprodvx_%i",ihvds), &hvdsBranch.genvPionprodvx_);
+      disphotree->Branch(Form("genvPionprodvy_%i",ihvds), &hvdsBranch.genvPionprodvy_);
+      disphotree->Branch(Form("genvPionprodvz_%i",ihvds), &hvdsBranch.genvPionprodvz_);
       
-      disphotree->Branch(Form("genvPiondecayvx_%i",ihvds), &hvdsBranch.genvPiondecayvx_, Form("genvPiondecayvx_%i/F",ihvds));
-      disphotree->Branch(Form("genvPiondecayvy_%i",ihvds), &hvdsBranch.genvPiondecayvy_, Form("genvPiondecayvy_%i/F",ihvds));
-      disphotree->Branch(Form("genvPiondecayvz_%i",ihvds), &hvdsBranch.genvPiondecayvz_, Form("genvPiondecayvz_%i/F",ihvds));
+      disphotree->Branch(Form("genvPiondecayvx_%i",ihvds), &hvdsBranch.genvPiondecayvx_);
+      disphotree->Branch(Form("genvPiondecayvy_%i",ihvds), &hvdsBranch.genvPiondecayvy_);
+      disphotree->Branch(Form("genvPiondecayvz_%i",ihvds), &hvdsBranch.genvPiondecayvz_);
       
-      disphotree->Branch(Form("genHVph0E_%i",ihvds), &hvdsBranch.genHVph0E_, Form("genHVph0E_%i/F",ihvds));
-      disphotree->Branch(Form("genHVph0pt_%i",ihvds), &hvdsBranch.genHVph0pt_, Form("genHVph0pt_%i/F",ihvds));
-      disphotree->Branch(Form("genHVph0phi_%i",ihvds), &hvdsBranch.genHVph0phi_, Form("genHVph0phi_%i/F",ihvds));
-      disphotree->Branch(Form("genHVph0eta_%i",ihvds), &hvdsBranch.genHVph0eta_, Form("genHVph0eta_%i/F",ihvds));
-      disphotree->Branch(Form("genHVph0match_%i",ihvds), &hvdsBranch.genHVph0match_, Form("genHVph0match_%i/I",ihvds));
+      disphotree->Branch(Form("genHVph0E_%i",ihvds), &hvdsBranch.genHVph0E_);
+      disphotree->Branch(Form("genHVph0pt_%i",ihvds), &hvdsBranch.genHVph0pt_);
+      disphotree->Branch(Form("genHVph0phi_%i",ihvds), &hvdsBranch.genHVph0phi_);
+      disphotree->Branch(Form("genHVph0eta_%i",ihvds), &hvdsBranch.genHVph0eta_);
+      disphotree->Branch(Form("genHVph0match_%i",ihvds), &hvdsBranch.genHVph0match_);
       
-      disphotree->Branch(Form("genHVph1E_%i",ihvds), &hvdsBranch.genHVph1E_, Form("genHVph1E_%i/F",ihvds));
-      disphotree->Branch(Form("genHVph1pt_%i",ihvds), &hvdsBranch.genHVph1pt_, Form("genHVph1pt_%i/F",ihvds));
-      disphotree->Branch(Form("genHVph1phi_%i",ihvds), &hvdsBranch.genHVph1phi_, Form("genHVph1phi_%i/F",ihvds));
-      disphotree->Branch(Form("genHVph1eta_%i",ihvds), &hvdsBranch.genHVph1eta_, Form("genHVph1eta_%i/F",ihvds));
-      disphotree->Branch(Form("genHVph1match_%i",ihvds), &hvdsBranch.genHVph1match_, Form("genHVph1match_%i/I",ihvds));
+      disphotree->Branch(Form("genHVph1E_%i",ihvds), &hvdsBranch.genHVph1E_);
+      disphotree->Branch(Form("genHVph1pt_%i",ihvds), &hvdsBranch.genHVph1pt_);
+      disphotree->Branch(Form("genHVph1phi_%i",ihvds), &hvdsBranch.genHVph1phi_);
+      disphotree->Branch(Form("genHVph1eta_%i",ihvds), &hvdsBranch.genHVph1eta_);
+      disphotree->Branch(Form("genHVph1match_%i",ihvds), &hvdsBranch.genHVph1match_);
     } // end loop over nHVDSs
   } // end block over HVDS
 
   // ToyMC Info
   if (isToy)
   {
-    disphotree->Branch("nToyPhs", &nToyPhs, "nToyPhs/I");
+    disphotree->Branch("nToyPhs", &nToyPhs);
 
     toyBranches.resize(Config::nToys);
     for (auto itoy = 0; itoy < Config::nToys; itoy++)
     {
       auto & toyBranch = toyBranches[itoy];
 
-      disphotree->Branch(Form("genphE_%i",itoy), &toyBranch.genphE_, Form("genphE_%i/F",itoy));
-      disphotree->Branch(Form("genphpt_%i",itoy), &toyBranch.genphpt_, Form("genphpt_%i/F",itoy));
-      disphotree->Branch(Form("genphphi_%i",itoy), &toyBranch.genphphi_, Form("genphphi_%i/F",itoy));
-      disphotree->Branch(Form("genpheta_%i",itoy), &toyBranch.genpheta_, Form("genpheta_%i/F",itoy));
+      disphotree->Branch(Form("genphE_%i",itoy), &toyBranch.genphE_);
+      disphotree->Branch(Form("genphpt_%i",itoy), &toyBranch.genphpt_);
+      disphotree->Branch(Form("genphphi_%i",itoy), &toyBranch.genphphi_);
+      disphotree->Branch(Form("genpheta_%i",itoy), &toyBranch.genpheta_);
       
-      disphotree->Branch(Form("genphmatch_%i",itoy), &toyBranch.genphmatch_, Form("genphmatch_%i/I",itoy));
-      disphotree->Branch(Form("genphmatch_ptres_%i",itoy), &toyBranch.genphmatch_ptres_, Form("genphmatch_ptres_%i/I",itoy));
-      disphotree->Branch(Form("genphmatch_status_%i",itoy), &toyBranch.genphmatch_status_, Form("genphmatch_status_%i/I",itoy));
+      disphotree->Branch(Form("genphmatch_%i",itoy), &toyBranch.genphmatch_);
+      disphotree->Branch(Form("genphmatch_ptres_%i",itoy), &toyBranch.genphmatch_ptres_);
+      disphotree->Branch(Form("genphmatch_status_%i",itoy), &toyBranch.genphmatch_status_);
     } // end loop over nToys
   } // end block over ToyMC
 
   // Run, Lumi, Event info
-  disphotree->Branch("run", &run, "run/i");
-  disphotree->Branch("lumi", &lumi, "lumi/i");
+  disphotree->Branch("run", &run);
+  disphotree->Branch("lumi", &lumi);
   disphotree->Branch("event", &event, "event/l");
-   
+  
+  // LHC Info
+  if ( lhcInfoValid ) {
+    disphotree->Branch( "bunch_crossing", &fBX, "bunch_crossing/i" );
+    disphotree->Branch( "num_bunch", &fBunchNum, "num_bunch/i");
+    disphotree->Branch( "beam1_VC", &beam1_VC, "beam1_VC/F" ); 
+    disphotree->Branch( "beam2_VC", &beam2_VC, "beam2_VC/F" ); 
+    disphotree->Branch( "beam1_RF", &beam1_RF, "beam1_RF/F" ); 
+    disphotree->Branch( "beam2_RF", &beam2_RF, "beam2_RF/F" ); 
+    disphotree->Branch("subtrain_position", &subtrain_position, "subtrain_position/i" ); 
+    disphotree->Branch("train_position", &train_position, "train_position/i" ); 
+    disphotree->Branch("subtrain_number", &subtrain_number, "subtrain_number/i" ); 
+    disphotree->Branch("train_number", &train_number, "train_number/i" ); 
+  }
+
   // Trigger Info
-  disphotree->Branch("hltSignal", &hltSignal, "hltSignal/O");
-  disphotree->Branch("hltRefPhoID", &hltRefPhoID, "hltRefPhoID/O");
-  disphotree->Branch("hltRefDispID", &hltRefDispID, "hltRefDispID/O");
-  disphotree->Branch("hltRefHT", &hltRefHT, "hltRefHT/O");
-  disphotree->Branch("hltPho50", &hltPho50, "hltPho50/O");
-  disphotree->Branch("hltPho200", &hltPho200, "hltPho200/O");
-  disphotree->Branch("hltDiPho70", &hltDiPho70, "hltDiPho70/O");
-  disphotree->Branch("hltDiPho3022M90", &hltDiPho3022M90, "hltDiPho3022M90/O");
-  disphotree->Branch("hltDiPho30PV18PV", &hltDiPho30PV18PV, "hltDiPho30PV18PV/O");
-  disphotree->Branch("hltEle32WPT", &hltEle32WPT, "hltEle32WPT/O");
-  disphotree->Branch("hltDiEle33MW", &hltDiEle33MW, "hltDiEle33MW/O");
-  disphotree->Branch("hltJet500", &hltJet500, "hltJet500/O");
+  disphotree->Branch("hltSignal", &hltSignal);
+  disphotree->Branch("hltRefPhoID", &hltRefPhoID);
+  disphotree->Branch("hltRefDispID", &hltRefDispID);
+  disphotree->Branch("hltRefHT", &hltRefHT);
+  disphotree->Branch("hltPho50", &hltPho50);
+  disphotree->Branch("hltPho200", &hltPho200);
+  disphotree->Branch("hltDiPho70", &hltDiPho70);
+  disphotree->Branch("hltDiPho3022M90", &hltDiPho3022M90);
+  disphotree->Branch("hltDiPho30PV18PV", &hltDiPho30PV18PV);
+  disphotree->Branch("hltEle32WPT", &hltEle32WPT);
+  disphotree->Branch("hltDiEle33MW", &hltDiEle33MW);
+  disphotree->Branch("hltJet500", &hltJet500);
 
   // MET Filter Info
-  disphotree->Branch("metPV", &metPV, "metPV/O");
-  disphotree->Branch("metBeamHalo", &metBeamHalo, "metBeamHalo/O");
-  disphotree->Branch("metHBHENoise", &metHBHENoise, "metHBHENoise/O");
-  disphotree->Branch("metHBHEisoNoise", &metHBHEisoNoise, "metHBHEisoNoise/O");
-  disphotree->Branch("metECALTP", &metECALTP, "metECALTP/O");
-  disphotree->Branch("metPFMuon", &metPFMuon, "metPFMuon/O");
-  disphotree->Branch("metPFChgHad", &metPFChgHad, "metPFChgHad/O");
-  disphotree->Branch("metEESC", &metEESC, "metEESC/O");
-  disphotree->Branch("metECALCalib", &metECALCalib, "metECALCalib/O");
-  disphotree->Branch("metECALBadCalib", &metECALBadCalib, "metECALBadCalib/O");
+  disphotree->Branch("metPV", &metPV);
+  disphotree->Branch("metBeamHalo", &metBeamHalo);
+  disphotree->Branch("metHBHENoise", &metHBHENoise);
+  disphotree->Branch("metHBHEisoNoise", &metHBHEisoNoise);
+  disphotree->Branch("metECALTP", &metECALTP);
+  disphotree->Branch("metPFMuon", &metPFMuon);
+  disphotree->Branch("metPFChgHad", &metPFChgHad);
+  disphotree->Branch("metEESC", &metEESC);
+  disphotree->Branch("metECALCalib", &metECALCalib);
+  disphotree->Branch("metECALBadCalib", &metECALBadCalib);
 
   // Vertex info
-  disphotree->Branch("nvtx", &nvtx, "nvtx/I");
-  disphotree->Branch("vtxX", &vtxX, "vtxX/F");
-  disphotree->Branch("vtxY", &vtxY, "vtxY/F");
-  disphotree->Branch("vtxZ", &vtxZ, "vtxZ/F");
-  
+  disphotree->Branch("nvtx", &nvtx);
+  disphotree->Branch("vtxX", &vtxX);
+  disphotree->Branch("vtxY", &vtxY);
+  disphotree->Branch("vtxZ", &vtxZ);
+
+  /*  
   // MET info
-  disphotree->Branch("t1pfMETpt", &t1pfMETpt, "t1pfMETpt/F");
-  disphotree->Branch("t1pfMETphi", &t1pfMETphi, "t1pfMETphi/F");
-  disphotree->Branch("t1pfMETsumEt", &t1pfMETsumEt, "t1pfMETsumEt/F");
+  disphotree->Branch("t1pfMETpt", &t1pfMETpt);
+  disphotree->Branch("t1pfMETphi", &t1pfMETphi);
+  disphotree->Branch("t1pfMETsumEt", &t1pfMETsumEt);
+
+  // GEN MET info
+  if (isMC)
+  { 
+    disphotree->Branch("genMETpt", &genMETpt);
+    disphotree->Branch("genMETphi", &genMETphi);
+  }
 
   // Jet info
-  disphotree->Branch("njets", &njets, "njets/I");
+  disphotree->Branch("njets", &njets);
   disphotree->Branch("jetE", &jetE);
   disphotree->Branch("jetpt", &jetpt);
   disphotree->Branch("jeteta", &jeteta);
@@ -2208,25 +2764,27 @@ void DisPho::MakeEventTree()
     disphotree->Branch("jetsmearUpSF", &jetsmearUpSF);
     disphotree->Branch("jetisGen", &jetisGen);
   }
+  */
 
   // Electron Info
-  disphotree->Branch("nelLowL", &nelLowL, "nelLowL/I");
-  disphotree->Branch("nelLowM", &nelLowM, "nelLowM/I");
-  disphotree->Branch("nelLowT", &nelLowT, "nelLowT/I");
-  disphotree->Branch("nelHighL", &nelHighL, "nelHighL/I");
-  disphotree->Branch("nelHighM", &nelHighM, "nelHighM/I");
-  disphotree->Branch("nelHighT", &nelHighT, "nelHighT/I");
+  disphotree->Branch("nelLowL", &nelLowL);
+  disphotree->Branch("nelLowM", &nelLowM);
+  disphotree->Branch("nelLowT", &nelLowT);
+  disphotree->Branch("nelHighL", &nelHighL);
+  disphotree->Branch("nelHighM", &nelHighM);
+  disphotree->Branch("nelHighT", &nelHighT);
 
   // Muon Info
-  disphotree->Branch("nmuLowL", &nmuLowL, "nmuLowL/I");
-  disphotree->Branch("nmuLowM", &nmuLowM, "nmuLowM/I");
-  disphotree->Branch("nmuLowT", &nmuLowT, "nmuLowT/I");
-  disphotree->Branch("nmuHighL", &nmuHighL, "nmuHighL/I");
-  disphotree->Branch("nmuHighM", &nmuHighM, "nmuHighM/I");
-  disphotree->Branch("nmuHighT", &nmuHighT, "nmuHighT/I");
+  disphotree->Branch("nmuLowL", &nmuLowL);
+  disphotree->Branch("nmuLowM", &nmuLowM);
+  disphotree->Branch("nmuLowT", &nmuLowT);
+  disphotree->Branch("nmuHighL", &nmuHighL);
+  disphotree->Branch("nmuHighM", &nmuHighM);
+  disphotree->Branch("nmuHighT", &nmuHighT);
 
   // RecHit Info
-  disphotree->Branch("nrechits", &nrechits, "nrechits/I");
+  disphotree->Branch("nrechits", &nrechits);
+  disphotree->Branch("nurechits", &nurechits);
   if (storeRecHits)
   {
     disphotree->Branch("rhX", &rhX);
@@ -2247,112 +2805,146 @@ void DisPho::MakeEventTree()
     disphotree->Branch("rhpedrms12", &rhpedrms12);
     disphotree->Branch("rhpedrms6", &rhpedrms6);
     disphotree->Branch("rhpedrms1", &rhpedrms1);
+
+    disphotree->Branch("uRhId", &uRhId);
+    disphotree->Branch("amplitude", &amplitude);
+    disphotree->Branch("amplitudeError", &amplitudeError);
+    disphotree->Branch("pedestal", &pedestal);
+    disphotree->Branch("jitter", &jitter);
+    disphotree->Branch("chi2", &chi2);
+//    disphotree->Branch("outOfTimeAmplitude", &outOfTimeAmplitude);
+    disphotree->Branch("ootA0", &ootA0);
+    disphotree->Branch("ootA1", &ootA1);
+    disphotree->Branch("ootA2", &ootA2);
+    disphotree->Branch("ootA3", &ootA3);
+    disphotree->Branch("ootA4", &ootA4);
+    disphotree->Branch("ootA5", &ootA5);
+    disphotree->Branch("ootA6", &ootA6);
+    disphotree->Branch("ootA7", &ootA7);
+    disphotree->Branch("ootA8", &ootA8);
+    disphotree->Branch("ootA9", &ootA9);
+//    disphotree->Branch("outOfTimeAmplitude", &outOfTimeAmplitude, "outOfTimeAmplitude/F");
+    disphotree->Branch("jitterError", &jitterError);
+    disphotree->Branch("isSaturated", &isSaturated);
+    disphotree->Branch("isJitterValid", &isJitterValid);
+    disphotree->Branch("isJitterErrorValid", &isJitterErrorValid);
+
   }
+  
+  // Digi Info
+  disphotree->Branch("ndigis", &ndigis);
+  if (storeRecHits)
+    {
+      disphotree->Branch("digiID", &digiID);
+      disphotree->Branch("digiData", &digiData, "digiData/F");
+    }
 
   // Photon Info
-  disphotree->Branch("nphotons", &nphotons, "nphotons/I");
+  disphotree->Branch("nphotons", &nphotons);
 
   phoBranches.resize(Config::nPhotons);
   for (auto iphoton = 0; iphoton < Config::nPhotons; iphoton++)
   {
     auto & phoBranch = phoBranches[iphoton];
 
-    disphotree->Branch(Form("phoE_%i",iphoton), &phoBranch.E_, Form("phoE_%i/F",iphoton));
-    disphotree->Branch(Form("phopt_%i",iphoton), &phoBranch.pt_, Form("phopt_%i/F",iphoton));
-    disphotree->Branch(Form("phoeta_%i",iphoton), &phoBranch.eta_, Form("phoeta_%i/F",iphoton));
-    disphotree->Branch(Form("phophi_%i",iphoton), &phoBranch.phi_, Form("phophi_%i/F",iphoton));
+    disphotree->Branch(Form("phoE_%i",iphoton), &phoBranch.E_);
+    disphotree->Branch(Form("phopt_%i",iphoton), &phoBranch.pt_);
+    disphotree->Branch(Form("phoeta_%i",iphoton), &phoBranch.eta_);
+    disphotree->Branch(Form("phophi_%i",iphoton), &phoBranch.phi_);
 
-    disphotree->Branch(Form("phoscE_%i",iphoton), &phoBranch.scE_, Form("phoscE_%i/F",iphoton));
-    disphotree->Branch(Form("phosceta_%i",iphoton), &phoBranch.sceta_, Form("phosceta_%i/F",iphoton));
-    disphotree->Branch(Form("phoscphi_%i",iphoton), &phoBranch.scphi_, Form("phoscphi_%i/F",iphoton));
+    disphotree->Branch(Form("phoscE_%i",iphoton), &phoBranch.scE_);
+    disphotree->Branch(Form("phosceta_%i",iphoton), &phoBranch.sceta_);
+    disphotree->Branch(Form("phoscphi_%i",iphoton), &phoBranch.scphi_);
+    disphotree->Branch(Form("phodz_%i",iphoton), &phoBranch.dz_);
+    disphotree->Branch(Form("photdz_%i",iphoton), &phoBranch.tdz_);
 
-    disphotree->Branch(Form("phoHoE_%i",iphoton), &phoBranch.HoE_, Form("phoHoE_%i/F",iphoton));
-    disphotree->Branch(Form("phor9_%i",iphoton), &phoBranch.r9_, Form("phor9_%i/F",iphoton));
+    disphotree->Branch(Form("phoHoE_%i",iphoton), &phoBranch.HoE_);
+    disphotree->Branch(Form("phor9_%i",iphoton), &phoBranch.r9_);
 
-    disphotree->Branch(Form("phoChgHadIso_%i",iphoton), &phoBranch.ChgHadIso_, Form("phoChgHadIso_%i/F",iphoton));
-    disphotree->Branch(Form("phoNeuHadIso_%i",iphoton), &phoBranch.NeuHadIso_, Form("phoNeuHadIso_%i/F",iphoton));
-    disphotree->Branch(Form("phoPhoIso_%i",iphoton), &phoBranch.PhoIso_, Form("phoPhoIso_%i/F",iphoton));
+    disphotree->Branch(Form("phoChgHadIso_%i",iphoton), &phoBranch.ChgHadIso_);
+    disphotree->Branch(Form("phoNeuHadIso_%i",iphoton), &phoBranch.NeuHadIso_);
+    disphotree->Branch(Form("phoPhoIso_%i",iphoton), &phoBranch.PhoIso_);
 
-    disphotree->Branch(Form("phoEcalPFClIso_%i",iphoton), &phoBranch.EcalPFClIso_, Form("phoEcalPFClIso_%i/F",iphoton));
-    disphotree->Branch(Form("phoHcalPFClIso_%i",iphoton), &phoBranch.HcalPFClIso_, Form("phoHcalPFClIso_%i/F",iphoton));
-    disphotree->Branch(Form("phoTrkIso_%i",iphoton), &phoBranch.TrkIso_, Form("phoTrkIso_%i/F",iphoton));
+    disphotree->Branch(Form("phoEcalPFClIso_%i",iphoton), &phoBranch.EcalPFClIso_);
+    disphotree->Branch(Form("phoHcalPFClIso_%i",iphoton), &phoBranch.HcalPFClIso_);
+    disphotree->Branch(Form("phoTrkIso_%i",iphoton), &phoBranch.TrkIso_);
 
-    disphotree->Branch(Form("phoChgHadIsoC_%i",iphoton), &phoBranch.ChgHadIsoC_, Form("phoChgHadIsoC_%i/F",iphoton));
-    disphotree->Branch(Form("phoNeuHadIsoC_%i",iphoton), &phoBranch.NeuHadIsoC_, Form("phoNeuHadIsoC_%i/F",iphoton));
-    disphotree->Branch(Form("phoPhoIsoC_%i",iphoton), &phoBranch.PhoIsoC_, Form("phoPhoIsoC_%i/F",iphoton));
+    disphotree->Branch(Form("phoChgHadIsoC_%i",iphoton), &phoBranch.ChgHadIsoC_);
+    disphotree->Branch(Form("phoNeuHadIsoC_%i",iphoton), &phoBranch.NeuHadIsoC_);
+    disphotree->Branch(Form("phoPhoIsoC_%i",iphoton), &phoBranch.PhoIsoC_);
 
-    disphotree->Branch(Form("phoEcalPFClIsoC_%i",iphoton), &phoBranch.EcalPFClIsoC_, Form("phoEcalPFClIsoC_%i/F",iphoton));
-    disphotree->Branch(Form("phoHcalPFClIsoC_%i",iphoton), &phoBranch.HcalPFClIsoC_, Form("phoHcalPFClIsoC_%i/F",iphoton));
-    disphotree->Branch(Form("phoTrkIsoC_%i",iphoton), &phoBranch.TrkIsoC_, Form("phoTrkIsoC_%i/F",iphoton));
+    disphotree->Branch(Form("phoEcalPFClIsoC_%i",iphoton), &phoBranch.EcalPFClIsoC_);
+    disphotree->Branch(Form("phoHcalPFClIsoC_%i",iphoton), &phoBranch.HcalPFClIsoC_);
+    disphotree->Branch(Form("phoTrkIsoC_%i",iphoton), &phoBranch.TrkIsoC_);
 
-    disphotree->Branch(Form("phosieie_%i",iphoton), &phoBranch.sieie_, Form("phosieie_%i/F",iphoton));
-    disphotree->Branch(Form("phosipip_%i",iphoton), &phoBranch.sipip_, Form("phosipip_%i/F",iphoton));
-    disphotree->Branch(Form("phosieip_%i",iphoton), &phoBranch.sieip_, Form("phosieip_%i/F",iphoton));
+    disphotree->Branch(Form("phosieie_%i",iphoton), &phoBranch.sieie_);
+    disphotree->Branch(Form("phosipip_%i",iphoton), &phoBranch.sipip_);
+    disphotree->Branch(Form("phosieip_%i",iphoton), &phoBranch.sieip_);
 
-    disphotree->Branch(Form("phoe2x2_%i",iphoton), &phoBranch.e2x2_, Form("phoe2x2_%i/F",iphoton));
-    disphotree->Branch(Form("phoe3x3_%i",iphoton), &phoBranch.e3x3_, Form("phoe3x3_%i/F",iphoton));
-    disphotree->Branch(Form("phoe5x5_%i",iphoton), &phoBranch.e5x5_, Form("phoe5x5_%i/F",iphoton));
+    disphotree->Branch(Form("phoe2x2_%i",iphoton), &phoBranch.e2x2_);
+    disphotree->Branch(Form("phoe3x3_%i",iphoton), &phoBranch.e3x3_);
+    disphotree->Branch(Form("phoe5x5_%i",iphoton), &phoBranch.e5x5_);
 
-    disphotree->Branch(Form("phosmaj_%i",iphoton), &phoBranch.smaj_, Form("phosmaj_%i/F",iphoton));
-    disphotree->Branch(Form("phosmin_%i",iphoton), &phoBranch.smin_, Form("phosmin_%i/F",iphoton));
-    disphotree->Branch(Form("phoalpha_%i",iphoton), &phoBranch.alpha_, Form("phoalpha_%i/F",iphoton));
+    disphotree->Branch(Form("phosmaj_%i",iphoton), &phoBranch.smaj_);
+    disphotree->Branch(Form("phosmin_%i",iphoton), &phoBranch.smin_);
+    disphotree->Branch(Form("phoalpha_%i",iphoton), &phoBranch.alpha_);
 
     if (storeRecHits)
     {
-      disphotree->Branch(Form("phoseed_%i",iphoton), &phoBranch.seed_, Form("phoseed_%i/I",iphoton));
+      disphotree->Branch(Form("phoseed_%i",iphoton), &phoBranch.seed_);
       disphotree->Branch(Form("phorecHits_%i",iphoton), &phoBranch.recHits_);
     }
     else 
     {
-      disphotree->Branch(Form("phoseedX_%i",iphoton), &phoBranch.seedX_, Form("phoseedX_%i/F",iphoton));
-      disphotree->Branch(Form("phoseedY_%i",iphoton), &phoBranch.seedY_, Form("phoseedY_%i/F",iphoton));
-      disphotree->Branch(Form("phoseedZ_%i",iphoton), &phoBranch.seedZ_, Form("phoseedZ_%i/F",iphoton));
-      disphotree->Branch(Form("phoseedE_%i",iphoton), &phoBranch.seedE_, Form("phoseedE_%i/F",iphoton));
-      disphotree->Branch(Form("phoseedtime_%i",iphoton), &phoBranch.seedtime_, Form("phoseedtime_%i/F",iphoton));
-      disphotree->Branch(Form("phoseedtimeErr_%i",iphoton), &phoBranch.seedtimeErr_, Form("phoseedtimeErr_%i/F",iphoton));
-      disphotree->Branch(Form("phoseedTOF_%i",iphoton), &phoBranch.seedTOF_, Form("phoseedTOF_%i/F",iphoton));
-      disphotree->Branch(Form("phoseedID_%i",iphoton), &phoBranch.seedID_, Form("phoseedID_%i/i",iphoton));
-      disphotree->Branch(Form("phoseedisOOT_%i",iphoton), &phoBranch.seedisOOT_, Form("phoseedisOOT_%i/i",iphoton));
-      disphotree->Branch(Form("phoseedisGS6_%i",iphoton), &phoBranch.seedisGS6_, Form("phoseedisGS6_%i/i",iphoton));
-      disphotree->Branch(Form("phoseedisGS1_%i",iphoton), &phoBranch.seedisGS1_, Form("phoseedisGS1_%i/i",iphoton));
-      disphotree->Branch(Form("phoseedadcToGeV_%i",iphoton), &phoBranch.seedadcToGeV_, Form("phoseedadcToGeV_%i/i",iphoton));
-      disphotree->Branch(Form("phoseedped12_%i",iphoton), &phoBranch.seedped12_, Form("phoseedped12_%i/i",iphoton));
-      disphotree->Branch(Form("phoseedped6_%i",iphoton), &phoBranch.seedped6_, Form("phoseedped6_%i/i",iphoton));
-      disphotree->Branch(Form("phoseedped1_%i",iphoton), &phoBranch.seedped1_, Form("phoseedped1_%i/i",iphoton));
-      disphotree->Branch(Form("phoseedpedrms12_%i",iphoton), &phoBranch.seedpedrms12_, Form("phoseedpedrms12_%i/i",iphoton));
-      disphotree->Branch(Form("phoseedpedrms6_%i",iphoton), &phoBranch.seedpedrms6_, Form("phoseedpedrms6_%i/i",iphoton));
-      disphotree->Branch(Form("phoseedpedrms1_%i",iphoton), &phoBranch.seedpedrms1_, Form("phoseedpedrms1_%i/i",iphoton));
+      disphotree->Branch(Form("phoseedX_%i",iphoton), &phoBranch.seedX_);
+      disphotree->Branch(Form("phoseedY_%i",iphoton), &phoBranch.seedY_);
+      disphotree->Branch(Form("phoseedZ_%i",iphoton), &phoBranch.seedZ_);
+      disphotree->Branch(Form("phoseedE_%i",iphoton), &phoBranch.seedE_);
+      disphotree->Branch(Form("phoseedtime_%i",iphoton), &phoBranch.seedtime_);
+      disphotree->Branch(Form("phoseedtimeErr_%i",iphoton), &phoBranch.seedtimeErr_);
+      disphotree->Branch(Form("phoseedTOF_%i",iphoton), &phoBranch.seedTOF_);
+      disphotree->Branch(Form("phoseedID_%i",iphoton), &phoBranch.seedID_);
+      disphotree->Branch(Form("phoseedisOOT_%i",iphoton), &phoBranch.seedisOOT_);
+      disphotree->Branch(Form("phoseedisGS6_%i",iphoton), &phoBranch.seedisGS6_);
+      disphotree->Branch(Form("phoseedisGS1_%i",iphoton), &phoBranch.seedisGS1_);
+      disphotree->Branch(Form("phoseedadcToGeV_%i",iphoton), &phoBranch.seedadcToGeV_);
+      disphotree->Branch(Form("phoseedped12_%i",iphoton), &phoBranch.seedped12_);
+      disphotree->Branch(Form("phoseedped6_%i",iphoton), &phoBranch.seedped6_);
+      disphotree->Branch(Form("phoseedped1_%i",iphoton), &phoBranch.seedped1_);
+      disphotree->Branch(Form("phoseedpedrms12_%i",iphoton), &phoBranch.seedpedrms12_);
+      disphotree->Branch(Form("phoseedpedrms6_%i",iphoton), &phoBranch.seedpedrms6_);
+      disphotree->Branch(Form("phoseedpedrms1_%i",iphoton), &phoBranch.seedpedrms1_);
     }
 
-    disphotree->Branch(Form("phosuisseX_%i",iphoton), &phoBranch.suisseX_, Form("phosuisseX_%i/F",iphoton));
+    disphotree->Branch(Form("phosuisseX_%i",iphoton), &phoBranch.suisseX_);
 
-    disphotree->Branch(Form("phoisOOT_%i",iphoton), &phoBranch.isOOT_, Form("phoisOOT_%i/O",iphoton));
-    disphotree->Branch(Form("phoisEB_%i",iphoton), &phoBranch.isEB_, Form("phoisEB_%i/O",iphoton));
-    disphotree->Branch(Form("phoisHLT_%i",iphoton), &phoBranch.isHLT_, Form("phoisHLT_%i/O",iphoton));
-    disphotree->Branch(Form("phoisTrk_%i",iphoton), &phoBranch.isTrk_, Form("phoisTrk_%i/O",iphoton));
-    disphotree->Branch(Form("phopassEleVeto_%i",iphoton), &phoBranch.passEleVeto_, Form("phopassEleVeto_%i/O",iphoton));
-    disphotree->Branch(Form("phohasPixSeed_%i",iphoton), &phoBranch.hasPixSeed_, Form("phohasPixSeed_%i/O",iphoton));
-    disphotree->Branch(Form("phogedID_%i",iphoton), &phoBranch.gedID_, Form("phogedID_%i/I",iphoton));
-    disphotree->Branch(Form("phoootID_%i",iphoton), &phoBranch.ootID_, Form("phoootID_%i/I",iphoton));
+    disphotree->Branch(Form("phoisOOT_%i",iphoton), &phoBranch.isOOT_);
+    disphotree->Branch(Form("phoisEB_%i",iphoton), &phoBranch.isEB_);
+    disphotree->Branch(Form("phoisHLT_%i",iphoton), &phoBranch.isHLT_);
+    disphotree->Branch(Form("phoisTrk_%i",iphoton), &phoBranch.isTrk_);
+    disphotree->Branch(Form("phopassEleVeto_%i",iphoton), &phoBranch.passEleVeto_);
+    disphotree->Branch(Form("phohasPixSeed_%i",iphoton), &phoBranch.hasPixSeed_);
+    disphotree->Branch(Form("phogedID_%i",iphoton), &phoBranch.gedID_);
+    disphotree->Branch(Form("phoootID_%i",iphoton), &phoBranch.ootID_);
 
     if (isMC)
     {
-      if (isGMSB || isHVDS) disphotree->Branch(Form("phoisSignal_%i",iphoton), &phoBranch.isSignal_, Form("phoisSignal_%i/I",iphoton));
-      disphotree->Branch(Form("phoisGen_%i",iphoton), &phoBranch.isGen_, Form("phoisGen_%i/O",iphoton));
+      if (isGMSB || isHVDS) disphotree->Branch(Form("phoisSignal_%i",iphoton), &phoBranch.isSignal_);
+      disphotree->Branch(Form("phoisGen_%i",iphoton), &phoBranch.isGen_);
 
-      disphotree->Branch(Form("phoscaleAbs_%i",iphoton), &phoBranch.scaleAbs_, Form("phoscaleAbs_%i/F",iphoton));
-      disphotree->Branch(Form("phosmearAbs_%i",iphoton), &phoBranch.smearAbs_, Form("phosmearAbs_%i/F",iphoton));
+      disphotree->Branch(Form("phoscaleAbs_%i",iphoton), &phoBranch.scaleAbs_);
+      disphotree->Branch(Form("phosmearAbs_%i",iphoton), &phoBranch.smearAbs_);
     } // end block over isMC
   } // end loop over nPhotons
 }
 
 void DisPho::endJob() {}
 
-void DisPho::beginRun(edm::Run const& iRun, edm::EventSetup const& iSetup) {}
+void DisPho::beginRun(edm::Run const & iRun, edm::EventSetup const & iSetup) {}
 
-void DisPho::endRun(edm::Run const&, edm::EventSetup const&) {}
+void DisPho::endRun(edm::Run const & iRun, edm::EventSetup const & iSetup) {}
 
-void DisPho::fillDescriptions(edm::ConfigurationDescriptions& descriptions) 
+void DisPho::fillDescriptions(edm::ConfigurationDescriptions & descriptions)
 {
   edm::ParameterSetDescription desc;
   desc.setUnknown();
@@ -2360,3 +2952,4 @@ void DisPho::fillDescriptions(edm::ConfigurationDescriptions& descriptions)
 }
 
 DEFINE_FWK_MODULE(DisPho);
+

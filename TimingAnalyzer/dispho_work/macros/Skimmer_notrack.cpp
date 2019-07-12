@@ -315,15 +315,15 @@ void Skimmer::EventLoop()
 
 	inpho.b_hasPixSeed->GetEntry(entry);
 	//cout << "has Pix Seed? " << inpho.hasPixSeed << endl;
-	if (!inpho.hasPixSeed) continue;   //   <<<<<<<<<<<<<<<<<<<<<<<<<<<<< uncomment  temp fix to run 2018?
+//	if (!inpho.hasPixSeed) continue;   //   <<<<<<<<<<<<<<<<<<<<<<<<<<<<< uncomment  temp fix to run 2018?
 
 	inpho.b_gedID->GetEntry(entry);
 //	cout << "gedID " << inpho.gedID << endl;
-	if (inpho.gedID < 3) continue; //  <<<<<<<<<<<<<<<<<<<<<<<<<<  change back to inpho.gedID < 3    temp fix ro run 2018
+//	if (inpho.gedID < 3) continue; //  <<<<<<<<<<<<<<<<<<<<<<<<<<  change back to inpho.gedID < 3    temp fix ro run 2018
 
 	inpho.b_isOOT->GetEntry(entry);
 //	cout << "isOOT " << inpho.isOOT << endl;
-	if (inpho.isOOT) continue;
+//	if (inpho.isOOT) continue;
 
 	good_phos.emplace_back(ipho);
       }

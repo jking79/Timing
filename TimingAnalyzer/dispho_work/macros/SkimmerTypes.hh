@@ -554,6 +554,12 @@ struct Pho
   Float_t seedootA7;
   Float_t seedootA8;
   Float_t seedootA9;
+  Float_t seedootMax;
+  Float_t seedootVsum;
+  Float_t seedootMbefore;
+  Float_t seedootMafter;
+  Int_t   seedootSign;;
+
 
   // MC types
   Bool_t  isGen;
@@ -641,6 +647,11 @@ struct Pho
   std::string s_seedootA7 = "phoseedootA7";
   std::string s_seedootA8 = "phoseedootA8"; 
   std::string s_seedootA9 = "phoseedootA9";
+  std::string s_seedootMax = "phoseedootMax";
+  std::string s_seedootMbefore = "phoseedootMbefore";
+  std::string s_seedootMafter = "phoseedootMafter";
+  std::string s_seedootSign = "phoseedootSign";
+  std::string s_seedootVsum = "phoseedootVsum";
   std::string s_isGen = "phoisGen";
   std::string s_isSignal = "phoisSignal";
   std::string s_scaleAbs = "phoscaleAbs";
@@ -725,6 +736,11 @@ struct Pho
   TBranch * b_seedootA7;
   TBranch * b_seedootA8;
   TBranch * b_seedootA9;
+  TBranch * b_seedootMax;
+  TBranch * b_seedootMbefore;
+  TBranch * b_seedootMafter;
+  TBranch * b_seedootSign;
+  TBranch * b_seedootVsum;
   TBranch * b_isGen;
   TBranch * b_isSignal;
   TBranch * b_scaleAbs;
@@ -749,6 +765,8 @@ struct Pho
   TBranch * b_ootA7;
   TBranch * b_ootA8;
   TBranch * b_ootA9;
+  TBranch * b_ootMax;
+  TBranch * b_ootVsum;
 
 };
 typedef std::vector<Pho> PhoVec;
@@ -846,17 +864,6 @@ struct Hvds
   Float_t genHVph1phi;
   Float_t genHVph1eta;
   Int_t   genHVph1match;
-
-  Float_t ootA0;
-  Float_t ootA1;
-  Float_t ootA2;
-  Float_t ootA3;
-  Float_t ootA4;
-  Float_t ootA5;
-  Float_t ootA6;
-  Float_t ootA7;
-  Float_t ootA8;
-  Float_t ootA9;
 
   std::string s_genvPionmass = "genvPionmass";
   std::string s_genvPionE = "genvPionE";

@@ -86,6 +86,8 @@ struct phoStruct
 
   float HoE_;
   float r9_;
+  float dz_;
+  float tdz_;
 
   float ChgHadIso_;
   float NeuHadIso_;
@@ -118,6 +120,8 @@ struct phoStruct
   // storeRecHits
   int seed_;
   std::vector<int> recHits_;
+  std::vector<int> uncalibratedRecHits_;
+  std::vector<int> digis_;
 
   // store seed only
   float seedX_;

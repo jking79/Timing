@@ -15,8 +15,8 @@ echo "Reading Config"
 ## command line inputs
 #outdirbase=${1:-"madv2_v1/timing/Zee"}
 outdirbase=${1:-"dispho_plots"}
+usetof=${2:-"false"}
 #usetof=${2:-"false"}
-usetof=${2:-"true"}
 #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 useshift=${3:-"false"}
 usesmear=${4:-"false"}
@@ -39,14 +39,12 @@ tower_d="Different"
 
 #run="2016sp"
 #run="2017sp"
-#run="2016deg_tof_ntt"
-#run="2017deg_tof_ntt"
-run="2018eg_tof_ntt"
-#run="2016G_deg_tof_raw_part"
-#run="2017B_deg_tof_raw_part"
-#run="2018eg_tof"
-#run="2018A_eg_tof_raw_315322"
-#run="2018A_eg_tof_mini_315322"
+#run="2016deg"
+#run="2017deg"
+#run="2016G_deg_raw_part"
+#run="2017B_deg_raw_part"
+#run="2018eg"
+run="2018A_eg_raw_315322"
 
 loc="Local"
 glo="Global"
@@ -120,26 +118,10 @@ fragdir="plot_config/fragments"
 #Zeeg="Global zee_skims/dispho_Zee_v3_sp2016 skimmed/dispho_Zee_v2_2017B always_true"
 
 #Zeel="Local dixtal_skims/dispho_DiXtal_v3_eg2018A_raw_315322 skimmed/dispho_Zee_v2_2017B always_true"
-#Zeeg="Global zee_skims/dispho_Zee_v3_eg2018A_raw_315322 skimmed/dispho_Zee_v2_2017B always_true"
+Zeeg="Global zee_skims/dispho_Zee_v4_eg2018A_raw_315322 skimmed/dispho_Zee_v2_2017B always_true"
 
-#Zeel="Local dixtal_skims/dispho_DiXtal_v3_eg2018A_mini_315322 skimmed/dispho_Zee_v2_2017B always_true"
-#Zeeg="Global zee_skims/dispho_Zee_v3_eg2018A_mini_315322 skimmed/dispho_Zee_v2_2017B always_true"
-
-#Zeel="Local dixtal_skims/dispho_DiXtal_v3_deg2017B_raw94_part skimmed/dispho_Zee_v2_2017B always_true"
-#Zeeg="Global zee_skims/dispho_Zee_v3_deg2017B_raw94_part skimmed/dispho_Zee_v2_2017B always_true"
-
-#Zeel="Local dixtal_skims/dispho_DiXtal_v4_deg2016G_raw94_part skimmed/dispho_Zee_v2_2017B always_true"
-#Zeeg="Global zee_skims/dispho_Zee_v4_deg2016G_raw94_part skimmed/dispho_Zee_v2_2017B always_true"
-
-#Zeel="Local dixtal_skims/dispho_DiXtal_deg2016 skimmed/dispho_Zee_v2_2017B always_true"
-#Zeeg="Global zee_skims/dispho_Zee_ntt_deg2016 skimmed/dispho_Zee_v2_2017B always_true"
-
-#Zeel="Local dixtal_skims/dispho_DiXtal_deg2017 skimmed/dispho_Zee_v2_2017B always_true"
-#Zeeg="Global zee_skims/dispho_Zee_ntt_deg2017 skimmed/dispho_Zee_v2_2017B always_true"
-
-Zeel="Local dixtal_skims/dispho_DiXtal_eg2018 skimmed/dispho_Zee_v2_2017B always_true"
-Zeeg="Global zee_skims/dispho_Zee_ntt_eg2018 skimmed/dispho_Zee_v2_2017B always_true"
-
+#Zeel="Local dixtal_skims/dispho_DiXtal_v3_deg2017B_raw_part skimmed/dispho_Zee_v2_2017B always_true"
+#Zeeg="Global zee_skims/dispho_Zee_v3_deg2017B_raw_part skimmed/dispho_Zee_v2_2017B always_true"
 
 ZEEL="${Zeel} empty"
 #declare -a inputsl=(ZEEL)
@@ -366,7 +348,8 @@ do
 	echo "Working with : ${jwk_cut}"
 	
 	## eta regions
-	declare -a dietas=("EBEB" "Full")
+#	declare -a dietas=("EBEB" "EBEE" "EEEE")
+       declare -a dietas=("EBEB")
 	
 	## vars
 	declare -a vars_map=("A_eff A") # "seedE_eff seedE"
@@ -401,176 +384,6 @@ do
 	do 
 	    echo ${var_pair} | while read -r var fragment
 	    do
-	        ##########################
-	        ## Set plot config (1D) ##
-	        ##########################
-		echo "Set plot config (1D)"
-		while IFS='' read -r line || [[ -n "${line}" ]]
-		do
-		    if   [[ "${line}" == "var="* ]]
-		    then
-			x_var=$( ReadConfig "${line}" )
-		    elif [[ "${line}" == "title="* ]]
-		    then
-			title=$( ReadConfig "${line}" )
-		    elif [[ "${line}" == "bins="* ]]
-		    then
-			x_bins=$( ReadConfig "${line}" )
-		    elif [[ "${line}" == "unit="* ]]
-		    then
-			unit=$( ReadConfig "${line}" )
-		    elif [[ "${line}" == "ytitle="* ]]
-		    then
-			ytitle=$( ReadConfig "${line}" )
-		    fi
-		done < "${fragdir}/${fragment}.${inTextExt}"
-	    
-	        ## add in photon indices
-		if   [[ "${var}" == *"_0" ]] 
-		then
-		    title="Leading ${title}"
-		    x_var="${x_var}_0"
-		elif [[ "${var}" == *"_1" ]]
-		then
-		    title="Subleading ${title}"
-		    x_var="${x_var}_1"
-		elif [[ "${var}" == *"_eff" ]]
-		then
-		    if [[ "${var}" == "A_eff" ]]
-		    then
-			title="${title}_{eff}/#sigma_{n}"
-			xvar0="(phoseedE_0/phoseedadcToGeV_0)/phoseedpedrms12_0"
-			xvar1="(phoseedE_1/phoseedadcToGeV_1)/phoseedpedrms12_1"
-			x_var="((${xvar0}*${xvar1})/sqrt(pow(${xvar0},2)+pow(${xvar1},2)))"
-		    else
-			title="Effective ${title}"
-			x_var="((${x_var}_0*${x_var}_1)/sqrt(pow(${x_var}_0,2)+pow(${x_var}_1,2)))"
-		    fi
-		elif [[ "${var}" == *"_delta" ]]
-		then
-		    title="#Delta(${title})"
-		    x_var="${x_var}_0-${x_var}_1"
-		fi
-	
-	        ## add units to title
-		if [[ "${unit}" != "" ]]
-		then
-		    title+=" ${unit}"
-		fi
-	    
-	        ##########################
-	        ## Set plot config (2D) ##
-	        ##########################
-		echo "Set plot config (2D)"
-		while IFS='' read -r line || [[ -n "${line}" ]]
-		do
-		    if   [[ "${line}" == "var="* ]]
-		    then
-			time_var=$( ReadConfig "${line}" )
-		    elif [[ "${line}" == "title="* ]]
-		    then
-			time_title=$( ReadConfig "${line}" )
-		    elif [[ "${line}" == "unit="* ]]
-		    then
-			time_unit=$( ReadConfig "${line}" )
-		    elif [[ "${line}" == "bins="* ]]
-		    then
-			time_bins=$( ReadConfig "${line}" )
-		    fi
-		done < "${fragdir}/${base_time_var}.${inTextExt}"
-		
-	        ## add in photon indices
-		time_var="${time_var}_0-${time_var}_1"
-	
-	        ## add delta and units to title
-		time_title="#Delta(${time_title}) ${time_unit}"
-	    
-	        #####################
-	        ## set corrections ##
-	        #####################
-		echo "set corrections"
-		## deltaT first, single T after
-		time_data_corr=""
-		time_mc_corr=""
-		data_corr=""
-		mc_corr=""
-	
-		## tof
-		if [[ "${usetof}" == "true" ]]
-		then
-		    time_tof_corr_delta="+(${tof_corr}_0-${tof_corr}_1)"
-	
-		    time_data_corr+="${time_tof_corr_delta}"
-		    time_mc_corr+="${time_tof_corr_delta}"
-	
-		    if [[ "${var}" == "time_0" ]]
-		    then
-			tof_corr_0="+${tof_corr}_0"
-	
-			data_corr+="${tof_corr_0}"
-			mc_corr+="${tof_corr_0}"
-		    elif [[ "${var}" == "time_1" ]]
-		    then
-			tof_corr_1="+${tof_corr}_1"
-	
-			data_corr+="${tof_corr_1}"
-			mc_corr+="${tof_corr_1}"
-		    elif [[ "${var}" == "time_delta" ]]
-		    then
-			data_corr+="${time_tof_corr_delta}"
-			mc_corr+="+${time_tof_corr_delta}"
-		    fi
-		fi
-	
-		## shift
-		if [[ "${useshift}" == "true" ]]
-		then
-		    time_shift_corr_delta="+${shift_corr}_0-${shift_corr}_1"
-	
-		    time_data_corr+="${time_shift_corr_delta}"
-		    time_mc_corr+="${time_shift_corr_delta}"
-	
-		    if [[ "${var}" == "time_0" ]]
-		    then
-			shift_corr_0="+${shift_corr}_0"
-	
-			data_corr+="${shift_corr_0}"
-			mc_corr+="${shift_corr_0}"
-		    elif [[ "${var}" == "time_1" ]]
-		    then
-			shift_corr_1="+${shift_corr}_1"
-	
-			data_corr+="${shift_corr_1}"
-			mc_corr+="${shift_corr_1}"
-		    elif [[ "${var}" == "time_delta" ]]
-		    then
-			data_corr+="${time_shift_corr_delta}"
-			mc_corr+="+${time_shift_corr_delta}"
-		    fi
-		fi
-	
-		## smear
-		if [[ "${usesmear}" == "true" ]]
-		then
-		    time_smear_corr_delta="+${smear_corr}_0-${smear_corr}_1"
-	
-		    time_mc_corr+="${time_smear_corr_delta}"
-	
-		    if [[ "${var}" == "time_0" ]]
-		    then
-			smear_corr_0="+${smear_corr}_0"
-	
-			mc_corr+="${smear_corr_0}"
-		    elif [[ "${var}" == "time_1" ]]
-		    then
-			smear_corr_1="+${smear_corr}_1"
-	
-			mc_corr+="${smear_corr_1}"
-		    elif [[ "${var}" == "time_delta" ]]
-		    then
-			mc_corr+="+${time_smear_corr_delta}"
-		    fi
-		fi
 	    
 	        ## loop over dieta regions
 		echo "loop over dieta regions"
@@ -749,13 +562,13 @@ do
 			    do
 	                 	## outfile names
 				#outdir="${outdirbase}/${label}/${diphodir}/${eta}/${var}"
-				outdir="${outdirbase}/${diphodir}_${ntcutname}_${ecutname}_${gdrcutname}/"
+				outdir="${outdirbase}/MyPlots_${diphodir}_${ntcutname}_${ecutname}_${gdrcutname}/"
 				outfile="${label}_${eta}_${era}"
 				
 				## run 1D plotter
 				jwk_plot="jwk_plot_configs/plot_difA_EBEB.txt"
 				#echo "run 1D plotter"
-				./scripts/runTreePlotter.sh "${skimdir}/${infile}.root" "${skimdir}/${insigfile}.root" "${cut}" "${varwgtconfigdir}/${varwgtmap}.${inTextExt}" "${jwk_plot}" "${miscconfigdir}/${misc}.${inTextExt}" "${era}" "${outfile}" "${outdir}"
+#				./scripts/runTreePlotter.sh "${skimdir}/${infile}.root" "${skimdir}/${insigfile}.root" "${cut}" "${varwgtconfigdir}/${varwgtmap}.${inTextExt}" "${jwk_plot}" "${miscconfigdir}/${misc}.${inTextExt}" "${era}" "${outfile}" "${outdir}"
 	
 				## run 2D plotter, passing 2D plots to make fits for all vars except vs time
 				echo " run 2D plotter, passing 2D plots to make fits for all vars except vs time"
@@ -786,18 +599,14 @@ do
 	                            jwk_outfile5="jwk_defT_v_nvtx_${outfile}"
 #	                            ./scripts/runTreePlotter2D.sh "${skimdir}/${infile}.root" "${skimdir}/${insigfile}.root" "${cut}" "${varwgtconfigdir}/${varwgtmap}.${inTextExt}" "${jwk_plot5}" "${miscconfigdir}/${misc}.${inTextExt}" "${era}" "${jwk_outfile5}" "${outdir}"
                                     rm ${jwk_outfile5}.root
-					
-				#  makes base 2d plot for time fit
-				    ./scripts/runTreePlotter2D.sh "${skimdir}/${infile}.root" "${skimdir}/${insigfile}.root" "${cut}" "${varwgtconfigdir}/${varwgtmap}.${inTextExt}" "${plot2D}" "${miscconfigdir}/${misc}.${inTextExt}" "${era}" "${outfile2D}" "${outdir}"
-
-
+#				    ./scripts/runTreePlotter2D.sh "${skimdir}/${infile}.root" "${skimdir}/${insigfile}.root" "${cut}" "${varwgtconfigdir}/${varwgtmap}.${inTextExt}" "${plot2D}" "${miscconfigdir}/${misc}.${inTextExt}" "${era}" "${outfile2D}" "${outdir}"
 				    jwk_plot2D="jwk_plot_configs/plot_A0_vs_A1_EBEB.TXT"
 	                            jwk_outfile="jwk_AvsA_${outfile}"
 	             #               ./scripts/runTreePlotter2D.sh "${skimdir}/${infile}.root" "${skimdir}/${insigfile}.root" "${cut}" "${varwgtconfigdir}/${varwgtmap}.${inTextExt}" "${jwk_plot2D}" "${miscconfigdir}/${misc}.${inTextExt}" "${era}" "${jwk_outfile}" "${outdir}"
                                     rm ${jwk_outfile}.root
 				    jwk_plot_time="jwk_plot_configs/plot_T0_vs_T1_EBEB.txt"
 				    jwk_time_outfile="jwk_TvsT_${outfile}"
-#	                           ./scripts/runTreePlotter2D.sh "${skimdir}/${infile}.root" "${skimdir}/${insigfile}.root" "${cut}" "${varwgtconfigdir}/${varwgtmap}.${inTextExt}" "${jwk_plot_time}" "${miscconfigdir}/${misc}.${inTextExt}" "${era}" "${jwk_time_outfile}" "${outdir}"
+	  #                          ./scripts/runTreePlotter2D.sh "${skimdir}/${infile}.root" "${skimdir}/${insigfile}.root" "${cut}" "${varwgtconfigdir}/${varwgtmap}.${inTextExt}" "${jwk_plot_time}" "${miscconfigdir}/${misc}.${inTextExt}" "${era}" "${jwk_time_outfile}" "${outdir}"
                                     rm ${jwk_time_outfile}.root
 	                            jwk_plot2="jwk_plot_configs/plot_difT_vs_A_eff_EBEB.txt"
 	                            jwk_outfile2="jwk_dTvsAeff_${outfile}"
@@ -817,7 +626,7 @@ do
 
                                     jwk_plot_20="jwk_plot_configs/plot_eta_eta.txt"
                                     jwk_outfile20="jwk_eta_eta_${outfile}"
-          #                          ./scripts/runTreePlotter2D.sh "${skimdir}/${infile}.root" "${skimdir}/${insigfile}.root" "${cut}" "${varwgtconfigdir}/${varwgtmap}.${inTextExt}" "${jwk_plot_20}" "${miscconfigdir}/${misc}.${inTextExt}" "${era}" "${jwk_outfile20}" "${outdir}"
+ #                                   ./scripts/runTreePlotter2D.sh "${skimdir}/${infile}.root" "${skimdir}/${insigfile}.root" "${cut}" "${varwgtconfigdir}/${varwgtmap}.${inTextExt}" "${jwk_plot_20}" "${miscconfigdir}/${misc}.${inTextExt}" "${era}" "${jwk_outfile20}" "${outdir}"
                                     rm ${jwk_outfile20}.root
                                     jwk_plot_21="jwk_plot_configs/plot_gedID_gedID.txt"
                                     jwk_outfile21="jwk_gedID_gedID_${outfile}"
@@ -853,7 +662,7 @@ do
                                     rm ${jwk_outfile28}.root
                                     jwk_plot_29="jwk_plot_configs/plot_phi_phi.txt"
                                     jwk_outfile29="jwk_phi_phi_${outfile}"
-           #                         ./scripts/runTreePlotter2D.sh "${skimdir}/${infile}.root" "${skimdir}/${insigfile}.root" "${cut}" "${varwgtconfigdir}/${varwgtmap}.${inTextExt}" "${jwk_plot_29}" "${miscconfigdir}/${misc}.${inTextExt}" "${era}" "${jwk_outfile29}" "${outdir}"
+  #                                  ./scripts/runTreePlotter2D.sh "${skimdir}/${infile}.root" "${skimdir}/${insigfile}.root" "${cut}" "${varwgtconfigdir}/${varwgtmap}.${inTextExt}" "${jwk_plot_29}" "${miscconfigdir}/${misc}.${inTextExt}" "${era}" "${jwk_outfile29}" "${outdir}"
                                     rm ${jwk_outfile29}.root
                                     jwk_plot_30="jwk_plot_configs/plot_pt_pt.txt"
                                     jwk_outfile30="jwk_pt_pt_${outfile}"
@@ -885,60 +694,155 @@ do
                                     rm ${jwk_outfile36}.root
                                     jwk_plot_37="jwk_plot_configs/plot_gzm.txt"
                                     jwk_outfile37="jwk_gzm_${outfile}"
- #                                   ./scripts/runTreePlotter.sh "${skimdir}/${infile}.root" "${skimdir}/${insigfile}.root" "${cut}" "${varwgtconfigdir}/${varwgtmap}.${inTextExt}" "${jwk_plot_37}" "${miscconfigdir}/${misc}.${inTextExt}" "${era}" "${jwk_outfile37}" "${outdir}"
+                                    ./scripts/runTreePlotter.sh "${skimdir}/${infile}.root" "${skimdir}/${insigfile}.root" "${cut}" "${varwgtconfigdir}/${varwgtmap}.${inTextExt}" "${jwk_plot_37}" "${miscconfigdir}/${misc}.${inTextExt}" "${era}" "${jwk_outfile37}" "${outdir}"
                                     rm ${jwk_outfile37}.root
                                     jwk_plot_38="jwk_plot_configs/plot_deltaEta.txt"
                                     jwk_outfile38="jwk_deltaEta_${outfile}"
-            #                        ./scripts/runTreePlotter.sh "${skimdir}/${infile}.root" "${skimdir}/${insigfile}.root" "${cut}" "${varwgtconfigdir}/${varwgtmap}.${inTextExt}" "${jwk_plot_38}" "${miscconfigdir}/${misc}.${inTextExt}" "${era}" "${jwk_outfile38}" "${outdir}"
+    #                                ./scripts/runTreePlotter.sh "${skimdir}/${infile}.root" "${skimdir}/${insigfile}.root" "${cut}" "${varwgtconfigdir}/${varwgtmap}.${inTextExt}" "${jwk_plot_38}" "${miscconfigdir}/${misc}.${inTextExt}" "${era}" "${jwk_outfile38}" "${outdir}"
                                     rm ${jwk_outfile38}.root
                                     jwk_plot_39="jwk_plot_configs/plot_deta_dR.txt"
                                     jwk_outfile39="jwk_deta_dR._${outfile}"
-  #                                  ./scripts/runTreePlotter2D.sh "${skimdir}/${infile}.root" "${skimdir}/${insigfile}.root" "${cut}" "${varwgtconfigdir}/${varwgtmap}.${inTextExt}" "${jwk_plot_39}" "${miscconfigdir}/${misc}.${inTextExt}" "${era}" "${jwk_outfile39}" "${outdir}"
+     #                               ./scripts/runTreePlotter2D.sh "${skimdir}/${infile}.root" "${skimdir}/${insigfile}.root" "${cut}" "${varwgtconfigdir}/${varwgtmap}.${inTextExt}" "${jwk_plot_39}" "${miscconfigdir}/${misc}.${inTextExt}" "${era}" "${jwk_outfile39}" "${outdir}"
                                     rm ${jwk_outfile39}.root
                                     jwk_plot_40="jwk_plot_configs/plot_deta_dpst.txt"
                                     jwk_outfile40="jwk_deta_dpst_${outfile}"
-             #                       ./scripts/runTreePlotter2D.sh "${skimdir}/${infile}.root" "${skimdir}/${insigfile}.root" "${cut}" "${varwgtconfigdir}/${varwgtmap}.${inTextExt}" "${jwk_plot_40}" "${miscconfigdir}/${misc}.${inTextExt}" "${era}" "${jwk_outfile40}" "${outdir}"
+      #                              ./scripts/runTreePlotter2D.sh "${skimdir}/${infile}.root" "${skimdir}/${insigfile}.root" "${cut}" "${varwgtconfigdir}/${varwgtmap}.${inTextExt}" "${jwk_plot_40}" "${miscconfigdir}/${misc}.${inTextExt}" "${era}" "${jwk_outfile40}" "${outdir}"
                                     rm ${jwk_outfile40}.root
                                     jwk_plot_41="jwk_plot_configs/plot_gdr.txt"
                                     jwk_outfile41="jwk_gdr_${outfile}"
-   #                                 ./scripts/runTreePlotter.sh "${skimdir}/${infile}.root" "${skimdir}/${insigfile}.root" "${cut}" "${varwgtconfigdir}/${varwgtmap}.${inTextExt}" "${jwk_plot_41}" "${miscconfigdir}/${misc}.${inTextExt}" "${era}" "${jwk_outfile41}" "${outdir}"
+                                    ./scripts/runTreePlotter.sh "${skimdir}/${infile}.root" "${skimdir}/${insigfile}.root" "${cut}" "${varwgtconfigdir}/${varwgtmap}.${inTextExt}" "${jwk_plot_41}" "${miscconfigdir}/${misc}.${inTextExt}" "${era}" "${jwk_outfile41}" "${outdir}"
                                     rm ${jwk_outfile41}.root
                                     jwk_plot_42="jwk_plot_configs/plot_gdr_gzm.txt"
                                     jwk_outfile42="jwk_gdr_gzm_${outfile}"
-    #                                ./scripts/runTreePlotter2D.sh "${skimdir}/${infile}.root" "${skimdir}/${insigfile}.root" "${cut}" "${varwgtconfigdir}/${varwgtmap}.${inTextExt}" "${jwk_plot_42}" "${miscconfigdir}/${misc}.${inTextExt}" "${era}" "${jwk_outfile42}" "${outdir}"
+            #                        ./scripts/runTreePlotter2D.sh "${skimdir}/${infile}.root" "${skimdir}/${insigfile}.root" "${cut}" "${varwgtconfigdir}/${varwgtmap}.${inTextExt}" "${jwk_plot_42}" "${miscconfigdir}/${misc}.${inTextExt}" "${era}" "${jwk_outfile42}" "${outdir}"
                                     rm ${jwk_outfile42}.root
                                     jwk_plot_43="jwk_plot_configs/plot_gdr_nxtalsep.txt"
                                     jwk_outfile43="jwk_gdr_nxtalsep_${outfile}"
-              #                      ./scripts/runTreePlotter2D.sh "${skimdir}/${infile}.root" "${skimdir}/${insigfile}.root" "${cut}" "${varwgtconfigdir}/${varwgtmap}.${inTextExt}" "${jwk_plot_43}" "${miscconfigdir}/${misc}.${inTextExt}" "${era}" "${jwk_outfile43}" "${outdir}"
+        #                            ./scripts/runTreePlotter2D.sh "${skimdir}/${infile}.root" "${skimdir}/${insigfile}.root" "${cut}" "${varwgtconfigdir}/${varwgtmap}.${inTextExt}" "${jwk_plot_43}" "${miscconfigdir}/${misc}.${inTextExt}" "${era}" "${jwk_outfile43}" "${outdir}"
                                     rm ${jwk_outfile43}.root
                                     jwk_plot_44="jwk_plot_configs/plot_npho.txt"
                                     jwk_outfile44="jwk_npho_${outfile}"
-               #                     ./scripts/runTreePlotter.sh "${skimdir}/${infile}.root" "${skimdir}/${insigfile}.root" "${cut}" "${varwgtconfigdir}/${varwgtmap}.${inTextExt}" "${jwk_plot_44}" "${miscconfigdir}/${misc}.${inTextExt}" "${era}" "${jwk_outfile44}" "${outdir}"
+         #                           ./scripts/runTreePlotter.sh "${skimdir}/${infile}.root" "${skimdir}/${insigfile}.root" "${cut}" "${varwgtconfigdir}/${varwgtmap}.${inTextExt}" "${jwk_plot_44}" "${miscconfigdir}/${misc}.${inTextExt}" "${era}" "${jwk_outfile44}" "${outdir}"
                                     rm ${jwk_outfile44}.root
                                     jwk_plot_45="jwk_plot_configs/plot_npho_dpst.txt"
                                     jwk_outfile45="jwk_npho_dpst_${outfile}"
-                #                    ./scripts/runTreePlotter2D.sh "${skimdir}/${infile}.root" "${skimdir}/${insigfile}.root" "${cut}" "${varwgtconfigdir}/${varwgtmap}.${inTextExt}" "${jwk_plot_45}" "${miscconfigdir}/${misc}.${inTextExt}" "${era}" "${jwk_outfile45}" "${outdir}"
+          #                          ./scripts/runTreePlotter2D.sh "${skimdir}/${infile}.root" "${skimdir}/${insigfile}.root" "${cut}" "${varwgtconfigdir}/${varwgtmap}.${inTextExt}" "${jwk_plot_45}" "${miscconfigdir}/${misc}.${inTextExt}" "${era}" "${jwk_outfile45}" "${outdir}"
                                     rm ${jwk_outfile45}.root
                                     jwk_plot_46="jwk_plot_configs/plot_rho_dpst.txt"
                                     jwk_outfile46="jwk_rho_dpst_${outfile}"
-     #                               ./scripts/runTreePlotter2D.sh "${skimdir}/${infile}.root" "${skimdir}/${insigfile}.root" "${cut}" "${varwgtconfigdir}/${varwgtmap}.${inTextExt}" "${jwk_plot_46}" "${miscconfigdir}/${misc}.${inTextExt}" "${era}" "${jwk_outfile46}" "${outdir}"
+           #                         ./scripts/runTreePlotter2D.sh "${skimdir}/${infile}.root" "${skimdir}/${insigfile}.root" "${cut}" "${varwgtconfigdir}/${varwgtmap}.${inTextExt}" "${jwk_plot_46}" "${miscconfigdir}/${misc}.${inTextExt}" "${era}" "${jwk_outfile46}" "${outdir}"
                                     rm ${jwk_outfile46}.root
                                     jwk_plot_47="jwk_plot_configs/plot_gdr_dpst.txt"
                                     jwk_outfile47="jwk_gdr_dpst_${outfile}"
-      #                              ./scripts/runTreePlotter2D.sh "${skimdir}/${infile}.root" "${skimdir}/${insigfile}.root" "${cut}" "${varwgtconfigdir}/${varwgtmap}.${inTextExt}" "${jwk_plot_47}" "${miscconfigdir}/${misc}.${inTextExt}" "${era}" "${jwk_outfile47}" "${outdir}"
+   #                                 ./scripts/runTreePlotter2D.sh "${skimdir}/${infile}.root" "${skimdir}/${insigfile}.root" "${cut}" "${varwgtconfigdir}/${varwgtmap}.${inTextExt}" "${jwk_plot_47}" "${miscconfigdir}/${misc}.${inTextExt}" "${era}" "${jwk_outfile47}" "${outdir}"
                                     rm ${jwk_outfile47}.root
-                                    jwk_plot_48="jwk_plot_configs/plot_ootamax_dpst.txt"
-                                    jwk_outfile48="jwk_ootamax_dpst_${outfile}"
-       #                             ./scripts/runTreePlotter2D.sh "${skimdir}/${infile}.root" "${skimdir}/${insigfile}.root" "${cut}" "${varwgtconfigdir}/${varwgtmap}.${inTextExt}" "${jwk_plot_48}" "${miscconfigdir}/${misc}.${inTextExt}" "${era}" "${jwk_outfile48}" "${outdir}"
+                                    jwk_plot_48="jwk_plot_configs/plot_ootam_dpst.txt"
+                                    jwk_outfile48="jwk_ootam_dpst_${outfile}"
+    #                                ./scripts/runTreePlotter2D.sh "${skimdir}/${infile}.root" "${skimdir}/${insigfile}.root" "${cut}" "${varwgtconfigdir}/${varwgtmap}.${inTextExt}" "${jwk_plot_48}" "${miscconfigdir}/${misc}.${inTextExt}" "${era}" "${jwk_outfile48}" "${outdir}"
                                     rm ${jwk_outfile48}.root
-                                    jwk_plot_48="jwk_plot_configs/plot_gdr_dtdz.txt"
-                                    jwk_outfile48="jwk_gdr_dtdz_${outfile}"
-        #                            ./scripts/runTreePlotter2D.sh "${skimdir}/${infile}.root" "${skimdir}/${insigfile}.root" "${cut}" "${varwgtconfigdir}/${varwgtmap}.${inTextExt}" "${jwk_plot_48}" "${miscconfigdir}/${misc}.${inTextExt}" "${era}" "${jwk_outfile48}" "${outdir}"
-                                    rm ${jwk_outfile48}.root
-				
+                                    jwk_plot_49="jwk_plot_configs/plot_ootag_dpst.txt"
+                                    jwk_outfile49="jwk_ootag_dpst_${outfile}"
+     #                               ./scripts/runTreePlotter2D.sh "${skimdir}/${infile}.root" "${skimdir}/${insigfile}.root" "${cut}" "${varwgtconfigdir}/${varwgtmap}.${inTextExt}" "${jwk_plot_49}" "${miscconfigdir}/${misc}.${inTextExt}" "${era}" "${jwk_outfile49}" "${outdir}"
+                                    rm ${jwk_outfile49}.root
+                                    jwk_plot_50="jwk_plot_configs/plot_gdr_dtdz.txt"
+                                    jwk_outfile50="jwk_gdr_dtdz_${outfile}"
+      #                              ./scripts/runTreePlotter2D.sh "${skimdir}/${infile}.root" "${skimdir}/${insigfile}.root" "${cut}" "${varwgtconfigdir}/${varwgtmap}.${inTextExt}" "${jwk_plot_50}" "${miscconfigdir}/${misc}.${inTextExt}" "${era}" "${jwk_outfile50}" "${outdir}"
+                                    rm ${jwk_outfile50}.root
+    #                                jwk_plot_51="jwk_plot_configs/plot_.txt"
+    #                                jwk_outfile51="jwk__${outfile}"
+     #                               ./scripts/runTreePlotter2D.sh "${skimdir}/${infile}.root" "${skimdir}/${insigfile}.root" "${cut}" "${varwgtconfigdir}/${varwgtmap}.${inTextExt}" "${jwk_plot_51}" "${miscconfigdir}/${misc}.${inTextExt}" "${era}" "${jwk_outfile51}" "${outdir}"
+                                    rm ${jwk_outfile51}.root
+                                    jwk_plot_52="jwk_plot_configs/plot_ootamaf_dpst.txt"
+                                    jwk_outfile52="jwk_ootamaf_dpst_${outfile}"
+                                    ./scripts/runTreePlotter2D.sh "${skimdir}/${infile}.root" "${skimdir}/${insigfile}.root" "${cut}" "${varwgtconfigdir}/${varwgtmap}.${inTextExt}" "${jwk_plot_52}" "${miscconfigdir}/${misc}.${inTextExt}" "${era}" "${jwk_outfile52}" "${outdir}"
+                                    rm ${jwk_outfile52}.root			
+                                    jwk_plot_53="jwk_plot_configs/plot_ootamaf_dpst_signed.txt"
+                                    jwk_outfile53="jwk_ootamaf_dpst_signed_${outfile}"
+                                    ./scripts/runTreePlotter2D.sh "${skimdir}/${infile}.root" "${skimdir}/${insigfile}.root" "${cut}" "${varwgtconfigdir}/${varwgtmap}.${inTextExt}" "${jwk_plot_53}" "${miscconfigdir}/${misc}.${inTextExt}" "${era}" "${jwk_outfile53}" "${outdir}"
+                                    rm ${jwk_outfile53}.root
+                                    jwk_plot_54="jwk_plot_configs/plot_ootamaf_ootamaf.txt"
+                                    jwk_outfile54="jwk_ootamaf_ootamaf_${outfile}"
+                                    ./scripts/runTreePlotter2D.sh "${skimdir}/${infile}.root" "${skimdir}/${insigfile}.root" "${cut}" "${varwgtconfigdir}/${varwgtmap}.${inTextExt}" "${jwk_plot_54}" "${miscconfigdir}/${misc}.${inTextExt}" "${era}" "${jwk_outfile54}" "${outdir}"
+                                    rm ${jwk_outfile54}.root
+                                    jwk_plot_55="jwk_plot_configs/plot_ootamax_dpst.txt"
+                                    jwk_outfile55="jwk_ootamax_dpst_${outfile}"
+                                    ./scripts/runTreePlotter2D.sh "${skimdir}/${infile}.root" "${skimdir}/${insigfile}.root" "${cut}" "${varwgtconfigdir}/${varwgtmap}.${inTextExt}" "${jwk_plot_55}" "${miscconfigdir}/${misc}.${inTextExt}" "${era}" "${jwk_outfile55}" "${outdir}"
+                                    rm ${jwk_outfile55}.root
+                                    jwk_plot_56="jwk_plot_configs/plot_ootamax_dpst_signed.txt"
+                                    jwk_outfile56="jwk_ootamax_dpst_signed_${outfile}"
+                                    ./scripts/runTreePlotter2D.sh "${skimdir}/${infile}.root" "${skimdir}/${insigfile}.root" "${cut}" "${varwgtconfigdir}/${varwgtmap}.${inTextExt}" "${jwk_plot_56}" "${miscconfigdir}/${misc}.${inTextExt}" "${era}" "${jwk_outfile56}" "${outdir}"
+                                    rm ${jwk_outfile56}.root
+                                    jwk_plot_57="jwk_plot_configs/plot_ootamax_ootamax.txt"
+                                    jwk_outfile57="jwk_ootamax_ootamax_${outfile}"
+                                    ./scripts/runTreePlotter2D.sh "${skimdir}/${infile}.root" "${skimdir}/${insigfile}.root" "${cut}" "${varwgtconfigdir}/${varwgtmap}.${inTextExt}" "${jwk_plot_57}" "${miscconfigdir}/${misc}.${inTextExt}" "${era}" "${jwk_outfile57}" "${outdir}"
+                                    rm ${jwk_outfile57}.root
+                                    jwk_plot_58="jwk_plot_configs/plot_ootambe_dpst.txt"
+                                    jwk_outfile58="jwk_ootambe_dpst_${outfile}"
+                                    ./scripts/runTreePlotter2D.sh "${skimdir}/${infile}.root" "${skimdir}/${insigfile}.root" "${cut}" "${varwgtconfigdir}/${varwgtmap}.${inTextExt}" "${jwk_plot_58}" "${miscconfigdir}/${misc}.${inTextExt}" "${era}" "${jwk_outfile58}" "${outdir}"
+                                    rm ${jwk_outfile58}.root
+                                    jwk_plot_59="jwk_plot_configs/plot_ootambe_dpst_signed.txt"
+                                    jwk_outfile59="jwk_ootambe_dpst_signed_${outfile}"
+                                    ./scripts/runTreePlotter2D.sh "${skimdir}/${infile}.root" "${skimdir}/${insigfile}.root" "${cut}" "${varwgtconfigdir}/${varwgtmap}.${inTextExt}" "${jwk_plot_59}" "${miscconfigdir}/${misc}.${inTextExt}" "${era}" "${jwk_outfile59}" "${outdir}"
+                                    rm ${jwk_outfile59}.root
+                                    jwk_plot_60="jwk_plot_configs/plot_ootambe_ootambe.txt"
+                                    jwk_outfile60="jwk_ootambe_ootambe_${outfile}"
+                                    ./scripts/runTreePlotter2D.sh "${skimdir}/${infile}.root" "${skimdir}/${insigfile}.root" "${cut}" "${varwgtconfigdir}/${varwgtmap}.${inTextExt}" "${jwk_plot_60}" "${miscconfigdir}/${misc}.${inTextExt}" "${era}" "${jwk_outfile60}" "${outdir}"
+                                    rm ${jwk_outfile60}.root
+                                    jwk_plot_61="jwk_plot_configs/plot_ootA0_pho0.txt"
+                                    jwk_outfile61="jwk_ootA0_pho0_${outfile}"
+                                    ./scripts/runTreePlotter.sh "${skimdir}/${infile}.root" "${skimdir}/${insigfile}.root" "${cut}" "${varwgtconfigdir}/${varwgtmap}.${inTextExt}" "${jwk_plot_61}" "${miscconfigdir}/${misc}.${inTextExt}" "${era}" "${jwk_outfile61}" "${outdir}"
+                                    rm ${jwk_outfile61}.root
+                                    jwk_plot_62="jwk_plot_configs/plot_ootA1_pho0.txt"
+                                    jwk_outfile62="jwk_ootA1_pho0_${outfile}"
+                                    ./scripts/runTreePlotter.sh "${skimdir}/${infile}.root" "${skimdir}/${insigfile}.root" "${cut}" "${varwgtconfigdir}/${varwgtmap}.${inTextExt}" "${jwk_plot_62}" "${miscconfigdir}/${misc}.${inTextExt}" "${era}" "${jwk_outfile62}" "${outdir}"
+                                    rm ${jwk_outfile62}.root
+                                    jwk_plot_63="jwk_plot_configs/plot_ootA2_pho0.txt"
+                                    jwk_outfile63="jwk_ootA2_pho0_${outfile}"
+                                    ./scripts/runTreePlotter.sh "${skimdir}/${infile}.root" "${skimdir}/${insigfile}.root" "${cut}" "${varwgtconfigdir}/${varwgtmap}.${inTextExt}" "${jwk_plot_63}" "${miscconfigdir}/${misc}.${inTextExt}" "${era}" "${jwk_outfile63}" "${outdir}"
+                                    rm ${jwk_outfile63}.root
+                                    jwk_plot_64="jwk_plot_configs/plot_ootA3_pho0.txt"
+                                    jwk_outfile64="jwk_ootA3_pho0_${outfile}"
+                                    ./scripts/runTreePlotter.sh "${skimdir}/${infile}.root" "${skimdir}/${insigfile}.root" "${cut}" "${varwgtconfigdir}/${varwgtmap}.${inTextExt}" "${jwk_plot_64}" "${miscconfigdir}/${misc}.${inTextExt}" "${era}" "${jwk_outfile64}" "${outdir}"
+                                    rm ${jwk_outfile64}.root
+                                    jwk_plot_65="jwk_plot_configs/plot_ootA4_pho0.txt.txt"
+                                    jwk_outfile65="jwk_ootA4_pho0.txt_${outfile}"
+                                    ./scripts/runTreePlotter.sh "${skimdir}/${infile}.root" "${skimdir}/${insigfile}.root" "${cut}" "${varwgtconfigdir}/${varwgtmap}.${inTextExt}" "${jwk_plot_65}" "${miscconfigdir}/${misc}.${inTextExt}" "${era}" "${jwk_outfile65}" "${outdir}"
+                                    rm ${jwk_outfile65}.root
+                                    jwk_plot_66="jwk_plot_configs/plot_ootA5_pho0.txt"
+                                    jwk_outfile66="jwk_ootA5_pho0_${outfile}"
+                                    ./scripts/runTreePlotter.sh "${skimdir}/${infile}.root" "${skimdir}/${insigfile}.root" "${cut}" "${varwgtconfigdir}/${varwgtmap}.${inTextExt}" "${jwk_plot_66}" "${miscconfigdir}/${misc}.${inTextExt}" "${era}" "${jwk_outfile66}" "${outdir}"
+                                    rm ${jwk_outfile66}.root
+                                    jwk_outfile67="jwk_ootA6_pho0_${outfile}"
+                                    ./scripts/runTreePlotter.sh "${skimdir}/${infile}.root" "${skimdir}/${insigfile}.root" "${cut}" "${varwgtconfigdir}/${varwgtmap}.${inTextExt}" "${jwk_plot_67}" "${miscconfigdir}/${misc}.${inTextExt}" "${era}" "${jwk_outfile67}" "${outdir}"
+                                    rm ${jwk_outfile67}.root
+                                    jwk_plot_68="jwk_plot_configs/plot_ootA7_pho0.txt"
+                                    jwk_outfile68="jwk_ootA7_pho0_${outfile}"
+                                    ./scripts/runTreePlotter.sh "${skimdir}/${infile}.root" "${skimdir}/${insigfile}.root" "${cut}" "${varwgtconfigdir}/${varwgtmap}.${inTextExt}" "${jwk_plot_68}" "${miscconfigdir}/${misc}.${inTextExt}" "${era}" "${jwk_outfile68}" "${outdir}"
+                                    rm ${jwk_outfile68}.root
+                                    jwk_plot_69="jwk_plot_configs/plot_ootA8_pho0.txt"
+                                    jwk_outfile69="jwk_ootA8_pho0_${outfile}"
+                                    ./scripts/runTreePlotter.sh "${skimdir}/${infile}.root" "${skimdir}/${insigfile}.root" "${cut}" "${varwgtconfigdir}/${varwgtmap}.${inTextExt}" "${jwk_plot_69}" "${miscconfigdir}/${misc}.${inTextExt}" "${era}" "${jwk_outfile69}" "${outdir}"
+                                    rm ${jwk_outfile69}.root
+                                    jwk_plot_70="jwk_plot_configs/plot_ootA9_pho0.txt"
+                                    jwk_outfile70="jwk_ootA9_pho0_${outfile}"
+                                    ./scripts/runTreePlotter.sh "${skimdir}/${infile}.root" "${skimdir}/${insigfile}.root" "${cut}" "${varwgtconfigdir}/${varwgtmap}.${inTextExt}" "${jwk_plot_70}" "${miscconfigdir}/${misc}.${inTextExt}" "${era}" "${jwk_outfile70}" "${outdir}"
+                                    rm ${jwk_outfile70}.root
+                                    jwk_plot_71="jwk_plot_configs/plot_ootMafter.txt"
+                                    jwk_outfile71="jwk_ootMafter_${outfile}"
+                                    ./scripts/runTreePlotter.sh "${skimdir}/${infile}.root" "${skimdir}/${insigfile}.root" "${cut}" "${varwgtconfigdir}/${varwgtmap}.${inTextExt}" "${jwk_plot_71}" "${miscconfigdir}/${misc}.${inTextExt}" "${era}" "${jwk_outfile71}" "${outdir}"
+                                    rm ${jwk_outfile71}.root
+                                    jwk_plot_72="jwk_plot_configs/plot_ootMax.txt"
+                                    jwk_outfile72="jwk_ootMax_${outfile}"
+                                    ./scripts/runTreePlotter.sh "${skimdir}/${infile}.root" "${skimdir}/${insigfile}.root" "${cut}" "${varwgtconfigdir}/${varwgtmap}.${inTextExt}" "${jwk_plot_72}" "${miscconfigdir}/${misc}.${inTextExt}" "${era}" "${jwk_outfile72}" "${outdir}"
+                                    rm ${jwk_outfile72}.root
+                                    jwk_plot_73="jwk_plot_configs/plot_ootMbefore.txt"
+                                    jwk_outfile73="jwk_ootMbefore_${outfile}"
+                                    ./scripts/runTreePlotter.sh "${skimdir}/${infile}.root" "${skimdir}/${insigfile}.root" "${cut}" "${varwgtconfigdir}/${varwgtmap}.${inTextExt}" "${jwk_plot_73}" "${miscconfigdir}/${misc}.${inTextExt}" "${era}" "${jwk_outfile73}" "${outdir}"
+                                    rm ${jwk_outfile73}.root
+	
 				    ## run fitter, getting 2D plots from before
 				    echo "run fitter, getting 2D plots from before"
-				    ./scripts/runTimeFitter.sh "${outfile2D}.root" "${plot2D}" "${misc_fit}" "${timefit_config}" "${era}" "${outfile}_${timefile}" "${outdir}"
+	#			    ./scripts/runTimeFitter.sh "${outfile2D}.root" "${plot2D}" "${misc_fit}" "${timefit_config}" "${era}" "${outfile}_${timefile}" "${outdir}"
 
 				fi ## end check over vars to fit
 			        echo "end check over vars to fit"

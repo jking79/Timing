@@ -222,6 +222,8 @@ private:
    std::vector<float>  * ootA7;
    std::vector<float>  * ootA8;
    std::vector<float>  * ootA9;
+   std::vector<float>  * ootMax;
+   std::vector<float>  * ootVsum;
    std::vector<float>  * uRhId;
    //Int_t          nurechits;
    //Int_t          ndigis;
@@ -243,6 +245,8 @@ private:
    TBranch        *b_ootA7;
    TBranch        *b_ootA8;
    TBranch        *b_ootA9;
+   TBranch        *b_ootMax;
+   TBranch        *b_ootVsum;
 
    TBranch        *b_bunch_crossing;   //!
    TBranch        *b_num_bunch;   //!

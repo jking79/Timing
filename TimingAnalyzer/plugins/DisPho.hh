@@ -42,6 +42,14 @@
 // Ecal RecHits
 #include "DataFormats/EcalRecHit/interface/EcalRecHit.h"
 #include "DataFormats/EcalRecHit/interface/EcalRecHitCollections.h"
+#include "DataFormats/EcalRecHit/interface/EcalUncalibratedRecHit.h"
+
+// Ecal Digis
+#include "DataFormats/EcalDigi/interface/EcalDigiCollections.h"
+#include "DataFormats/EcalDigi/interface/EcalTriggerPrimitiveDigi.h"
+#include "DataFormats/EcalDigi/interface/EcalTimeDigi.h"
+#include "DataFormats/EcalDigi/interface/EBSrFlag.h"
+#include "DataFormats/EcalDigi/interface/EESrFlag.h"
 
 // Supercluster info
 #include "DataFormats/EgammaReco/interface/SuperCluster.h"
@@ -88,6 +96,11 @@
 #include "CondFormats/JetMETObjects/interface/JetResolutionObject.h"
 #include "JetMETCorrections/Modules/interface/JetResolution.h"
 
+// LHC Info
+//#include "CondFormats/RunInfo/interface/LHCInfo.h"
+//#include "CondFormats/DataRecord/interface/LHCInfoRcd.h"
+//#include "CondTools/RunInfo/interface/LHCInfoPopConSourceHandler.h"
+
 // ROOT
 #include "TH1F.h"
 #include "TTree.h"
@@ -99,98 +112,163 @@
 // Unique structs
 #include "Timing/TimingAnalyzer/plugins/DisPhoTypes.hh"
 
-// Unique typedef
+#define BUNCHES 3564
+#define SAMPLES 10
+
+using namespace std;
+using namespace edm;
+
+////////////////////
+// Unique typedef //
+////////////////////
+
 typedef ROOT::Math::PositionVector3D<ROOT::Math::Cartesian3D<float>,ROOT::Math::DefaultCoordinateSystemTag> Point3D;
+
+//////////////////////
+// Class Definition //
+//////////////////////
 
 class DisPho : public edm::one::EDAnalyzer<edm::one::SharedResources,edm::one::WatchRuns> 
 {
- public:
-  explicit DisPho(const edm::ParameterSet&);
+public:
+
+  ////////////////////////
+  // Internal Functions //
+  ////////////////////////
+
+  explicit DisPho(const edm::ParameterSet & iConfig);
+  void ConsumeTokens();
   ~DisPho();
+  static void fillDescriptions(edm::ConfigurationDescriptions & descriptions);  
+
+  /////////////////////////////
+  // Analyzer Prep Functions //
+  /////////////////////////////
 
   void MakeHists();
   void MakeAndFillConfigTree();
   void MakeEventTree();
 
-  void InitializeRhoBranches();
-  void SetRhoBranches(const edm::Handle<double> & rhosH);
+  ///////////////////////////
+  // Object Prep Functions //
+  ///////////////////////////
 
-  void InitializeGenEvtBranches();
-  void SetGenEvtBranches(const edm::Handle<GenEventInfoProduct> & genevtInfoH);
-
-  void InitializeGenPointBranches();
-  void SetGenXYZ0Branches(const edm::Handle<Point3D> & genxyz0H);
-  void SetGenT0Branches(const edm::Handle<float> & gent0H);
-
+  bool GetObjects(const edm::Event & iEvent, const edm::EventSetup & iSetup);
+  //bool GetLHCInfo(const edm::Event & iEvent, const edm::EventSetup & iSetup);
+  bool GetStandardObjects(const edm::Event & iEvent);
+  bool GetCalibrationConstants(const  edm::EventSetup & iSetup);
+  bool GetMCObjects(const edm::Event & iEvent);
+  void InitializeObjects(const edm::Event & iEvent);
+  //void InitializeLHCInfo();
+  
+  void GetWeights();
   void InitializeGenPUBranches();
-  void SetGenPUBranches(const edm::Handle<std::vector<PileupSummaryInfo> > & pileupInfoH);
+  void SetGenPUBranches();
+  void AlwaysFillHists();
 
+  void PrepObjects(const edm::Event & iEvent);
+
+  ////////////////////////////////
+  // Blinding and Pre-Selection //
+  ////////////////////////////////
+
+  inline bool ApplyBlindSF();
+  void FillBlindSF();
+
+  inline bool ApplyBlindMET();
+  void FillBlindMET();
+
+  bool ApplyPreSelectionTrigger();
+  void FillPreSelectionTrigger();
+
+  bool ApplyPreSelectionHT();
+  void FillPreSelectionHT();
+
+  bool ApplyPreSelectionGoodPhoton();
+  void FillPreSelectionGoodPhoton();
+
+  //////////////////////////////////////
+  // Fill Tree from Objects Functions //
+  //////////////////////////////////////
+
+  void FillTreeFromObjects(const edm::Event & iEvent);
+
+  void SetMCInfo();
+  void InitializeGenPointBranches();
+  void SetGenT0Branches();
+  void SetGenXYZ0Branches();
   void InitializeGMSBBranches();
-  void SetGMSBBranches(const std::vector<reco::GenParticle> & neutralinos, const std::vector<oot::Photon> & photons, const int nPhotons);
-
+  void SetGMSBBranches();
   void InitializeHVDSBranches();
-  void SetHVDSBranches(const std::vector<reco::GenParticle> & vPions, const std::vector<oot::Photon> & photons, const int nPhotons);
- 
+  void SetHVDSBranches();
   void InitializeToyBranches();
-  void SetToyBranches(const std::vector<reco::GenParticle> & toys, const std::vector<oot::Photon> & photons, const int nPhotons);
+  void SetToyBranches();
 
-  void SetRecordInfo(const edm::Event& iEvent);
+  void SetRecordInfo(const edm::Event & iEvent);
   void SetTriggerBranches();
-  void SetMETFilterBranches(const edm::Handle<bool> & ecalBadCalibFlagH);
+  void SetMETFilterBranches();
 
   void InitializePVBranches();
-  void SetPVBranches(const edm::Handle<std::vector<reco::Vertex> > & verticesH);
+  void SetPVBranches();
 
   void InitializeMETBranches();
-  void SetMETBranches(const pat::MET & t1pfMET);
+  void SetMETBranches();
+  void InitializeMETBranchesMC();
+  void SetMETBranchesMC();
 
-  void InitializeJetBranches(const int nJets);
-  void SetJetBranches(const std::vector<pat::Jet> & jet, const int nJets);
-
-  void InitializeJetBranchesMC(const int nJets);
-  void SetJetBranchesMC(const std::vector<pat::Jet> & jet, const int nJets, const edm::Handle<std::vector<reco::GenJet> > & genjetsH,
-			JetCorrectionUncertainty & jetCorrUnc, const JME::JetResolution & jetRes, const JME::JetResolutionScaleFactor & jetRes_sf);
-  int GenJetMatcher(const pat::Jet & jet, const std::vector<reco::GenJet> & genjets, const float jer);
+  void InitializeJetBranches();
+  void SetJetBranches();
+  void InitializeJetBranchesMC();
+  void SetJetBranchesMC();
+  int GenJetMatcher(const pat::Jet & jet, const edm::Handle<std::vector<reco::GenJet> > & genJetsH, const float jer);
   void GetStochasticSmear(std::mt19937 & mt_rand, const float jer, const float jer_sf, float & jet_smear);
   void CheckJetSmear(const float energy, float & jet_smear);
   
   void InitializeElectronBranches();
-  void SetElectronBranches(const std::vector<pat::Electron> & electrons);
-
+  void SetElectronBranches();
   void InitializeMuonBranches();
-  void SetMuonBranches(const std::vector<pat::Muon> & muons);  
+  void SetMuonBranches();
 
-  void InitializeRecHitBranches(const int nRecHits);
-  void SetRecHitBranches(const EcalRecHitCollection * recHitsEB, const CaloSubdetectorGeometry * barrelGeometry,
-			 const EcalRecHitCollection * recHitsEE, const CaloSubdetectorGeometry * endcapGeometry,
-			 const uiiumap & recHitMap, const edm::Event & iEvent,
-			 const edm::ESHandle<EcalLaserDbService> & laserH, const EcalIntercalibConstantMap * interCalibMap,
-			 const edm::ESHandle<EcalADCToGeVConstant> & adcToGeVH, const edm::ESHandle<EcalPedestals> & pedestalsH);
-  void SetRecHitBranches(const EcalRecHitCollection * recHits, const CaloSubdetectorGeometry * geometry,
-			 const uiiumap & recHitMap, const edm::Event & iEvent, 
-			 const edm::ESHandle<EcalLaserDbService> & laserH, const EcalIntercalibConstantMap * interCalibMap,
-			 const float adcToGeV, const edm::ESHandle<EcalPedestals> & pedestalsH);
+  void InitializeRecHitBranches();
+  void SetRecHitBranches();
+  void SetRecHitBranches(const EcalRecHitCollection * recHits, const CaloSubdetectorGeometry * geometry, const float adcToGeV);
+  void SetURecHitBranches(const EcalUncalibratedRecHitCollection * recHits, const CaloSubdetectorGeometry * geometry);
+
+  void InitializeDigiBranches();
+  void SetDigiBranches();
+  void SetDigiBranches(const EBDigiCollection * ebDigis, const EEDigiCollection * eeDigis, const CaloSubdetectorGeometry * geometry);
 
   void InitializePhoBranches();
-  void SetPhoBranches(const std::vector<oot::Photon> photons, const int nPhotons, const uiiumap & recHitMap,
-		      const EcalRecHitCollection * recHitsEB, const EcalRecHitCollection * recHitsEE,
-		      const edm::Handle<std::vector<reco::Track> > & tracksH);
-
+  void SetPhoBranches();
   void InitializePhoBranchesMC();
-  void SetPhoBranchesMC(const std::vector<oot::Photon> photons, const int nPhotons, 
-			const edm::Handle<std::vector<reco::GenParticle> > & genparticlesH);
-  int  CheckMatchHVDS(const int iphoton, const hvdsStruct& hvdsBranch);
+  void SetPhoBranchesMC();
+  int  CheckMatchHVDS(const int iphoton, const hvdsStruct & hvdsBranch);
 
-  static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
-  
- private:
+private:
+
+  ////////////////////////
+  // Internal Functions //
+  ////////////////////////
+
   virtual void beginJob() override;
-  virtual void analyze(const edm::Event&, const edm::EventSetup&) override;
+  virtual void analyze(const edm::Event & iEvent, const edm::EventSetup & iSetup) override;
   virtual void endJob() override;
   
-  virtual void beginRun(edm::Run const&, edm::EventSetup const&) override;
-  virtual void endRun(edm::Run const&, edm::EventSetup const&) override;
+  virtual void beginRun(const edm::Run & iRun, const edm::EventSetup & iSetup) override;
+  virtual void endRun(const edm::Run & iRun, const edm::EventSetup & iSetup) override;
 
+  ///////////////////
+  // Input Members //
+  ///////////////////
+
+  // LHC info  
+  std::vector<unsigned int> train_zero, train_notzero, long_train_notzero, subtrain_num, train_num;
+  unsigned int subtrain_position, train_position, subtrain_number, train_number;
+  unsigned int fBunchNum, fBX, fXangle;
+  float fBeam1VC[BUNCHES], fBeam2VC[BUNCHES], fBeam1RF[BUNCHES], fBeam2RF[BUNCHES];
+  float beam1_VC, beam2_VC, beam1_RF, beam2_RF;
+  const bool lhcInfoValid;
+  
   // blinding
   const unsigned int blindSF;
   const bool applyBlindSF;
@@ -207,6 +285,7 @@ class DisPho : public edm::one::EDAnalyzer<edm::one::SharedResources,edm::one::W
 
   // object extra pruning
   const float seedTimemin;
+  const int nPhosmax;
 
   // photon storing options
   const bool splitPho;
@@ -244,70 +323,195 @@ class DisPho : public edm::one::EDAnalyzer<edm::one::SharedResources,edm::one::W
   // JER extra info
   const float smearjetEmin;
 
-  // triggers
+  // trigger inputs
   const std::string inputPaths;
   std::vector<std::string> pathNames;
   strBitMap triggerBitMap;
   const std::string inputFilters;
   std::vector<std::string> filterNames;
+
+  // trigger results
   const edm::InputTag triggerResultsTag;
   edm::EDGetTokenT<edm::TriggerResults> triggerResultsToken;
+  edm::Handle<edm::TriggerResults> triggerResultsH;
+
+  // trigger objects
   const edm::InputTag triggerObjectsTag;
   edm::EDGetTokenT<std::vector<pat::TriggerObjectStandAlone> > triggerObjectsToken;
-  trigObjVecMap triggerObjectsByFilterMap; // first index is filter label, second is trigger objects
+  edm::Handle<std::vector<pat::TriggerObjectStandAlone> > triggerObjectsH;
 
-  // met filters
+  // output triggers
+  std::map<std::string,std::vector<pat::TriggerObjectStandAlone> > triggerObjectsByFilterMap; // first index is filter label, second is trigger objects
+
+  // met filter inputs
   const std::string inputFlags;
   std::vector<std::string> flagNames;
   strBitMap triggerFlagMap;
+
+  // met filters
   const edm::InputTag triggerFlagsTag;
   edm::EDGetTokenT<edm::TriggerResults> triggerFlagsToken;
+  edm::Handle<edm::TriggerResults> triggerFlagsH;
+
   const edm::InputTag ecalBadCalibFlagTag;
   edm::EDGetTokenT<bool> ecalBadCalibFlagToken;
+  edm::Handle<bool> ecalBadCalibFlagH;
 
   // Tracks
   const edm::InputTag tracksTag;
   edm::EDGetTokenT<std::vector<reco::Track> > tracksToken;
+  edm::Handle<std::vector<reco::Track> > tracksH;
 
   // vertices
   const edm::InputTag verticesTag;
   edm::EDGetTokenT<std::vector<reco::Vertex> > verticesToken;
+  edm::Handle<std::vector<reco::Vertex> > verticesH;
 
-  // rhos
-  const edm::InputTag rhosTag;
-  edm::EDGetTokenT<double> rhosToken;
+  // rho
+  const edm::InputTag rhoTag;
+  edm::EDGetTokenT<double> rhoToken;
+  edm::Handle<double> rhoH;
+  float rho;
 
   // mets
   const edm::InputTag metsTag;
   edm::EDGetTokenT<std::vector<pat::MET> > metsToken;
+  edm::Handle<std::vector<pat::MET> > metsH;
+
+  // output MET
+  pat::MET t1pfMET;
 
   // jets
   const edm::InputTag jetsTag;
   edm::EDGetTokenT<std::vector<pat::Jet> > jetsToken;
+  edm::Handle<std::vector<pat::Jet> > jetsH;
+  std::vector<pat::Jet> jets;
 
   // electrons
   const edm::InputTag electronsTag;
   edm::EDGetTokenT<std::vector<pat::Electron> > electronsToken;
-
+  edm::Handle<std::vector<pat::Electron> > electronsH;
+  std::vector<pat::Electron> electrons;
+  
   // muons
   const edm::InputTag muonsTag;
   edm::EDGetTokenT<std::vector<pat::Muon> > muonsToken;
-
-  // ECAL RecHits
+  edm::Handle<std::vector<pat::Muon> > muonsH;
+  std::vector<pat::Muon> muons;
+  
+  // RecHits EB
   const edm::InputTag recHitsEBTag;
   edm::EDGetTokenT<edm::SortedCollection<EcalRecHit,edm::StrictWeakOrdering<EcalRecHit> > > recHitsEBToken;
+  edm::Handle<edm::SortedCollection<EcalRecHit,edm::StrictWeakOrdering<EcalRecHit> > > recHitsEBH;
+  const edm::SortedCollection<EcalRecHit,edm::StrictWeakOrdering<EcalRecHit> > * recHitsEB;
+
+  // RecHits EE
   const edm::InputTag recHitsEETag;
   edm::EDGetTokenT<edm::SortedCollection<EcalRecHit,edm::StrictWeakOrdering<EcalRecHit> > > recHitsEEToken;
+  edm::Handle<edm::SortedCollection<EcalRecHit,edm::StrictWeakOrdering<EcalRecHit> > > recHitsEEH;
+  const edm::SortedCollection<EcalRecHit,edm::StrictWeakOrdering<EcalRecHit> > * recHitsEE;
 
-  // gedPhotons + ids
+  // EB Uncalibrated RecHits
+  const edm::InputTag uncalibratedRecHitsEBTag;
+  edm::EDGetTokenT<edm::SortedCollection<EcalUncalibratedRecHit,edm::StrictWeakOrdering<EcalUncalibratedRecHit> > > uncalibratedRecHitsEBToken;
+  edm::Handle<edm::SortedCollection<EcalUncalibratedRecHit,edm::StrictWeakOrdering<EcalUncalibratedRecHit> > > uncalibratedRecHitsEBH;
+  const edm::SortedCollection<EcalUncalibratedRecHit,edm::StrictWeakOrdering<EcalUncalibratedRecHit> > * uncalibratedRecHitsEB;
+
+  // EE Uncalibrated RecHits
+  const edm::InputTag uncalibratedRecHitsEETag;
+  edm::EDGetTokenT<edm::SortedCollection<EcalUncalibratedRecHit,edm::StrictWeakOrdering<EcalUncalibratedRecHit> > > uncalibratedRecHitsEEToken;
+  edm::Handle<edm::SortedCollection<EcalUncalibratedRecHit,edm::StrictWeakOrdering<EcalUncalibratedRecHit> > > uncalibratedRecHitsEEH;
+  const edm::SortedCollection<EcalUncalibratedRecHit,edm::StrictWeakOrdering<EcalUncalibratedRecHit> > * uncalibratedRecHitsEE;
+
+  /*
+  // EB Digis
+  const edm::InputTag ecalDigisEBTag;
+  edm::EDGetTokenT<edm::SortedCollection<EcalTimeDigi,edm::StrictWeakOrdering<EcalTimeDigi> > > ecalDigisEBToken;
+  edm::Handle<edm::SortedCollection<EcalTimeDigi,edm::StrictWeakOrdering<EcalTimeDigi> > > ecalDigisEBH;
+  const edm::SortedCollection<EcalTimeDigi,edm::StrictWeakOrdering<EcalTimeDigi> > * ecalDigisEB;
+
+  // EE Digis
+  const edm::InputTag ecalDigisEETag;
+  edm::EDGetTokenT<edm::SortedCollection<EcalTimeDigi,edm::StrictWeakOrdering<EcalTimeDigi> > > ecalDigisEEToken;
+  edm::Handle<edm::SortedCollection<EcalTimeDigi,edm::StrictWeakOrdering<EcalTimeDigi> > > ecalDigisEEH;
+  const edm::SortedCollection<EcalTimeDigi,edm::StrictWeakOrdering<EcalTimeDigi> > * ecalDigisEE;
+  
+
+  // EB Digis
+  const edm::InputTag ecalDigisEBTag;
+  edm::EDGetTokenT<edm::SortedCollection<EBSrFlag,edm::StrictWeakOrdering<EBSrFlag> > > ecalDigisEBToken;
+  edm::Handle<edm::SortedCollection<EBSrFlag,edm::StrictWeakOrdering<EBSrFlag> > > ecalDigisEBH;
+  const edm::SortedCollection<EBSrFlag,edm::StrictWeakOrdering<EBSrFlag> > * ecalDigisEB;
+
+  // EE Digis
+  const edm::InputTag ecalDigisEETag;
+  edm::EDGetTokenT<edm::SortedCollection<EESrFlag,edm::StrictWeakOrdering<EESrFlag> > > ecalDigisEEToken;
+  edm::Handle<edm::SortedCollection<EESrFlag,edm::StrictWeakOrdering<EESrFlag> > > ecalDigisEEH;
+  const edm::SortedCollection<EESrFlag,edm::StrictWeakOrdering<EESrFlag> > * ecalDigisEE;
+  */
+
+  
+  // EB Digis test
+  const edm::InputTag ecalDigisEBTag;
+  edm::EDGetTokenT<EBDigiCollection> ebDigiCollectionToken_;
+  edm::Handle<EBDigiCollection> pEBDigis;
+  const EBDigiCollection * EBdigiCollection;
+
+  // EE Digis test
+  const edm::InputTag ecalDigisEETag;
+  edm::EDGetTokenT<EEDigiCollection> eeDigiCollectionToken_;
+  edm::Handle<EEDigiCollection> pEEDigis;
+  const EEDigiCollection * EEdigiCollection;
+
+  // Output rechit map
+  uiiumap recHitMap;
+  uiiumap uncalibratedRecHitMap;
+
+  // Output digi map
+  uiiumap digiMap;
+
+  // gedPhotons
   const edm::InputTag gedPhotonsTag;
   edm::EDGetTokenT<std::vector<pat::Photon> > gedPhotonsToken;
+  edm::Handle<std::vector<pat::Photon> > gedPhotonsH;
 
-  // ootPhotons + ids
+  // ootPhotons
   const edm::InputTag ootPhotonsTag;
   edm::EDGetTokenT<std::vector<pat::Photon> > ootPhotonsToken;
+  edm::Handle<std::vector<pat::Photon> > ootPhotonsH;
 
-  // Gen Particles and MC info
+  // output photons
+  std::vector<pat::Photon> photons;
+
+  // geometry
+  edm::ESHandle<CaloGeometry> caloGeoH;
+  const CaloSubdetectorGeometry * barrelGeometry;
+  const CaloSubdetectorGeometry * endcapGeometry;
+
+  // lasers
+  edm::ESHandle<EcalLaserDbService> laserH;
+  edm::Timestamp evTime;
+
+  // inter calibration
+  edm::ESHandle<EcalIntercalibConstants> interCalibH;
+  const EcalIntercalibConstantMap *      interCalibMap;
+
+  // ADCToGeV
+  edm::ESHandle<EcalADCToGeVConstant> adcToGeVH;
+  float adcToGeVEB;
+  float adcToGeVEE;
+
+  // pedestals
+  edm::ESHandle<EcalPedestals> pedestalsH;
+
+  // JECs
+  edm::ESHandle<JetCorrectorParametersCollection> jetCorrH;
+  
+  // JERs
+  JME::JetResolution jetRes;
+  JME::JetResolutionScaleFactor jetRes_sf; 
+
+  // Gen config and MC info
   const bool isGMSB;
   const bool isHVDS;
   const bool isBkgd;
@@ -317,12 +521,52 @@ class DisPho : public edm::one::EDAnalyzer<edm::one::SharedResources,edm::one::W
   const float filterEff;
   const float BR;
   bool isMC;
-  edm::EDGetTokenT<GenEventInfoProduct>             genevtInfoToken;
-  edm::EDGetTokenT<Point3D>                         genxyz0Token;
-  edm::EDGetTokenT<float>                           gent0Token;
-  edm::EDGetTokenT<std::vector<PileupSummaryInfo> > pileupInfoToken;
-  edm::EDGetTokenT<std::vector<reco::GenParticle> > genpartsToken;
-  edm::EDGetTokenT<std::vector<reco::GenJet> >      genjetsToken;
+
+  // genEvtInfo
+  const edm::InputTag genEvtInfoTag;
+  edm::EDGetTokenT<GenEventInfoProduct> genEvtInfoToken;
+  edm::Handle<GenEventInfoProduct> genEvtInfoH;
+
+  // gen time
+  const edm::InputTag gent0Tag;
+  edm::EDGetTokenT<float> gent0Token;
+  edm::Handle<float> gent0H;
+  
+  // gen vertex
+  const edm::InputTag genxyz0Tag;
+  edm::EDGetTokenT<Point3D> genxyz0Token;
+  edm::Handle<Point3D> genxyz0H;
+  
+  // pileups
+  const edm::InputTag pileupInfosTag;
+  edm::EDGetTokenT<std::vector<PileupSummaryInfo> > pileupInfosToken;
+  edm::Handle<std::vector<PileupSummaryInfo> > pileupInfosH;
+  
+  // genParticles
+  const edm::InputTag genParticlesTag;
+  edm::EDGetTokenT<std::vector<reco::GenParticle> > genParticlesToken;
+  edm::Handle<std::vector<reco::GenParticle> > genParticlesH;
+
+  // genJets
+  const edm::InputTag genJetsTag;
+  edm::EDGetTokenT<std::vector<reco::GenJet> > genJetsToken;
+  edm::Handle<std::vector<reco::GenJet> > genJetsH;
+
+  // output gen particles
+  std::vector<reco::GenParticle> neutralinos;
+  std::vector<reco::GenParticle> vPions;
+  std::vector<reco::GenParticle> toys;
+
+  ///////////////////////////
+  // Temp Internal Members //
+  ///////////////////////////
+
+  float wgt;
+  int nJets, nRecHits, nURecHits, nDigis, nPhotons;
+
+  ////////////////////
+  // Output Members //
+  ////////////////////
 
   // output histograms
   TH1F * h_cutflow;
@@ -341,7 +585,7 @@ class DisPho : public edm::one::EDAnalyzer<edm::one::SharedResources,edm::one::W
  
   // MC info
   float genwgt;
-  float genx0,geny0,genz0,gent0;
+  float gent0,genx0,geny0,genz0;
   int genpuobs, genputrue;
 
   // gmsb
@@ -390,11 +634,11 @@ class DisPho : public edm::one::EDAnalyzer<edm::one::SharedResources,edm::one::W
   int nvtx;
   float vtxX, vtxY, vtxZ;
 
-  // rho
-  float rho;
-
-  // MET
+  // Type-1 PF MET
   float t1pfMETpt, t1pfMETphi, t1pfMETsumEt;
+
+  // GEN MET
+  float genMETpt, genMETphi;
 
   // jets
   int njets;
@@ -419,6 +663,20 @@ class DisPho : public edm::one::EDAnalyzer<edm::one::SharedResources,edm::one::W
   std::vector<float> rhadcToGeV;
   std::vector<float> rhped12, rhped6, rhped1;
   std::vector<float> rhpedrms12, rhpedrms6, rhpedrms1;
+
+  // Uncalibrated RecHits
+  int nurechits;
+  std::vector<unsigned int> uRhId;
+  std::vector<float> amplitude, amplitudeError, pedestal, jitter, chi2, jitterError;
+  //std::vector<std::vector<float> > outOfTimeAmplitude;
+  std::vector<float> ootA0, ootA1, ootA2, ootA3, ootA4, ootA5, ootA6, ootA7, ootA8, ootA9;
+
+  std::vector<bool> isSaturated, isJitterValid, isJitterErrorValid;
+
+  // Digis
+  int ndigis;
+  std::vector<unsigned int> digiID;
+  std::vector<std::vector<float> > digiData;
 
   // photon info
   int nphotons;

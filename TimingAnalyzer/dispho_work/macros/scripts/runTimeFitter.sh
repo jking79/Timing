@@ -39,7 +39,7 @@ do
     done
 done
 mv ${outfiletext}.root ${outfiletext}"_fitinfo".${outTextExt} ${fulldir}
-rm ${infilename}.root
+##rm ${infilename}.root
 
 ## Final message
 echo "Finished TimeFitting for plot:" ${plotconfig}
