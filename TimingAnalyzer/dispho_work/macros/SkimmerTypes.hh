@@ -194,6 +194,7 @@ struct Event
   Int_t     nmuHighM;
   Int_t     nmuHighT;
   Int_t     nrechits;
+  Int_t     nkurechits;
   Int_t     nphotons;
 
   Float_t   evtwgt;
@@ -262,6 +263,7 @@ struct Event
   std::string s_nmuHighM = "nmuHighM";
   std::string s_nmuHighT = "nmuHighT";
   std::string s_nrechits = "nrechits";
+  std::string s_nkurechits = "nkurechits";
   std::string s_nphotons = "nphotons";
   std::string s_evtwgt = "evtwgt";
   std::string s_genwgt = "genwgt";  
@@ -324,6 +326,7 @@ struct Event
   TBranch * b_nmuHighM;
   TBranch * b_nmuHighT;
   TBranch * b_nrechits;
+  TBranch * b_nkurechits;
   TBranch * b_nphotons;
   TBranch * b_evtwgt;
   TBranch * b_genwgt;
@@ -517,6 +520,7 @@ struct Pho
   Float_t alpha;
   Int_t   seed;
   std::vector<Int_t> * recHits;
+  std::vector<Int_t> * kurecHits;
   Float_t suisseX;
   Bool_t  isOOT;
   Bool_t  isEB;
@@ -544,6 +548,7 @@ struct Pho
   Float_t seedpedrms12;
   Float_t seedpedrms6;
   Float_t seedpedrms1;
+  //  ucal RecHit Info
   Float_t seedootA0;
   Float_t seedootA1;
   Float_t seedootA2;
@@ -559,6 +564,24 @@ struct Pho
   Float_t seedootMbefore;
   Float_t seedootMafter;
   Int_t   seedootSign;;
+  // KU RecHit info
+  //Float_t seedkuX;
+  //Float_t seedkuY;
+  //Float_t seedkuZ;
+  Float_t seedkuE;
+  Float_t seedkutime;
+  Float_t seedkutimeErr;
+  Float_t seedkuTOF;
+  UInt_t  seedkuID;
+  //Int_t   seedkuisGS6;
+  //Int_t   seedkuisGS1;
+  //Float_t seedkuadcToGeV;
+  //Float_t seedkuped12;
+  //Float_t seedkuped6;
+  //Float_t seedkuped1;
+  //Float_t seedkupedrms12;
+  //Float_t seedkupedrms6;
+  //Float_t seedkupedrms1;
 
 
   // MC types
@@ -609,8 +632,11 @@ struct Pho
   std::string s_smaj = "phosmaj";
   std::string s_smin = "phosmin";
   std::string s_alpha = "phoalpha";
+  
   std::string s_seed = "phoseed";
   std::string s_recHits = "phorecHits";
+  std::string s_kurecHits = "phokurecHits";
+
   std::string s_suisseX = "phosuisseX";
   std::string s_isOOT = "phoisOOT";
   std::string s_isEB = "phoisEB";
@@ -637,6 +663,7 @@ struct Pho
   std::string s_seedpedrms12 = "phoseedpedrms12";
   std::string s_seedpedrms6 = "phoseedpedrms6";
   std::string s_seedpedrms1 = "phoseedpedrms1";
+
   std::string s_seedootA0 = "phoseedootA0";
   std::string s_seedootA1 = "phoseedootA1";
   std::string s_seedootA2 = "phoseedootA2";
@@ -652,6 +679,7 @@ struct Pho
   std::string s_seedootMafter = "phoseedootMafter";
   std::string s_seedootSign = "phoseedootSign";
   std::string s_seedootVsum = "phoseedootVsum";
+
   std::string s_isGen = "phoisGen";
   std::string s_isSignal = "phoisSignal";
   std::string s_scaleAbs = "phoscaleAbs";
@@ -665,6 +693,25 @@ struct Pho
   std::string s_weightedtimeLT120 = "phoweightedtimeLT120";
   std::string s_weightedtimeTOF = "phoweightedtimeTOF";
   std::string s_weightedtimeLT120TOF = "phoweightedtimeLT120TOF";
+
+  //std::string s_seedkuX = "phoseedkuX";
+  //std::string s_seedkuY = "phoseedkuY";
+  //std::string s_seedkuZ = "phoseedkuZ";
+  std::string s_seedkuE = "phoseedkuE";
+  std::string s_seedkutime = "phoseedkutime";
+  std::string s_seedkutimeErr = "phoseedkutimeErr";
+  std::string s_seedkuTOF = "phoseedkuTOF";
+  std::string s_seedkuID = "phoseedkuID";
+  //std::string s_seedkuisGS6 = "phoseedkuisGS6";
+  //std::string s_seedkuisGS1 = "phoseedkuisGS1";
+  //std::string s_seedkuadcToGeV = "phoseedkuadcToGeV";
+  //std::string s_seedkuped12 = "phoseedkuped12";
+  //std::string s_seedkuped6 = "phoseedkuped6";
+  //std::string s_seedkuped1 = "phoseedkuped1";
+  //std::string s_seedkupedrms12 = "phoseedkupedrms12";
+  //std::string s_seedkupedrms6 = "phoseedkupedrms6";
+  //std::string s_seedkupedrms1 = "phoseedkupedrms1";
+
 
   // tbranches
   TBranch * b_E;
@@ -700,6 +747,7 @@ struct Pho
   TBranch * b_alpha;
   TBranch * b_seed;
   TBranch * b_recHits;
+  TBranch * b_kurecHits;
   TBranch * b_suisseX;
   TBranch * b_isOOT;
   TBranch * b_isEB;
@@ -709,6 +757,7 @@ struct Pho
   TBranch * b_hasPixSeed;
   TBranch * b_gedID;
   TBranch * b_ootID;
+
   TBranch * b_seedX;
   TBranch * b_seedY;
   TBranch * b_seedZ;
@@ -726,6 +775,7 @@ struct Pho
   TBranch * b_seedpedrms12;
   TBranch * b_seedpedrms6;
   TBranch * b_seedpedrms1;
+
   TBranch * b_seedootA0;
   TBranch * b_seedootA1;
   TBranch * b_seedootA2;
@@ -741,12 +791,14 @@ struct Pho
   TBranch * b_seedootMafter;
   TBranch * b_seedootSign;
   TBranch * b_seedootVsum;
+
   TBranch * b_isGen;
   TBranch * b_isSignal;
   TBranch * b_scaleAbs;
   TBranch * b_smearAbs;
   TBranch * b_seedTT;
   TBranch * b_nrechits;
+  TBranch * b_nkurechits;
   TBranch * b_nrechitsLT120;
   TBranch * b_meantime;
   TBranch * b_meantimeLT120;
@@ -755,18 +807,23 @@ struct Pho
   TBranch * b_weightedtimeTOF;
   TBranch * b_weightedtimeLT120TOF;
 
-  TBranch * b_ootA0;
-  TBranch * b_ootA1;
-  TBranch * b_ootA2;
-  TBranch * b_ootA3;
-  TBranch * b_ootA4;
-  TBranch * b_ootA5;
-  TBranch * b_ootA6;
-  TBranch * b_ootA7;
-  TBranch * b_ootA8;
-  TBranch * b_ootA9;
-  TBranch * b_ootMax;
-  TBranch * b_ootVsum;
+  //TBranch * b_seedkuX;
+  //TBranch * b_seedkuY;
+  //TBranch * b_seedkuZ;
+  TBranch * b_seedkuE;
+  TBranch * b_seedkutime;
+  TBranch * b_seedkutimeErr;
+  TBranch * b_seedkuTOF;
+  TBranch * b_seedkuID;
+  //TBranch * b_seedkuisGS6;
+  //TBranch * b_seedkuisGS1;
+  //TBranch * b_seedkuadcToGeV;
+  //TBranch * b_seedkuped12;
+  //TBranch * b_seedkuped6;
+  //TBranch * b_seedkuped1;
+  //TBranch * b_seedkupedrms12;
+  //TBranch * b_seedkupedrms6;
+  //TBranch * b_seedkupedrms1;
 
 };
 typedef std::vector<Pho> PhoVec;
@@ -887,17 +944,6 @@ struct Hvds
   std::string s_genHVph1eta = "genHVph1eta";
   std::string s_genHVph1match = "genHVph1match";
 
-  std::string s_ootA0 = "ootA0";
-  std::string s_ootA1 = "ootA1";
-  std::string s_ootA2 = "ootA2";
-  std::string s_ootA3 = "ootA3";
-  std::string s_ootA4 = "ootA4";
-  std::string s_ootA5 = "ootA5";
-  std::string s_ootA6 = "ootA6";
-  std::string s_ootA7 = "ootA7";
-  std::string s_ootA8 = "ootA8";
-  std::string s_ootA9 = "ootA9";
-
   TBranch * b_genvPionmass;
   TBranch * b_genvPionE;
   TBranch * b_genvPionpt;
@@ -919,17 +965,6 @@ struct Hvds
   TBranch * b_genHVph1phi;
   TBranch * b_genHVph1eta;
   TBranch * b_genHVph1match;
-
-  TBranch * b_ootA0;
-  TBranch * b_ootA1;
-  TBranch * b_ootA2;
-  TBranch * b_ootA3;
-  TBranch * b_ootA4;
-  TBranch * b_ootA5;
-  TBranch * b_ootA6;
-  TBranch * b_ootA7;
-  TBranch * b_ootA8;
-  TBranch * b_ootA9;
 
 };
 typedef std::vector<Hvds> HvdsVec;

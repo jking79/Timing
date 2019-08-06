@@ -85,12 +85,12 @@ skimconfig=${4}
 
 ##RAW tests
 ##2016
-root -b -q -l runSkimmer.C\(\"/home/t3-ku/jaking/trees/ecal\",\"/home/t3-ku/jaking/trees/ecal/dixtal_skims\",\"dispho_raw94_deg2016G_279760.root\",\"skim_config/DiXtal_urec_Skim.txt\"\)
+#root -b -q -l runSkimmer.C\(\"/home/t3-ku/jaking/trees/ecal\",\"/home/t3-ku/jaking/trees/ecal/dixtal_skims\",\"dispho_raw94_deg2016G_279760.root\",\"skim_config/DiXtal_urec_Skim.txt\"\)
 #root -b -q -l runSkimmer.C\(\"/home/t3-ku/jaking/trees/ecal\",\"/home/t3-ku/jaking/trees/ecal/dixtal_skims\",\"dispho_raw94_deg2016G_280191.root\",\"skim_config/DiXtal_urec_Skim.txt\"\)
 #root -b -q -l runSkimmer.C\(\"/home/t3-ku/jaking/trees/ecal\",\"/home/t3-ku/jaking/trees/ecal/dixtal_skims\",\"dispho_raw94_deg2016G_280251.root\",\"skim_config/DiXtal_urec_Skim.txt\"\)
 #root -b -q -l runSkimmer.C\(\"/home/t3-ku/jaking/trees/ecal\",\"/home/t3-ku/jaking/trees/ecal/dixtal_skims\",\"dispho_raw94_deg2016G_280364.root\",\"skim_config/DiXtal_urec_Skim.txt\"\)
 
-root -b -q -l runSkimmer.C\(\"/home/t3-ku/jaking/trees/ecal\",\"/home/t3-ku/jaking/trees/ecal/zee_skims\",\"dispho_raw94_deg2016G_279760.root\",\"skim_config/Zee_urec_Skim.txt\"\)
+#root -b -q -l runSkimmer.C\(\"/home/t3-ku/jaking/trees/ecal\",\"/home/t3-ku/jaking/trees/ecal/zee_skims\",\"dispho_raw94_deg2016G_279760.root\",\"skim_config/Zee_urec_Skim.txt\"\)
 #root -b -q -l runSkimmer.C\(\"/home/t3-ku/jaking/trees/ecal\",\"/home/t3-ku/jaking/trees/ecal/zee_skims\",\"dispho_raw94_deg2016G_280191.root\",\"skim_config/Zee_urec_Skim.txt\"\)
 #root -b -q -l runSkimmer.C\(\"/home/t3-ku/jaking/trees/ecal\",\"/home/t3-ku/jaking/trees/ecal/zee_skims\",\"dispho_raw94_deg2016G_280251.root\",\"skim_config/Zee_urec_Skim.txt\"\)
 #root -b -q -l runSkimmer.C\(\"/home/t3-ku/jaking/trees/ecal\",\"/home/t3-ku/jaking/trees/ecal/zee_skims\",\"dispho_raw94_deg2016G_280364.root\",\"skim_config/Zee_urec_Skim.txt\"\)
@@ -115,6 +115,14 @@ root -b -q -l runSkimmer.C\(\"/home/t3-ku/jaking/trees/ecal\",\"/home/t3-ku/jaki
 
 #root -b -q -l runSkimmer.C\(\"/home/t3-ku/jaking/trees/ecal\",\"/home/t3-ku/jaking/trees/ecal/dixtal_skims\",\"dispho_mini_eg2018A_315322.root\",\"skim_config/DiXtal_Skim.txt\"\)
 #root -b -q -l runSkimmer.C\(\"/home/t3-ku/jaking/trees/ecal\",\"/home/t3-ku/jaking/trees/ecal/zee_skims\",\"dispho_mini_eg2018A_315322.root\",\"skim_config/Zee_Skim.txt\"\)
+
+##ku_rechit test
+#very_short_kutest_run18D_dispho.root
+#root -b -q -l runKUSkimmer.C\(\"/home/t3-ku/jaking/trees/ecal\",\"/home/t3-ku/jaking/trees/ecal/dixtal_skims\",\"ku_2tier_test_run18D_dispho.root\",\"skim_config/DiXtal_urec_Skim.txt\"\)
+#root -b -q -l runKUSkimmer.C\(\"/home/t3-ku/jaking/trees/ecal\",\"/home/t3-ku/jaking/trees/ecal/zee_skims\",\"ku_2tier_test_run18D_dispho.root\",\"skim_config/Zee_urec_Skim.txt\"\)
+
+root -b -q -l runKUSkimmer.C\(\"/home/t3-ku/jaking/trees/ecal\",\"/home/t3-ku/jaking/trees/ecal/dixtal_skims\",\"ku_rhcomp_twotier_run18D_dispho.root\",\"skim_config/DiXtal_urec_Skim.txt\"\)
+#root -b -q -l runKUSkimmer.C\(\"/home/t3-ku/jaking/trees/ecal\",\"/home/t3-ku/jaking/trees/ecal/zee_skims\",\"ku_rhcomp_twotier_run18D_dispho.root\",\"skim_config/Zee_urec_Skim.txt\"\)
 
 
 ## Final message

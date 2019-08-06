@@ -431,7 +431,7 @@ void Skimmer::EventLoop()
     } // end of ZeeSkim
     else if (fSkim == SkimType::DiXtal) // this is a hack selection, which mixes up seeds and photons --> do NOT use this for analysis
     {
-	//std::cout << "Start DiXtal "<< std::endl;
+      std::cout << "Start DiXtal "<< std::endl;
       // get rechits
       fInRecHits.b_E->GetEntry(entry);
       fInRecHits.b_ID->GetEntry(entry);
@@ -476,11 +476,11 @@ void Skimmer::EventLoop()
 	  const auto id_i = (*fInRecHits.ID)[rh_i];
           const auto t_i = (*fInRecHits.time)[rh_i];
 
- //	  std::cout << "Filling xtalRecHit " << id_i << " time with: " << t_i << std::endl;
+ 	  std::cout << "Filling xtalRecHit " << id_i << " time with: " << t_i << std::endl;
 	  sumXtalPhoRecTime[id_i] += t_i;
-	  //std::cout << "-------------Finished filling sumXtalRecHit times." << std::endl;
+	  std::cout << "-------------Finished filling sumXtalRecHit times." << std::endl;
 	  numXtalPhoRecTime[id_i] += 1;
-	  //std::cout << "-------------Finished filling numXxtalRecHit times." << std::endl;
+	  std::cout << "-------------Finished filling numXxtalRecHit times." << std::endl;
 
 	  for (auto j = i+1; j < n; j++)
 	  {
