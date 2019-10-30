@@ -23,8 +23,10 @@ export fragdir="plot_config/fragments"
 
 ## common output info
 export outTextExt="log"
-export topdir="/home/t3-ku/jaking/ecaltiming"
-export disphodir="dispho_plots"
+#export topdir="/home/t3-ku/jaking/ecaltiming"
+export topdir="./"
+#export disphodir="dispho_plots"
+export disphodir="trplots"
 
 ## common derived output info
 export limitdir="limits"

@@ -19,6 +19,7 @@ Skimmer::Skimmer(const TString & indir, const TString & outdir, const TString & 
 
   // Set skim config options 
   Skimmer::SetupDefaults();
+  std::cout << "Running SkimConfig" << std::endl;
   Skimmer::SetupSkimConfig();
 
   // get detids if skim needs it
@@ -228,7 +229,7 @@ void Skimmer::EventLoop()
   {
     // dump status check
     if (entry%Common::nEvCheck == 0 || entry == 0) std::cout << "Processing Entry: " << entry << " out of " << nEntries << std::endl;
-
+    if( entry > 100 ) break;
     // get event weight: no scaling by BR, xsec, lumi, etc.
     if (fIsMC) fInEvent.b_genwgt->GetEntry(entry);
     const auto wgt    = (fIsMC ? fInEvent.genwgt : 1.f);
@@ -722,6 +723,11 @@ void Skimmer::FillOutEvent(const UInt_t entry, const Float_t evtwgt)
   // fInEvent.b_nmuHighT->GetEntry(entry);
   fInEvent.b_nrechits->GetEntry(entry);
   fInEvent.b_nkurechits->GetEntry(entry);
+  //if( hasMultiKURecHit ){
+  //b_nkuStcrechits->GetEntry(entry);
+  //b_nkuNotrechits->GetEntry(entry);
+  //b_nkuNotStcrechits->GetEntry(entry);
+ // }
   fInEvent.b_nphotons->GetEntry(entry);
 
   //std::cout << "clearing UncalDigi " << std::endl;
@@ -772,6 +778,11 @@ void Skimmer::FillOutEvent(const UInt_t entry, const Float_t evtwgt)
   // fOutEvent.nmuHighT = fInEvent.nmuHighT;
   fOutEvent.nrechits = fInEvent.nrechits;
   fOutEvent.nkurechits = fInEvent.nkurechits;
+  //if( hasMultiKURecHit ){
+  //fOutEvent.nkuStcrechits = fInEvent.nkuStcrechits;
+  //fOutEvent.nkuNotrechits = fInEvent.nkuNotrechits;
+  //fOutEvent.nkuNotStcrechits = fInEvent.nkuNotStcrechits;
+  //}
   fOutEvent.nphotons = fInEvent.nphotons;
   fOutEvent.evtwgt   = evtwgt;
 
@@ -965,6 +976,25 @@ void Skimmer::FillOutPhos(const UInt_t entry)
   b_kurhTOF->GetEntry(entry);
   b_kurhID->GetEntry(entry);
 
+  if( hasMultiKURecHit ){
+  b_kuStcrhE->GetEntry(entry);
+  b_kuStcrhtime->GetEntry(entry);
+  b_kuStcrhtimeErr->GetEntry(entry);
+  b_kuStcrhTOF->GetEntry(entry);
+  b_kuStcrhID->GetEntry(entry);
+
+  b_kuNotrhE->GetEntry(entry);
+  b_kuNotrhtime->GetEntry(entry);
+  b_kuNotrhtimeErr->GetEntry(entry);
+  b_kuNotrhTOF->GetEntry(entry);
+  b_kuNotrhID->GetEntry(entry);
+
+  b_kuNotStcrhE->GetEntry(entry);
+  b_kuNotStcrhtime->GetEntry(entry);
+  b_kuNotStcrhtimeErr->GetEntry(entry);
+  b_kuNotStcrhTOF->GetEntry(entry);
+  b_kuNotStcrhID->GetEntry(entry);
+  }
         if( hasUrecDigi ){
                 //std::cout << "Getting UrecDigi Info" << std::endl;
                 b_uRhId->GetEntry(entry);
@@ -1092,6 +1122,39 @@ void Skimmer::FillOutPhos(const UInt_t entry)
         		outpho.seedkuID = (*kurhID)[kuseed];			
                 }
         }
+
+  	if( hasMultiKURecHit ){
+        for(UInt_t kuStcseed = 0; kuStcseed < (*kuStcrhID).size(); kuStcseed++ ){
+                if( (*kuStcrhID)[kuStcseed] == (*fInRecHits.ID)[seed] ){
+                        outpho.seedkuStcE = (*kuStcrhE)[kuStcseed];
+                        outpho.seedkuStctime = (*kuStcrhtime)[kuStcseed];
+                        outpho.seedkuStctimeErr = (*kuStcrhtimeErr)[kuStcseed];
+                        outpho.seedkuStcTOF = (*kuStcrhTOF)[kuStcseed];
+                        outpho.seedkuStcID = (*kuStcrhID)[kuStcseed];
+                }
+        }
+
+        for(UInt_t kuNotseed = 0; kuNotseed < (*kuNotrhID).size(); kuNotseed++ ){
+                if( (*kuNotrhID)[kuNotseed] == (*fInRecHits.ID)[seed] ){
+                        outpho.seedkuNotE = (*kuNotrhE)[kuNotseed];
+                        outpho.seedkuNottime = (*kuNotrhtime)[kuNotseed];
+                        outpho.seedkuNottimeErr = (*kuNotrhtimeErr)[kuNotseed];
+                        outpho.seedkuNotTOF = (*kuNotrhTOF)[kuNotseed];
+                        outpho.seedkuNotID = (*kuNotrhID)[kuNotseed];
+                }
+        }
+
+        for(UInt_t kuNotStcseed = 0; kuNotStcseed < (*kuNotStcrhID).size(); kuNotStcseed++ ){
+                if( (*kuNotStcrhID)[kuNotStcseed] == (*fInRecHits.ID)[seed] ){
+                        outpho.seedkuNotStcE = (*kuNotStcrhE)[kuNotStcseed];
+                        outpho.seedkuNotStctime = (*kuNotStcrhtime)[kuNotStcseed];
+                        outpho.seedkuNotStctimeErr = (*kuNotStcrhtimeErr)[kuNotStcseed];
+                        outpho.seedkuNotStcTOF = (*kuNotStcrhTOF)[kuNotStcseed];
+                        outpho.seedkuNotStcID = (*kuNotStcrhID)[kuNotStcseed];
+                }
+        }
+        }
+
         if( hasUrecDigi ){
 		for(UInt_t urseed = 0; urseed < (*uRhId).size(); urseed++ ){
 			if( (*uRhId)[urseed] == (*fInRecHits.ID)[seed] ){
@@ -1226,6 +1289,26 @@ void Skimmer::FillOutPhos(const UInt_t entry)
         outpho.seedkutimeErr = -9999.f;
         outpho.seedkuTOF     = -9999.f;
         outpho.seedkuID    = 0;
+
+  	if( hasMultiKURecHit ){
+        outpho.seedkuStcE = -9999.f;
+        outpho.seedkuStctime    = -9999.f;
+        outpho.seedkuStctimeErr = -9999.f;
+        outpho.seedkuStcTOF     = -9999.f;
+        outpho.seedkuStcID    = 0;
+
+        outpho.seedkuNotE = -9999.f;
+        outpho.seedkuNottime    = -9999.f;
+        outpho.seedkuNottimeErr = -9999.f;
+        outpho.seedkuNotTOF     = -9999.f;
+        outpho.seedkuNotID    = 0;
+
+        outpho.seedkuNotStcE = -9999.f;
+        outpho.seedkuNotStctime    = -9999.f;
+        outpho.seedkuNotStctimeErr = -9999.f;
+        outpho.seedkuNotStcTOF     = -9999.f;
+        outpho.seedkuNotStcID    = 0;
+        }
 
 	outpho.nrechits             = -1;
 	outpho.nrechitsLT120        = -1;
@@ -1394,6 +1477,26 @@ void Skimmer::InitInBranchVecs()
   kurhTOF = 0;
   kurhID = 0;
 
+  if( hasMultiKURecHit ){
+  kuStcrhE = 0;
+  kuStcrhtime = 0;
+  kuStcrhtimeErr = 0;
+  kuStcrhTOF = 0;
+  kuStcrhID = 0;
+
+  kuNotrhE = 0;
+  kuNotrhtime = 0;
+  kuNotrhtimeErr = 0;
+  kuNotrhTOF = 0;
+  kuNotrhID = 0;
+
+  kuNotStcrhE = 0;
+  kuNotStcrhtime = 0;
+  kuNotStcrhtimeErr = 0;
+  kuNotStcrhTOF = 0;
+  kuNotStcrhID = 0;
+  }
+
   if( hasUrecDigi ){
    ootA0 = 0;
    ootA1 = 0;
@@ -1551,6 +1654,26 @@ void Skimmer::InitInBranches()
    fInTree->SetBranchAddress("kurhTOF", &kurhTOF, &b_kurhTOF);
    fInTree->SetBranchAddress("kurhID", &kurhID, &b_kurhID);
 
+   if( hasMultiKURecHit ){
+   fInTree->SetBranchAddress("kuStcrhE", &kuStcrhE, &b_kuStcrhE);
+   fInTree->SetBranchAddress("kuStcrhtime", &kuStcrhtime, &b_kuStcrhtime);
+   fInTree->SetBranchAddress("kuStcrhtimeErr", &kuStcrhtimeErr, &b_kuStcrhtimeErr);
+   fInTree->SetBranchAddress("kuStcrhTOF", &kuStcrhTOF, &b_kuStcrhTOF);
+   fInTree->SetBranchAddress("kuStcrhID", &kuStcrhID, &b_kuStcrhID);
+
+   fInTree->SetBranchAddress("kuNotrhE", &kuNotrhE, &b_kuNotrhE);
+   fInTree->SetBranchAddress("kuNotrhtime", &kuNotrhtime, &b_kuNotrhtime);
+   fInTree->SetBranchAddress("kuNotrhtimeErr", &kuNotrhtimeErr, &b_kuNotrhtimeErr);
+   fInTree->SetBranchAddress("kuNotrhTOF", &kuNotrhTOF, &b_kuNotrhTOF);
+   fInTree->SetBranchAddress("kuNotrhID", &kuNotrhID, &b_kuNotrhID);
+
+   fInTree->SetBranchAddress("kuNotStcrhE", &kuNotStcrhE, &b_kuNotStcrhE);
+   fInTree->SetBranchAddress("kuNotStcrhtime", &kuNotStcrhtime, &b_kuNotStcrhtime);
+   fInTree->SetBranchAddress("kuNotStcrhtimeErr", &kuNotStcrhtimeErr, &b_kuNotStcrhtimeErr);
+   fInTree->SetBranchAddress("kuNotStcrhTOF", &kuNotStcrhTOF, &b_kuNotStcrhTOF);
+   fInTree->SetBranchAddress("kuNotStcrhID", &kuNotStcrhID, &b_kuNotStcrhID);
+   }
+
   if( hasUrecDigi ){
      fInTree->SetBranchAddress("nurechits", &nurechits, &b_nurechits);
      fInTree->SetBranchAddress("ndigis", &ndigis, &b_ndigis);
@@ -1600,6 +1723,12 @@ void Skimmer::InitInBranches()
 
   fInTree->SetBranchAddress(fInEvent.s_nrechits.c_str(), &fInEvent.nrechits, &fInEvent.b_nrechits);
   fInTree->SetBranchAddress(fInEvent.s_nkurechits.c_str(), &fInEvent.nkurechits, &fInEvent.b_nkurechits);
+  //if( hasMultiKURecHit ){
+  //fInTree->SetBranchAddress("nkuStcrechits", &nkuStcrechits, &b_nkuStcrechits);
+  //fInTree->SetBranchAddress("nkuNotrechits", &nkuNotrechits, &b_nkuNotrechits);
+  //fInTree->SetBranchAddress("nkuNotStcrechits", &nkuNotStcrechits, &b_nkuNotStcrechits);
+ // }
+
   if (fInConfig.storeRecHits)
   {
     // fInTree->SetBranchAddress(fInRecHits.s_X.c_str(), &fInRecHits.X, &fInRecHits.b_X);
@@ -1876,6 +2005,11 @@ void Skimmer::InitOutBranches()
   
   fOutTree->Branch(fOutEvent.s_nrechits.c_str(), &fOutEvent.nrechits);
   fOutTree->Branch(fOutEvent.s_nkurechits.c_str(), &fOutEvent.nkurechits);
+  //if( hasMultiKURecHit ){
+  //fOutTree->Branch("nkuStcrechits", &nkuStcrechits);
+  //fOutTree->Branch("nkuNotrechits", &nkuNotrechits);
+  //fOutTree->Branch("nkuNotStcrechits", &nkuNotStcrechits);
+ // }
   fOutTree->Branch("nurechits", &nurechits);
   fOutTree->Branch("ndigis", &ndigis);
 
@@ -1939,6 +2073,26 @@ void Skimmer::InitOutBranches()
     fOutTree->Branch(Form("%s_%i",pho.s_seedkutimeErr.c_str(),ipho), &pho.seedkutimeErr);
     fOutTree->Branch(Form("%s_%i",pho.s_seedkuTOF.c_str(),ipho), &pho.seedkuTOF);
     fOutTree->Branch(Form("%s_%i",pho.s_seedkuID.c_str(),ipho), &pho.seedkuID);
+
+    if( hasMultiKURecHit ){
+    fOutTree->Branch(Form("%s_%i",pho.s_seedkuStcE.c_str(),ipho), &pho.seedkuStcE);
+    fOutTree->Branch(Form("%s_%i",pho.s_seedkuStctime.c_str(),ipho), &pho.seedkuStctime);
+    fOutTree->Branch(Form("%s_%i",pho.s_seedkuStctimeErr.c_str(),ipho), &pho.seedkuStctimeErr);
+    fOutTree->Branch(Form("%s_%i",pho.s_seedkuStcTOF.c_str(),ipho), &pho.seedkuStcTOF);
+    fOutTree->Branch(Form("%s_%i",pho.s_seedkuStcID.c_str(),ipho), &pho.seedkuStcID);
+
+    fOutTree->Branch(Form("%s_%i",pho.s_seedkuNotE.c_str(),ipho), &pho.seedkuNotE);
+    fOutTree->Branch(Form("%s_%i",pho.s_seedkuNottime.c_str(),ipho), &pho.seedkuNottime);
+    fOutTree->Branch(Form("%s_%i",pho.s_seedkuNottimeErr.c_str(),ipho), &pho.seedkuNottimeErr);
+    fOutTree->Branch(Form("%s_%i",pho.s_seedkuNotTOF.c_str(),ipho), &pho.seedkuNotTOF);
+    fOutTree->Branch(Form("%s_%i",pho.s_seedkuNotID.c_str(),ipho), &pho.seedkuNotID);
+
+    fOutTree->Branch(Form("%s_%i",pho.s_seedkuNotStcE.c_str(),ipho), &pho.seedkuNotStcE);
+    fOutTree->Branch(Form("%s_%i",pho.s_seedkuNotStctime.c_str(),ipho), &pho.seedkuNotStctime);
+    fOutTree->Branch(Form("%s_%i",pho.s_seedkuNotStctimeErr.c_str(),ipho), &pho.seedkuNotStctimeErr);
+    fOutTree->Branch(Form("%s_%i",pho.s_seedkuNotStcTOF.c_str(),ipho), &pho.seedkuNotStcTOF);
+    fOutTree->Branch(Form("%s_%i",pho.s_seedkuNotStcID.c_str(),ipho), &pho.seedkuNotStcID);
+    }
 
     fOutTree->Branch(Form("%s_%i",pho.s_seedootA0.c_str(),ipho), &pho.seedootA0);
     fOutTree->Branch(Form("%s_%i",pho.s_seedootA1.c_str(),ipho), &pho.seedootA1);
@@ -2088,6 +2242,7 @@ void Skimmer::SetupDefaults()
   fSumWgts = 1.f;
   isLHCInfo = false;
   hasUrecDigi = false;
+  hasMultiKURecHit = false;
   fJEC = ECorr::Nominal;
   fJER = ECorr::Nominal;
   fPhoSc = ECorr::Nominal;
@@ -2150,13 +2305,19 @@ void Skimmer::SetupSkimConfig()
       if( str == "true" ) hasUrecDigi = true;
       if( str == "false" ) hasUrecDigi = false;
     }
+    else if (str.find("hasMultiKURecHit=") != std::string::npos)
+    {
+      str = Common::RemoveDelim(str,"hasMultiKURecHit=");
+      if( str == "true" ) hasMultiKURecHit = true;
+      if( str == "false" ) hasMultiKURecHit = false;
+    }
     else
     {
       std::cerr << "Specified a non-known option: " << str.c_str() << " ...Exiting..." << std::endl;
       exit(1);
     }
   }
-
+  std::cout << "hasMultiKURecHit = " << hasMultiKURecHit << std::endl;
   // reduce output of DiXtal
   fNOutPhos = (fSkim == SkimType::DiXtal ? 2 : Common::nPhotons);
 }

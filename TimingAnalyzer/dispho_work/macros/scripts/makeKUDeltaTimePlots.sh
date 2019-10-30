@@ -790,6 +790,16 @@ do
 				    ## run 2D plotter
 				    echo "run 2D plotter"
 				#  makes base 2d plot for time fit
+				echo "${skimdir}/${infile}.root"
+				echo "${skimdir}/${insigfile}.root"
+				echo "${cut}"
+				echo "${varwgtconfigdir}/${varwgtmap}.${inTextExt}"
+                                echo "${miscconfigdir}/${misc}.${inTextExt}"
+                                echo "${era}"
+                                echo "${outdir}"
+                                echo "${misc_fit}"
+                                echo "${timefit_config}"
+
 				    ./scripts/runTreePlotter2D.sh "${skimdir}/${infile}.root" "${skimdir}/${insigfile}.root" "${cut}" "${varwgtconfigdir}/${varwgtmap}.${inTextExt}" "${plot2D}" "${miscconfigdir}/${misc}.${inTextExt}" "${era}" "${outfile2D}" "${outdir}"
                                     ./scripts/runTreePlotter2D.sh "${skimdir}/${infile}.root" "${skimdir}/${insigfile}.root" "${cut}" "${varwgtconfigdir}/${varwgtmap}.${inTextExt}" "${plot_ku_2D}" "${miscconfigdir}/${misc}.${inTextExt}" "${era}" "${outfile_ku_2D}" "${outdir}"
 

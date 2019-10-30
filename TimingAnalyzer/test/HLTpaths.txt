@@ -1,4 +1,0 @@
-HLT_Photon60_R9Id90_CaloIdL_IsoL_v
-HLT_Photon60_R9Id90_CaloIdL_IsoL_DisplacedIdL_v
-HLT_PFHT350MinPFJet15_v
-HLT_Photon60_R9Id90_CaloIdL_IsoL_DisplacedIdL_PFHT350MinPFJet15_v

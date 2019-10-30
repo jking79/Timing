@@ -163,7 +163,7 @@ private:
    bool		isLHCInfo;
    bool		hasUncalDigi;
    bool         hasKURecHit;
-
+   bool         hasMultiKURecHit;
    bool		hasUrecDigi;
 
 
@@ -188,6 +188,9 @@ private:
    std::map<UInt_t,Float_t> sumXtalPhoRecTimeEM;
    std::map<UInt_t,UInt_t> numXtalPhoRecTimeEM;
 
+   std::map<UInt_t,UInt_t> caliXtalPhoRecTimeEB;
+   std::map<UInt_t,UInt_t> caliXtalPhoRecTimeEP;
+   std::map<UInt_t,UInt_t> caliXtalPhoRecTimeEM;
 
    //Float_t	   aveRecTime;
    //UInt_t	   numAveRecTime;
@@ -208,6 +211,9 @@ private:
    Int_t	  nxtal_sep;
    Int_t          nurechits;
    Int_t          nkurechits;
+   Int_t          nkuStcrechits;
+   Int_t          nkuNotrechits;
+   Int_t          nkuNotStcrechits;
    Int_t          ndigis;
 
    std::vector<Float_t>  * ootA0;
@@ -230,8 +236,29 @@ private:
    std::vector<Float_t> * kurhTOF;
    std::vector<UInt_t>  * kurhID;
 
+   std::vector<Float_t> * kuStcrhE;
+   std::vector<Float_t> * kuStcrhtime;
+   std::vector<Float_t> * kuStcrhtimeErr;
+   std::vector<Float_t> * kuStcrhTOF;
+   std::vector<UInt_t>  * kuStcrhID;
+
+   std::vector<Float_t> * kuNotrhE;
+   std::vector<Float_t> * kuNotrhtime;
+   std::vector<Float_t> * kuNotrhtimeErr;
+   std::vector<Float_t> * kuNotrhTOF;
+   std::vector<UInt_t>  * kuNotrhID;
+
+   std::vector<Float_t> * kuNotStcrhE;
+   std::vector<Float_t> * kuNotStcrhtime;
+   std::vector<Float_t> * kuNotStcrhtimeErr;
+   std::vector<Float_t> * kuNotStcrhTOF;
+   std::vector<UInt_t>  * kuNotStcrhID;
+
    TBranch        *b_nurechits;
    TBranch        *b_nkurechits;
+   TBranch        *b_nkuStcrechits;
+   TBranch        *b_nkuNotrechits;
+   TBranch        *b_nkuNotStcrechits;
    TBranch        *b_ndigis;
    TBranch        *b_uRhId;
 
@@ -265,6 +292,24 @@ private:
    TBranch 	  *b_kurhtimeErr;
    TBranch 	  *b_kurhTOF;
    TBranch 	  *b_kurhID;
+
+   TBranch        *b_kuStcrhE;
+   TBranch        *b_kuStcrhtime;
+   TBranch        *b_kuStcrhtimeErr;
+   TBranch        *b_kuStcrhTOF;
+   TBranch        *b_kuStcrhID;
+
+   TBranch        *b_kuNotrhE;
+   TBranch        *b_kuNotrhtime;
+   TBranch        *b_kuNotrhtimeErr;
+   TBranch        *b_kuNotrhTOF;
+   TBranch        *b_kuNotrhID;
+
+   TBranch        *b_kuNotStcrhE;
+   TBranch        *b_kuNotStcrhtime;
+   TBranch        *b_kuNotStcrhtimeErr;
+   TBranch        *b_kuNotStcrhTOF;
+   TBranch        *b_kuNotStcrhID;
 
 };
 

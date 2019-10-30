@@ -3,9 +3,6 @@
 <use name="FWCore/ParameterSet"/>
 <use name="FWCore/MessageLogger"/>
 <use name="FWCore/ServiceRegistry"/>
-<use name="CondFormats/RunInfo"/>
-<use name="CondFormats/DataRecord"/>
-
 
 <library file="*.cc" name="TimingPlugins">
   <use name="CommonTools/UtilAlgos"/>
@@ -18,11 +15,9 @@
   <use name="DataFormats/EgammaCandidates"/>
   <use name="DataFormats/PatCandidates"/>
   <use name="DataFormats/HepMCCandidate"/>
-  <use name="DataFormats/EcalDigi"/>
   <use name="JetMETCorrections/Objects"/>
   <use name="CondFormats/JetMETObjects"/>
   <use name="SimDataFormats/PileupSummaryInfo"/>
-  <use name="RecoEgamma/PhotonIdentification"/>
   <use name="RecoEgamma/EgammaTools"/>
   <use name="JetMETCorrections/Modules"/>
 </library>
