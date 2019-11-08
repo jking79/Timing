@@ -1,6 +1,7 @@
 #include "Common.hh"
 #include "TLatex.h"
 #include "TColor.h"
+#include <math.h>
 
 namespace Common
 {
@@ -72,6 +73,71 @@ namespace Common
     return ((diff_i1 == 1 && diff_i2 == 0) || (diff_i1 == 0 && diff_i2 == 1));
   }
 
+  float get_phi( int x, int y ){
+
+	int phi = 0;
+  	if( x  == 50 ){
+                if( y  < 50 ) phi = 270;
+                else phi = 90;
+        } else {
+                phi = std::atan(std::abs((y - 50)/(x - 50)))*(Common::RadToDeg);
+                if( x < 50 ){ if ( y < 50 ) phi = phi + 180; else phi = phi + 90;
+		} else if ( y < 50 ) phi = phi + 270; 
+        }
+	return phi;
+  }
+
+  Int_t Xtal_Seperation(const UInt_t detid1, const UInt_t detid2)
+  {
+    Int_t sep = 0;
+    const auto & idinfo1 = Common::DetIDMap[detid1];
+    const auto & idinfo2 = Common::DetIDMap[detid2];
+
+    const auto diff_i1 = std::abs(idinfo1.i1-idinfo2.i1);
+    const auto diff_i2 = std::abs(idinfo1.i2-idinfo2.i2);
+//    std::cout << "i1: (" << idinfo1.i1 << "," << idinfo1.i2 << ") i2: ( " << idinfo2.i1 << "," << idinfo2.i2 << ") " << std::endl;
+
+    if( (idinfo1.ecal == ECAL::EB) && (idinfo2.ecal == ECAL::EB) ){
+	const auto wdiff_i1 = ((diff_i1 > 180) ? (diff_i1 - 180) : diff_i1); 
+//	std::cout << " EB EB with " << wdiff_i1 << " : " << diff_i2 << std::endl;
+        sep = int(std::sqrt( wdiff_i1*wdiff_i1 + diff_i2*diff_i2 ));
+    }
+    else if( ((idinfo1.ecal == ECAL::EB) && (idinfo2.ecal == ECAL::EP)) || ((idinfo1.ecal == ECAL::EB) && (idinfo2.ecal == ECAL::EM)) ){
+        //auto phi = Common::get_phi( idinfo2.i1, idinfo2.i1 );
+        //auto rad = std::abs(50 - std::sqrt( (idinfo2.i1 - 50 )*(idinfo2.i1 - 50 ) + (idinfo2.i2 - 50 )*(idinfo2.i2 - 50 ) ));
+        //auto dphi = std::abs( phi - idinfo1.i1 );
+	//auto mz = std::abs( idinfo1.i2 - ((idinfo2.ecal == ECAL::EP) ? 85 : -85 )) + rad;
+        //auto wphi = ((dphi > 180) ? (360 - dphi) : dphi);
+ //       std::cout << " Phi/Rad of " << phi << " : " << rad << std::endl;
+ //       std::cout << " EB EP/M with " << wphi << " : " << mz << std::endl;
+        //sep = int(std::sqrt( wphi*wphi + mz*mz )) + 1000;
+	sep = 1000;
+    }
+    else if( ((idinfo1.ecal == ECAL::EP) && (idinfo2.ecal == ECAL::EB)) || ((idinfo1.ecal == ECAL::EM) && (idinfo2.ecal == ECAL::EB)) ){
+        //float phi = Common::get_phi( idinfo1.i1, idinfo1.i2 );
+        //auto rad = std::abs(50 - std::sqrt( (idinfo1.i1 - 50 )*(idinfo1.i1 - 50 ) + (idinfo1.i2 - 50 )*(idinfo1.i2 - 50 ) ));
+	//auto dphi = std::abs( phi - idinfo2.i1 );
+        //auto mz = std::abs( idinfo2.i2 - ((idinfo1.ecal == ECAL::EP) ? 85 : -85 )) + rad;
+        //auto wphi = ((dphi > 180) ? (360 - dphi) : dphi);
+//	std::cout << " Phi/Rad of " << phi << " : " << rad << std::endl;
+//        std::cout << " EB EP/M with " << wphi << " : " << mz << std::endl;
+        //sep = std::sqrt( wphi*wphi + mz*mz) + 1000;
+	sep = 1000;
+    }
+    else if( ((idinfo1.ecal == ECAL::EM) && (idinfo2.ecal == ECAL::EM)) || ((idinfo1.ecal == ECAL::EP) && (idinfo2.ecal == ECAL::EP)) ){
+//        std::cout << " EP EP or EM EM with " << diff_i1 << " : " << diff_i2 << std::endl;
+        sep = int(std::sqrt( diff_i1*diff_i1 + diff_i2*diff_i2 ) + 0);
+    }
+    else { //( ((idinfo1.ecal == ECAL::EP) && (idinfo2.ecal == ECAL::EM)) || ((idinfo1.ecal == ECAL::EM) && (idinfo2.ecal == ECAL::EP)) )
+//        std::cout << " EP EM or EM EP with " << diff_i1 << " : " << diff_i2 << std::endl;
+        //sep = int(std::sqrt( diff_i1*diff_i1 + diff_i2*diff_i2 + 170*170 )) + 5000;
+	sep = 5000;
+    }
+
+    return sep; 
+
+  }
+
   Bool_t IsWithinRadius(const UInt_t detid1, const UInt_t detid2, const Int_t radius)
   {
     const auto & idinfo1 = Common::DetIDMap[detid1];
@@ -133,9 +199,10 @@ namespace Common
     Common::EraMap["2017C"] = {299337,302029,9.633f}; // 9.633
     Common::EraMap["2017D"] = {302030,303434,4.228f}; // 4.228
     Common::EraMap["2017E"] = {303435,304826,9.315f}; // 9.315
-    Common::EraMap["2017F"] = {304911,306462,13.54f}; // 13.540
-
-    Common::EraMap["Full"] = {Common::EraMap["2017B"].startRun,Common::EraMap["2017F"].endRun,41.53f}; // for some idiotic reason, sum of above is 41.51
+//    Common::EraMap["2017F"] = {304911,306462,13.54f}; // 13.540
+    Common::EraMap["2017F"] = {304911,326462,13.54f}; // 13.540
+    Common::EraMap["Full"] = {0,1000000,1.00f}; // just run over the whole input file
+//    Common::EraMap["Full"] = {Common::EraMap["2017B"].startRun,Common::EraMap["2017F"].endRun,41.53f}; // for some idiotic reason, sum of above is 41.51
   }
 
   void SetupSamples()
@@ -202,7 +269,7 @@ namespace Common
     Common::SampleMap["MC/ZX/ZZ"] = "ZX";
     Common::SampleMap["MC/ZX/ZGGJets"] = "ZX";
     Common::SampleMap["MC/ZX/ZZZ"] = "ZX";
-    
+  
     // Data
     Common::SampleMap[Form("Data/%s/B/v1",Common::PrimaryDataset.Data())] = "Data";
     Common::SampleMap[Form("Data/%s/C/v1",Common::PrimaryDataset.Data())] = "Data";
@@ -224,7 +291,7 @@ namespace Common
       {
 	auto sctau = ctau;
 	if (ctau.EqualTo("0p1") && !(lambda.EqualTo("500") || lambda.EqualTo("600"))) sctau = "0_1";
-	Common::SampleMap["MC/GMSB/L-"+lambda+"TeV_Ctau-"+sctau+"cm"] = "GMSB_L"+lambda+"_CTau"+ctau;
+//	Common::SampleMap["MC/GMSB/L-"+lambda+"TeV_Ctau-"+sctau+"cm"] = "GMSB_L"+lambda+"_CTau"+ctau;
       }
     }
 
@@ -767,7 +834,8 @@ namespace Common
     
       if (Common::GroupMap[sample] != SampleGroup::isData)
       {
-	cutwgt += " * (evtwgt * puwgt)";
+//	cutwgt += " * (evtwgt * puwgt)";
+        cutwgt += " * (evtwgt * 1)";
       }
     }  
 

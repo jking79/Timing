@@ -19,13 +19,13 @@ def getOptions():
 
     parser.add_option('-c', '--crabCmd',
                       dest = 'crabCmd',
-                      default = '',
+                      default = 'submit',
                       help = "crab command",
                       metavar = 'CMD')
 
     parser.add_option('-w', '--workArea',
                       dest = 'workArea',
-                      default = 'multicrab_dispho_SPH',
+                      default = 'myWorkArea',
                       help = "work area directory (only if CMD != 'submit')",
                       metavar = 'WAD')
 
@@ -58,12 +58,14 @@ def main():
     if options.crabCmd == 'submit':
 
         # External files needed by CRAB
-        inputDir     = '/afs/cern.ch/user/k/kmcdermo/public/input/'
+        #inputDir     = '/afs/cern.ch/user/k/kmcdermo/public/input/'
+	inputDir     = '/home/t3-ku/jaking/ecaltiming/CMSSW_9_4_10/src/Timing/TimingAnalyzer/test/'
         inputPaths   = 'HLTpathsWExtras.txt'
         inputFilters = 'HLTfilters.txt'
         inputFlags   = 'METflags.txt'
-        inputJSON    = 'golden2017.json'
-         
+        #inputJSON    = 'golden2017.json'
+        inputJSON    = 'golden2016.json'        
+ 
         #--------------------------------------------------------
         # This is the base config:
         #--------------------------------------------------------
@@ -86,24 +88,40 @@ def main():
 
         config.Data.outputDatasetTag = None
         config.Data.publication      = False
-        config.Site.storageSite      = 'T2_CH_CERN'
-        config.Data.outLFNDirBase    = '/store/group/phys_exotica/displacedPhotons/nTuples/2017/analysis/unskimmed'
+        config.Site.storageSite      = 'T2_US_Nebraska'
+	#config.Data.outLFNDirBase    = '/store/group/phys_exotica/displacedPhotons/nTuples/2017/analysis/unskimmed'
+        config.Data.outLFNDirBase    = '/store/user/jaking/ecalTiming/'
+
         #--------------------------------------------------------
 
         # Will submit one task for each of these input datasets.
         inputDataAndOpts = [
-            ['/SinglePhoton/Run2017B-31Mar2018-v1/MINIAOD'],
-            ['/SinglePhoton/Run2017C-31Mar2018-v1/MINIAOD'],
-            ['/SinglePhoton/Run2017D-31Mar2018-v1/MINIAOD'],
-            ['/SinglePhoton/Run2017E-31Mar2018-v1/MINIAOD'],
-            ['/SinglePhoton/Run2017F-31Mar2018-v1/MINIAOD'],
+    #        ['/SinglePhoton/Run2017B-31Mar2018-v1/MINIAOD'],
+    #        ['/SinglePhoton/Run2017C-31Mar2018-v1/MINIAOD'],
+    #        ['/SinglePhoton/Run2017D-31Mar2018-v1/MINIAOD'],
+    #        ['/SinglePhoton/Run2017E-31Mar2018-v1/MINIAOD'],
+    #        ['/SinglePhoton/Run2017F-31Mar2018-v1/MINIAOD'],
 
-            ['/DoubleEG/Run2017B-31Mar2018-v1/MINIAOD'],
-            ['/DoubleEG/Run2017C-31Mar2018-v1/MINIAOD'],
-            ['/DoubleEG/Run2017D-31Mar2018-v1/MINIAOD'],
-            ['/DoubleEG/Run2017E-31Mar2018-v1/MINIAOD'],
-            ['/DoubleEG/Run2017F-31Mar2018-v1/MINIAOD'],
+    #        ['/SinglePhoton/Run2016C-17Jul2018-v1/MINIAOD'],
+    #        ['/SinglePhoton/Run2016D-17Jul2018-v1/MINIAOD'],
+    #        ['/SinglePhoton/Run2016E-17Jul2018-v1/MINIAOD'],
+    #        ['/SinglePhoton/Run2016F-17Jul2018-v1/MINIAOD'],
+    #        ['/SinglePhoton/Run2016G-17Jul2018-v1/MINIAOD'],
+    #        ['/SinglePhoton/Run2016H-17Jul2018-v1/MINIAOD'],
 
+            ['/DoubleEG/Run2016B-17Jul2018_ver2-v1/MINIAOD'],
+            ['/DoubleEG/Run2016C-17Jul2018-v1/MINIAOD'],
+            ['/DoubleEG/Run2016D-17Jul2018-v1/MINIAOD'],
+            ['/DoubleEG/Run2016E-17Jul2018-v1/MINIAOD'],
+            ['/DoubleEG/Run2016F-17Jul2018-v1/MINIAOD'],
+            ['/DoubleEG/Run2016G-17Jul2018-v1/MINIAOD'],
+            ['/DoubleEG/Run2016H-17Jul2018-v1/MINIAOD'],
+
+    #        ['/DoubleEG/Run2017B-31Mar2018-v1/MINIAOD'],
+    #        ['/DoubleEG/Run2017C-31Mar2018-v1/MINIAOD'],
+    #        ['/DoubleEG/Run2017D-31Mar2018-v1/MINIAOD'],
+    #        ['/DoubleEG/Run2017E-31Mar2018-v1/MINIAOD'],
+    #        ['/DoubleEG/Run2017F-31Mar2018-v1/MINIAOD'],
             ]
  
         for inDO in inputDataAndOpts:
@@ -115,6 +133,7 @@ def main():
 
             config.JobType.pyCfgParams   = ['globalTag=94X_dataRun2_v6','nThreads='+str(config.JobType.numCores),
                                             'inputPaths='+inputPaths,'inputFilters='+inputFilters,'inputFlags='+inputFlags]
+
             config.Data.inputDataset     = inDO[0]
             config.Data.outputDatasetTag = '%s_%s' % (config.General.workArea, config.General.requestName)
             # Submit.

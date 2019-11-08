@@ -60,11 +60,12 @@ options.register('leptondRmin',0.3,VarParsing.multiplicity.singleton,VarParsing.
 options.register('smearjetEmin',0.01,VarParsing.multiplicity.singleton,VarParsing.varType.float,'min jet E for smearing');
 
 ## trigger input
-options.register('inputPaths','/afs/cern.ch/user/k/kmcdermo/public/input/HLTpathsWExtras.txt',VarParsing.multiplicity.singleton,VarParsing.varType.string,'text file list of input signal paths');
-options.register('inputFilters','/afs/cern.ch/user/k/kmcdermo/public/input/HLTfilters.txt',VarParsing.multiplicity.singleton,VarParsing.varType.string,'text file list of input signal filters');
+inputDir = '/afs/cern.ch/user/j/jaking/private/ecal/CMSSW_9_4_10/src/Timing/TimingAnalyzer/test/input/'
+options.register('inputPaths',inputDir+'HLTpathsWExtras.txt',VarParsing.multiplicity.singleton,VarParsing.varType.string,'text file list of input signal paths');
+options.register('inputFilters',inputDir+'HLTfilters.txt',VarParsing.multiplicity.singleton,VarParsing.varType.string,'text file list of input signal filters');
 
 ## met filter input
-options.register('inputFlags','/afs/cern.ch/user/k/kmcdermo/public/input/METflags.txt',VarParsing.multiplicity.singleton,VarParsing.varType.string,'text file list of input MET filter flags');
+options.register('inputFlags',inputDir+'METflags.txt',VarParsing.multiplicity.singleton,VarParsing.varType.string,'text file list of input MET filter flags');
 
 ## data or MC options
 options.register('isMC',False,VarParsing.multiplicity.singleton,VarParsing.varType.bool,'flag to indicate data or MC');
@@ -221,6 +222,7 @@ from PhysicsTools.PatAlgos.slimming.unpackedTracksAndVertices_cfi import unpacke
 process.unpackedTracksAndVertices = unpackedTracksAndVertices.clone()
 
 ## MET corrections for 2017 data: https://twiki.cern.ch/twiki/bin/view/CMS/MissingETUncertaintyPrescription#Instructions_for_9_4_X_X_9_for_2
+##  for 2017 data with 17Nov2017 and 31Mar2018 rereco  only
 from PhysicsTools.PatUtils.tools.runMETCorrectionsAndUncertainties import runMetCorAndUncFromMiniAOD
 runMetCorAndUncFromMiniAOD (
         process,

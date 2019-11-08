@@ -52,34 +52,34 @@ void TreePlotter::MakeTreePlot()
   TreePlotter::MakeDataOutput();
 
   // Make Bkgd Output
-  TreePlotter::MakeBkgdOutput();
+//  TreePlotter::MakeBkgdOutput();
 
   // Make Signal Output
-  TreePlotter::MakeSignalOutput();
+ // TreePlotter::MakeSignalOutput();
 
   // Make Ratio Output
-  TreePlotter::MakeRatioOutput();
+//  TreePlotter::MakeRatioOutput();
 
   // Make Legend
-  TreePlotter::MakeLegend();
+//  TreePlotter::MakeLegend();
 
   // Init Output Canv+Pads
-  TreePlotter::InitOutputCanvPads();
+//  TreePlotter::InitOutputCanvPads();
 
   // Draw Upper Pad
-  TreePlotter::DrawUpperPad();
+//  TreePlotter::DrawUpperPad();
 
   // Draw Lower Pad
-  TreePlotter::DrawLowerPad();
+  //TreePlotter::DrawLowerPad();
 
   // Save Output
-  TreePlotter::SaveOutput(fOutFileText,fEra);
+//  TreePlotter::SaveOutput(fOutFileText,fEra);
 
   // Write Out Config
-  TreePlotter::MakeConfigPave();
+//  TreePlotter::MakeConfigPave();
 
   // Dump integrals into text file
-  TreePlotter::DumpIntegrals(fOutFileText);
+//  TreePlotter::DumpIntegrals(fOutFileText);
 
   // Delete allocated memory
   TreePlotter::DeleteMemory(true);
@@ -90,19 +90,24 @@ void TreePlotter::MakeHistFromTrees(TFile *& inFile, TFile *& inSignalFile)
   std::cout << "Making hists from input trees..." << std::endl;
 
   // loop over sample groups for each tree
-  for (const auto & TreeNamePair : Common::TreeNameMap)
+  for( int fake = 0; fake < 1; fake++ )
+	 //(const auto & TreeNamePair : Common::TreeNameMap)
   {
     // Init
-    const auto & sample   = TreeNamePair.first;
-    const auto & treename = TreeNamePair.second;
+    const TString jwk_sample("Data");
+    const TString jwk_treename("Data_Tree");
+    const auto & sample   = jwk_sample; //TreeNamePair.first;
+    const auto & treename = jwk_treename; //TreeNamePair.second;
     std::cout << "Working on tree: " << treename.Data() << std::endl;
 	
     // Get infile
-    auto & infile = ((Common::GroupMap[sample] != SampleGroup::isSignal) ? inFile : inSignalFile);
+    //auto & infile = ((Common::GroupMap[sample] != SampleGroup::isSignal) ? inFile : inSignalFile);
+    auto & infile = inFile;
     infile->cd();
 
     // Get TTree
-    auto intree = (TTree*)infile->Get(Form("%s",treename.Data()));
+    //auto intree = (TTree*)infile->Get(Form("%s",treename.Data()));
+    auto intree = (TTree*)infile->Get("disphotree");
     const auto isnull = Common::IsNullTree(intree);
 
     if (!isnull)
@@ -429,7 +434,8 @@ void TreePlotter::DrawUpperPad()
   UpperPad->SetLogx(fIsLogX);
 
   // get relevant hist for setting options
-  auto & hist = (fSignalsOnly || fSkipData) ? HistMap[fPlotSignalVec.front()] : DataHist;
+//  auto & hist = (fSignalsOnly || fSkipData) ? HistMap[fPlotSignalVec.front()] : DataHist;
+    auto & hist = DataHist;
   
   // Get and Set Global Minimum and Maximum
   TreePlotter::GetHistMinimum();
@@ -457,17 +463,18 @@ void TreePlotter::DrawUpperPad()
     }
     
     // Draw stack
-    BkgdStack->Draw("HIST SAME"); 
-    UpperPad->RedrawAxis("SAME"); // stack kills axis
+//    BkgdStack->Draw("HIST SAME"); 
+//    UpperPad->RedrawAxis("SAME"); // stack kills axis
     
     // Draw MC sum total error as well on top of stack --> E2 makes error appear as rectangle
-    BkgdHist->Draw("E2 SAME");
+//    BkgdHist->Draw("E2 SAME");
 
     // Redraw data to make it appear again!
-    DataHist->Draw("PE SAME"); 
+//    DataHist->Draw("PE SAME"); 
   } 
 
   // Draw Signal : loop over ones to plot
+/*
   for (auto isample = 0U; isample < fPlotSignalVec.size(); isample++)
   {
     const auto & sample = fPlotSignalVec[isample];
@@ -475,7 +482,7 @@ void TreePlotter::DrawUpperPad()
 
     hist->Draw(((isample==0 && fSignalsOnly)?"HIST":"HIST SAME"));
   }
-
+*/
   // And lastly draw the legend
   Legend->Draw("SAME"); 
 }
@@ -668,18 +675,18 @@ void TreePlotter::DeleteMemory(const Bool_t deleteInternal)
   std::cout << "Deleting memory in TreePlotter... deleting internal: " << Common::PrintBool(deleteInternal).Data() << std::endl;
 
   // delete everything
-  delete fConfigPave;
+//  delete fConfigPave;
 
-  delete LowerPad;
-  delete UpperPad;
-  delete OutCanv;
-  delete Legend;
-  delete RatioLine;
-  delete RatioMCErrs;
-  delete RatioHist;
-  delete BkgdStack;
-  delete EWKHist;
-  delete BkgdHist;
+//  delete LowerPad;
+//  delete UpperPad;
+//  delete OutCanv;
+//  delete Legend;
+//  delete RatioLine;
+//  delete RatioMCErrs;
+//  delete RatioHist;
+//  delete BkgdStack;
+// delete EWKHist;
+//  delete BkgdHist;
   delete DataHist;
 
   Common::DeleteMap(HistMap);
@@ -984,9 +991,12 @@ void TreePlotter::SetupHists()
   std::cout << "Setting up output hists..." << std::endl;
 
   // instantiate each histogram
-  for (const auto & HistNamePair : Common::HistNameMap)
+  for ( int fake = 0; fake < 1; fake++ ) // (const auto & HistNamePair : Common::HistNameMap)
   {
-    HistMap[HistNamePair.first] = TreePlotter::SetupHist(HistNamePair.second);
+   	const TString jwk_sample("Data");
+   	const TString jwk_histname("Data_Hist");
+  //  	HistMap[HistNamePair.first] = TreePlotter::SetupHist(HistNamePair.second);
+	HistMap[jwk_sample] = TreePlotter::SetupHist(jwk_histname);
   }
 }
 
