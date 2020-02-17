@@ -93,7 +93,7 @@ options.register('demoMode',False,VarParsing.multiplicity.singleton,VarParsing.v
 options.register('processName','TREE',VarParsing.multiplicity.singleton,VarParsing.varType.string,'process name to be considered');
 
 ## outputFile Name
-options.register('outputFileName','ku_ksMulti_lhcinfo_test_twotier_run18D_320712_323414_dispho.root',VarParsing.multiplicity.singleton,VarParsing.varType.string,'output file name created by cmsRun');
+options.register('outputFileName','ku_ksMulti_algo_test_twotier_run18D_323414_dispho.root',VarParsing.multiplicity.singleton,VarParsing.varType.string,'output file name created by cmsRun');
 
 ## etra bits
 options.register('nThreads',8,VarParsing.multiplicity.singleton,VarParsing.varType.int,'number of threads per job');
@@ -241,13 +241,13 @@ process.source = cms.Source("PoolSource",
         #'file:EF735B7A-54AA-3749-84B6-ADBBCE9B4329.root'#run2018D mini
         #'/store/data/Run2018A/EGamma/RAW/v1/000/315/973/00000/2E81C787-2D53-E811-BAFC-FA163E2CD5B1.root'
 	#'/store/data/Run2018D/EGamma/MINIAOD/PromptReco-v2/000/320/712/00000/4A95EB13-2698-E811-BBC4-FA163EC6DE18.root',
-	#'/store/data/Run2018D/EGamma/MINIAOD/PromptReco-v2/000/323/414/00000/AF2238B6-5EE6-064E-8192-0DFC2DF3933B.root'
-	'/store/data/Run2018D/EGamma/MINIAOD/PromptReco-v2/000/325/175/00000/9D0F9360-DD60-314A-BB24-33D62A3CD6BD.root'
+	'/store/data/Run2018D/EGamma/MINIAOD/PromptReco-v2/000/323/414/00000/AF2238B6-5EE6-064E-8192-0DFC2DF3933B.root'
+	#'/store/data/Run2018D/EGamma/MINIAOD/PromptReco-v2/000/325/175/00000/9D0F9360-DD60-314A-BB24-33D62A3CD6BD.root'
         #'/store/data/Run2018D/EGamma/MINIAOD/22Jan2019-v2/70001/FFBC2AE4-28D9-B947-A927-84804A19B8CD.root'
         ),
     secondaryFileNames = cms.untracked.vstring(
 	#325175
-	'/store/data/Run2018D/EGamma/RAW/v1/000/325/175/00000/07EF361B-06DA-6048-AAF6-DDBCD3D7B4A0.root'
+	#'/store/data/Run2018D/EGamma/RAW/v1/000/325/175/00000/07EF361B-06DA-6048-AAF6-DDBCD3D7B4A0.root'
 	#70001/FFBC2AE4-28D9-B947-A927-84804A19B8CD.root
 	#'/store/data/Run2018D/EGamma/RAW/v1/000/324/878/00000/349768D5-290F-224D-AA01-F53FE4A457B0.root',
 	#'/store/data/Run2018D/EGamma/RAW/v1/000/324/785/00000/B204A5A8-2179-134E-AC60-03B17A0687E7.root',
@@ -275,10 +275,10 @@ process.source = cms.Source("PoolSource",
 	#'/store/data/Run2018D/EGamma/RAW/v1/000/323/414/00000/78266801-FA3A-0A4E-86E6-1147C0A1FD27.root',
 	#'/store/data/Run2018D/EGamma/RAW/v1/000/323/414/00000/C9875CA5-D499-2043-BDE2-F766389D2D26.root',
 	#'/store/data/Run2018D/EGamma/RAW/v1/000/323/414/00000/DF56FF9E-1DE4-DA4C-B02F-0CEA64882D80.root',
-	#'/store/data/Run2018D/EGamma/RAW/v1/000/323/414/00000/E9A6A66F-0E63-AD45-8137-66B9631818AC.root',
-	#'/store/data/Run2018D/EGamma/RAW/v1/000/323/414/00000/F1430E66-D4F8-3D46-BAFE-F2EA8B065FE5.root',
-	#'/store/data/Run2018D/EGamma/RAW/v1/000/323/414/00000/60148CAA-381A-D045-9851-3D84D968BB05.root',
-	#'/store/data/Run2018D/EGamma/RAW/v1/000/323/414/00000/618E1C14-A17B-3B4D-8337-94A987B372D5.root'
+	'/store/data/Run2018D/EGamma/RAW/v1/000/323/414/00000/E9A6A66F-0E63-AD45-8137-66B9631818AC.root',
+	'/store/data/Run2018D/EGamma/RAW/v1/000/323/414/00000/F1430E66-D4F8-3D46-BAFE-F2EA8B065FE5.root',
+	'/store/data/Run2018D/EGamma/RAW/v1/000/323/414/00000/60148CAA-381A-D045-9851-3D84D968BB05.root',
+	'/store/data/Run2018D/EGamma/RAW/v1/000/323/414/00000/618E1C14-A17B-3B4D-8337-94A987B372D5.root'
 	),
     #eventsToProcess = cms.untracked.VEventRange(eventList)
 )
@@ -287,8 +287,8 @@ process.source = cms.Source("PoolSource",
 ## How many events to process
 #if   options.demoMode : process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(1000))
 #else                  : process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(options.maxEvents))
-process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(10))
-#process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(100))
+#process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(10))
+process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(100))
 #process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(1000))
 #process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(-1))
 

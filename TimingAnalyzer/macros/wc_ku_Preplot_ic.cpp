@@ -3,7 +3,7 @@
 
 #include <iostream>
 
-void wc_ku_Preplot_ic( string califilename, string infilename, string outfilename ){
+void wc_ku_Preplot_ic( string califilename, string infilename, string outfilename, string iters ){
 
     std::cout << "open input files" << std::endl;
     string disphotreename("disphotree");
@@ -139,9 +139,12 @@ void wc_ku_Preplot_ic( string califilename, string infilename, string outfilenam
 //    auto epmapcl = (TH2F*)fCaliFile->Get("AveXtalRtOOTStcPhoClRecTimeEPMap");
 //    auto emmapcl = (TH2F*)fCaliFile->Get("AveXtalRtOOTStcPhoClRecTimeEMMap");
 //    std::cout << " Cl hists: " << ebmapcl << " " << epmapcl << " " << emmapcl << std::endl;
-    auto ebmapic = (TH2F*)fCaliFile->Get("AveXtalRtOOTStcPhoIcRecTimeEBMap_i49");
-    auto epmapic = (TH2F*)fCaliFile->Get("AveXtalRtOOTStcPhoIcRecTimeEPMap_i49");
-    auto emmapic = (TH2F*)fCaliFile->Get("AveXtalRtOOTStcPhoIcRecTimeEMMap_i49");
+    string ebmapstring("AveXtalRtOOTStcPhoIcRecTimeEBMap_i"+iters);
+    string epmapstring("AveXtalRtOOTStcPhoIcRecTimeEPMap_i"+iters);
+    string emmapstring("AveXtalRtOOTStcPhoIcRecTimeEMMap_i"+iters);
+    auto ebmapic = (TH2F*)fCaliFile->Get(ebmapstring.c_str());
+    auto epmapic = (TH2F*)fCaliFile->Get(epmapstring.c_str());
+    auto emmapic = (TH2F*)fCaliFile->Get(emmapstring.c_str());
     std::cout << " Ic hists: " << ebmapic << " " << epmapic << " " << emmapic << std::endl;
 
 //  set branches for fCaliTree
@@ -344,6 +347,8 @@ void wc_ku_Preplot_ic( string califilename, string infilename, string outfilenam
     fOutTree->AddFriend(fCaliTree);
     fOutFile->Write();
 
+
+
     delete fInFile;
     delete fOutFile;
     delete fCaliFile;
@@ -354,12 +359,13 @@ void wc_ku_Preplot_ic( string califilename, string infilename, string outfilenam
 
 int main ( int argc, char *argv[] ){
 
-        if( argc != 4 ) { std::cout << "Insufficent arguments." << std::endl; }
+        if( argc != 5 ) { std::cout << "Insufficent arguments." << std::endl; }
         else {
                 auto califilename = argv[1];
                 auto infilename = argv[2];
                 auto outfilename = argv[3];
-		wc_ku_Preplot_ic( califilename, infilename, outfilename );
+                auto iters = argv[4];
+		wc_ku_Preplot_ic( califilename, infilename, outfilename, iters );
         }
         return 1;
 }

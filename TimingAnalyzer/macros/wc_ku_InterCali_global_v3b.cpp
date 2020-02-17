@@ -98,23 +98,23 @@ void SetupDetIDsEE( std::map<UInt_t,DetIDStruct> &DetIDMap )
 }
 
 
-void wc_ku_InterCali_global_v2( string infilename, string outfilename, int mfc  ){
+void wc_ku_InterCali_global_v3b( string infilename, string outfilename, int mfcorrection  ){
 
-    const int  nIterations = 50;
+    const int  nIterations = 100;
     const int  nAlgos = 2; // RtStc, RtOOTStc //, WtOOTStc
     const int  nPhotons = 4;
     const double offset = 100.0;
     const int bin_offset = 86;
-    const int mfcorrection = mfc;
 
     const double ri_ecut = 5.0;
-    const double rj_ecut = 3.0;
+    const double rj_ecut = 5.0;
 
     double M[nIterations] = {0.0};
     double Mnot[nIterations] = {0.0};
     double Mwoot[nIterations] = {0.0};
-    int nM[nIterations] = {0};
+    double nM[nIterations] = {0.0};
     const int power = 2;
+    //const double step = 0.5;
 
     auto MHist = new TH1F( "MHist", "M Histogram", nIterations, 0, nIterations);
     auto MnotHist = new TH1F( "MnotHist", "Mnot Histogram", nIterations, 0, nIterations);
@@ -124,26 +124,26 @@ void wc_ku_InterCali_global_v2( string infilename, string outfilename, int mfc  
     auto fInFile = TFile::Open(infilename.c_str(), "update");
     auto fInTree = (TTree*)fInFile->Get(disphotreename.c_str());
     
-    auto ebmape0 = (TH2F*)fInFile->Get("AveXtalRtOOTStcRecTimeE0EBMap");
-    auto epmape0 = (TH2F*)fInFile->Get("AveXtalRtOOTStcRecTimeE0EPMap");
-    auto emmape0 = (TH2F*)fInFile->Get("AveXtalRtOOTStcRecTimeE0EMMap");
-    std::cout << " E0 hists: " << ebmape0 << " " << epmape0 << " " << emmape0 << std::endl;
-    auto ebmape1 = (TH2F*)fInFile->Get("AveXtalRtOOTStcRecTimeE1EBMap");
-    auto epmape1 = (TH2F*)fInFile->Get("AveXtalRtOOTStcRecTimeE1EPMap");
-    auto emmape1 = (TH2F*)fInFile->Get("AveXtalRtOOTStcRecTimeE1EMMap");
-    std::cout << " E1 hists: " << ebmape1 << " " << epmape1 << " " << emmape1 << std::endl;
-    auto ebmap2e1 = (TH2F*)fInFile->Get("AveXtalRtOOTStcRecTime2E1EBMap");
-    auto epmap2e1 = (TH2F*)fInFile->Get("AveXtalRtOOTStcRecTime2E1EPMap");
-    auto emmap2e1 = (TH2F*)fInFile->Get("AveXtalRtOOTStcRecTime2E1EMMap");
-    std::cout << " 2E1 hists: " << ebmap2e1 << " " << epmap2e1 << " " << emmap2e1 << std::endl;
-    auto ebmap4e1 = (TH2F*)fInFile->Get("AveXtalRtOOTStcRecTime4E1EBMap");
-    auto epmap4e1 = (TH2F*)fInFile->Get("AveXtalRtOOTStcRecTime4E1EPMap");
-    auto emmap4e1 = (TH2F*)fInFile->Get("AveXtalRtOOTStcRecTime4E1EMMap");
-    std::cout << " 4E1 hists: " << ebmap4e1 << " " << epmap4e1 << " " << emmap4e1 << std::endl;
-    auto ebmape2 = (TH2F*)fInFile->Get("AveXtalRtOOTStcRecTimeE2EBMap");
-    auto epmape2 = (TH2F*)fInFile->Get("AveXtalRtOOTStcRecTimeE2EPMap");
-    auto emmape2 = (TH2F*)fInFile->Get("AveXtalRtOOTStcRecTimeE2EMMap");
-    std::cout << " E2 hists: " << ebmape2 << " " << epmape2 << " " << emmape2 << std::endl;
+//    auto ebmape0 = (TH2F*)fInFile->Get("AveXtalRtOOTStcRecTimeE0EBMap");
+//    auto epmape0 = (TH2F*)fInFile->Get("AveXtalRtOOTStcRecTimeE0EPMap");
+//    auto emmape0 = (TH2F*)fInFile->Get("AveXtalRtOOTStcRecTimeE0EMMap");
+//    std::cout << " E0 hists: " << ebmape0 << " " << epmape0 << " " << emmape0 << std::endl;
+//    auto ebmape1 = (TH2F*)fInFile->Get("AveXtalRtOOTStcRecTimeE1EBMap");
+//    auto epmape1 = (TH2F*)fInFile->Get("AveXtalRtOOTStcRecTimeE1EPMap");
+//    auto emmape1 = (TH2F*)fInFile->Get("AveXtalRtOOTStcRecTimeE1EMMap");
+//    std::cout << " E1 hists: " << ebmape1 << " " << epmape1 << " " << emmape1 << std::endl;
+//    auto ebmap2e1 = (TH2F*)fInFile->Get("AveXtalRtOOTStcRecTime2E1EBMap");
+//    auto epmap2e1 = (TH2F*)fInFile->Get("AveXtalRtOOTStcRecTime2E1EPMap");
+//    auto emmap2e1 = (TH2F*)fInFile->Get("AveXtalRtOOTStcRecTime2E1EMMap");
+//    std::cout << " 2E1 hists: " << ebmap2e1 << " " << epmap2e1 << " " << emmap2e1 << std::endl;
+//    auto ebmap4e1 = (TH2F*)fInFile->Get("AveXtalRtOOTStcRecTime4E1EBMap");
+//    auto epmap4e1 = (TH2F*)fInFile->Get("AveXtalRtOOTStcRecTime4E1EPMap");
+//    auto emmap4e1 = (TH2F*)fInFile->Get("AveXtalRtOOTStcRecTime4E1EMMap");
+//    std::cout << " 4E1 hists: " << ebmap4e1 << " " << epmap4e1 << " " << emmap4e1 << std::endl;
+//    auto ebmape2 = (TH2F*)fInFile->Get("AveXtalRtOOTStcRecTimeE2EBMap");
+//    auto epmape2 = (TH2F*)fInFile->Get("AveXtalRtOOTStcRecTimeE2EPMap");
+//    auto emmape2 = (TH2F*)fInFile->Get("AveXtalRtOOTStcRecTimeE2EMMap");
+//    std::cout << " E2 hists: " << ebmape2 << " " << epmape2 << " " << emmape2 << std::endl;
     auto ebmapkue5 = (TH2F*)fInFile->Get("AveXtalRtStcRecTimeE5EBMap");
     auto epmapkue5 = (TH2F*)fInFile->Get("AveXtalRtStcRecTimeE5EPMap");
     auto emmapkue5 = (TH2F*)fInFile->Get("AveXtalRtStcRecTimeE5EMMap");
@@ -152,14 +152,14 @@ void wc_ku_InterCali_global_v2( string infilename, string outfilename, int mfc  
     auto epmape5 = (TH2F*)fInFile->Get("AveXtalRtOOTStcRecTimeE5EPMap");
     auto emmape5 = (TH2F*)fInFile->Get("AveXtalRtOOTStcRecTimeE5EMMap");
     std::cout << " E5 hists: " << ebmape5 << " " << epmape5 << " " << emmape5 << std::endl;
-    auto ebmap2e5 = (TH2F*)fInFile->Get("AveXtalRtOOTStcRecTime2E5EBMap");
-    auto epmap2e5 = (TH2F*)fInFile->Get("AveXtalRtOOTStcRecTime2E5EPMap");
-    auto emmap2e5 = (TH2F*)fInFile->Get("AveXtalRtOOTStcRecTime2E5EMMap");
-    std::cout << " 2E5 hists: " << ebmap2e5 << " " << epmap2e5 << " " << emmap2e5 << std::endl;
-    auto ebmap4e5 = (TH2F*)fInFile->Get("AveXtalRtOOTStcRecTime4E5EBMap");
-    auto epmap4e5 = (TH2F*)fInFile->Get("AveXtalRtOOTStcRecTime4E5EPMap");
-    auto emmap4e5 = (TH2F*)fInFile->Get("AveXtalRtOOTStcRecTime4E5EMMap");
-    std::cout << " 4E5 hists: " << ebmap4e5 << " " << epmap4e5 << " " << emmap4e5 << std::endl;
+//    auto ebmap2e5 = (TH2F*)fInFile->Get("AveXtalRtOOTStcRecTime2E5EBMap");
+//    auto epmap2e5 = (TH2F*)fInFile->Get("AveXtalRtOOTStcRecTime2E5EPMap");
+//    auto emmap2e5 = (TH2F*)fInFile->Get("AveXtalRtOOTStcRecTime2E5EMMap");
+//    std::cout << " 2E5 hists: " << ebmap2e5 << " " << epmap2e5 << " " << emmap2e5 << std::endl;
+//    auto ebmap4e5 = (TH2F*)fInFile->Get("AveXtalRtOOTStcRecTime4E5EBMap");
+//    auto epmap4e5 = (TH2F*)fInFile->Get("AveXtalRtOOTStcRecTime4E5EPMap");
+//    auto emmap4e5 = (TH2F*)fInFile->Get("AveXtalRtOOTStcRecTime4E5EMMap");
+//    std::cout << " 4E5 hists: " << ebmap4e5 << " " << epmap4e5 << " " << emmap4e5 << std::endl;
     auto ebmape10 = (TH2F*)fInFile->Get("AveXtalRtOOTStcRecTimeE10EBMap");
     auto epmape10 = (TH2F*)fInFile->Get("AveXtalRtOOTStcRecTimeE10EPMap");
     auto emmape10 = (TH2F*)fInFile->Get("AveXtalRtOOTStcRecTimeE10EMMap");
@@ -191,9 +191,14 @@ void wc_ku_InterCali_global_v2( string infilename, string outfilename, int mfc  
 //{sumXtalRtStcPhoIcRecTime, sumXtalRtOOTStcPhoIcRecTime }; //, sumXtalWtOOTStcPhoIcRecTime };
 
     std::map<UInt_t,Float_t> sumXtalRtStcPhoIcRecTime;
+//    std::map<UInt_t,Float_t> sum2XtalRtStcPhoIcRecTime;
     std::map<UInt_t,Float_t> sumXtalRtOOTStcPhoIcRecTime;
+//    std::map<UInt_t,Float_t> sum2XtalRtOOTStcPhoIcRecTime;
     std::map<UInt_t,Float_t> sumXtalWtOOTStcPhoIcRecTime;
     std::map<UInt_t,Float_t> numXtalIcRecTime;
+    std::map<UInt_t,Float_t> prevDMRtStc;
+    std::map<UInt_t,Float_t> prevDMRtOOTStc;
+    std::map<UInt_t,Float_t> prevDMWtOOTStc;
     //double normRtStc = 0.0;
     //double normRtOOTStc = 0.0;
     //double normWtOOTStc = 0.0;
@@ -397,12 +402,12 @@ void wc_ku_InterCali_global_v2( string infilename, string outfilename, int mfc  
              //for (auto i = 0U; i < 1; i++){
 		  double subM = 0.0;
                   double subsum = 0.0;
-                  double subsumE = 0.0;
-                  int subsumnum = 0;
+                  //double subsumnum = 0.0;
                   double subMnot = 0.0;
                   double subsumnot = 0.0;
                   double subsumwoot = 0.0;
-    
+                  double subsumE = 0.0;   
+
                   const auto rh_i = (*(cluster[ipho0]))[i]; // position within event rec hits vector
                   //const auto E_i  = seedE_0; //(*fInRecHits_E) [rh_i];
                   const auto E_i  = (*fInRecHits_E) [rh_i];
@@ -486,41 +491,45 @@ void wc_ku_InterCali_global_v2( string infilename, string outfilename, int mfc  
               			if( id_j_info.ecal == ECAL::EB ){
                       			prev_j[a] = (((IcMapEB[a][iter])->GetBinContent( id_j_info.i2 + bin_offset, id_j_info.i1))/mfcor) - offset;  // 
               			} else if( id_j_info.ecal == ECAL::EP ){
-                                        prev_j[a] = (IcMapEP[a][iter])->GetBinContent( id_j_info.i2, id_j_info.i1) - offset;  //  
+                                        prev_j[a] = (((IcMapEP[a][iter])->GetBinContent( id_j_info.i2, id_j_info.i1))/mfcor) - offset;  //  
               			} else if( id_j_info.ecal == ECAL::EM ){
-                                        prev_j[a] = (IcMapEM[a][iter])->GetBinContent( id_j_info.i2, id_j_info.i1) - offset;  //  
+                                        prev_j[a] = (((IcMapEM[a][iter])->GetBinContent( id_j_info.i2, id_j_info.i1))/mfcor) - offset;  //  
               			}
 			}
 
-//			auto tmpsum1 = RtStc_t_i - prev_i[0] - RtStc_t_j + prev_j[0];
+			//auto tmpsum1 = RtStc_t_i - prev_i[0] - RtStc_t_j + prev_j[0];
 			//subM += (tmpsum1 * tmpsum1);
 			//(RtStc_t_i - prev_i[0] - RtStc_t_j + prev_j[0])*(RtStc_t_i - prev_i[0] - RtStc_t_j + prev_j[0]));
-                        //subsum += (tmpsum1 + prev_i[0]); 
-                        subsum += E_j*(RtStc_t_j - prev_j[0]);
+                        //subsum += tmpsum1; 
+                        auto ejpow =  pow(E_j,power);
+			subsum += ejpow*(RtStc_t_j - prev_j[0]);
 			//auto tmpsum2 = RtOOTStc_t_i - prev_i[1] - RtOOTStc_t_j + prev_j[1];
                         //subMnot += (tmpsum2 * tmpsum2);
 			//(RtOOTStc_t_i - prev_i[1] - RtOOTStc_t_j + prev_j[1])*(RtOOTStc_t_i - prev_i[1] - RtOOTStc_t_j + prev_j[1]));
-                        //subsumnot += (tmpsum2 + prev_i[1]);
-                        subsumnot += E_j*(RtOOTStc_t_j - prev_j[1]);
+			subsumnot += ejpow*(RtOOTStc_t_j - prev_j[1]);
+                        //subsumnot += tmpsum2;
                         //subsumwoot += (WtOOTStc_t_i - WtOOTStc_t_j ); //+ prev[2]);
-                        subsumE += E_j;
-                        subsumnum += 1;
+			subsumE += ejpow;
+                        //subsumnum += 1;
 
                   } // end inner double loop over rechit
     //            >>>>  do subsums
-                  if( subsumnum == 0. ) continue;
+                  if( subsumE == 0. ) continue;
                   auto tot = ( RtStc_t_i - prev_i[0] - (subsum/subsumE) );
                   auto totnot = ( RtOOTStc_t_i - prev_i[1] - (subsumnot/subsumE) );
-	          M[iter] += tot*tot;
-		  Mnot[iter] += totnot*totnot;
-		  nM[iter] += 1;
+                  auto eipow =  pow(E_i,power);
+	          M[iter] += eipow*tot*tot;
+		  Mnot[iter] += eipow*totnot*totnot;
+		  nM[iter] += eipow;
 		  //normRtStc += subsum;
                   //normRtOOTStc += subsumnot;
                   //normWtOOTStc += subsumwoot;
-                  sumXtalRtStcPhoIcRecTime[id_i] += (tot + prev_i[0]); //(subsum/subsumnum);
-                  sumXtalRtOOTStcPhoIcRecTime[id_i] += (totnot + prev_i[1]); //(subsumnot/subsumnum);
+                  sumXtalRtStcPhoIcRecTime[id_i] += eipow*tot; //(subsum/subsumnum);
+//                  sum2XtalRtStcPhoIcRecTime[id_i] += subM; //(subsum/subsumnum);
+                  sumXtalRtOOTStcPhoIcRecTime[id_i] += eipow*totnot; //(subsumnot/subsumnum);
+//                  sum2XtalRtOOTStcPhoIcRecTime[id_i] += subMnot; //(subsumnot/subsumnum);
                   //sumXtalWtOOTStcPhoIcRecTime[id_i] += subsumwoot; //(subsumwoot/subsumnum);
-                  numXtalIcRecTime[id_i] += 1; //1;
+                  numXtalIcRecTime[id_i] += eipow; //1;
              } // end outer double loop over rechits
              //std::cout << "RecHits Loop done "<< std::endl;
  //       } // end loop over photons
@@ -532,25 +541,58 @@ void wc_ku_InterCali_global_v2( string infilename, string outfilename, int mfc  
 
     //double  norm[nAlgos] = { normRtStc, normRtOOTStc };
     std::map<UInt_t,Float_t> *  icmaps[nAlgos] = {&sumXtalRtStcPhoIcRecTime, &sumXtalRtOOTStcPhoIcRecTime }; //, sumXtalWtOOTStcPhoIcRecTime };
-
+//    std::map<UInt_t,Float_t> *  icmaps2[nAlgos] = {&sum2XtalRtStcPhoIcRecTime, &sum2XtalRtOOTStcPhoIcRecTime }; //, sumXtalWtOOTStcPhoIcRecTime };
+//    std::map<UInt_t,Float_t> *  prevDMmaps[nAlgos] = { &prevDMRtStc, &prevDMRtOOTStc };
+//    auto previter = iter - 1;  
+//    if( previter < 0 ) previter = 0;
+    auto gamma = nM[iter]/M[iter];
     for( auto ai = 0; ai < nAlgos; ai++ ){
-	 double drift = 0.0;
-	 for( std::map<UInt_t,Float_t>::iterator it=(*icmaps[ai]).begin(); it!=(*icmaps[ai]).end(); ++it){ drift += (((*icmaps[ai])[it->first])/(numXtalIcRecTime[it->first])); }
+//	 double mddm = 0.0;
+         double mfcor = 1.0;
+//	 std::map<UInt_t,Float_t> curDMmap;
+         if( iter == 0 ) mfcor = mfcorrection;
+//         for( std::map<UInt_t,Float_t>::iterator it=(*icmaps[ai]).begin(); it!=(*icmaps[ai]).end(); ++it){
+//		if( iter == 0 ) (*prevDMmaps[ai])[it->first] = 0.0;
+//                curDMmap[it->first] = (-2.0)*(((*icmaps[ai])[it->first])/(numXtalIcRecTime[it->first]));
+//         }
+//	 for( std::map<UInt_t,Float_t>::iterator it=(*icmaps[ai]).begin(); it!=(*icmaps[ai]).end(); ++it){ 
+//		auto dif = curDMmap[it->first] - (*prevDMmaps[ai])[it->first];
+//		mddm += dif*dif; 
+//	 }
          for( std::map<UInt_t,Float_t>::iterator it=(*icmaps[ai]).begin(); it!=(*icmaps[ai]).end(); ++it){
                    const auto & fill_idinfo = DetIDMap[it->first];
-                   const auto & map_time = (((*icmaps[ai])[it->first])/(numXtalIcRecTime[it->first]) - (drift/(icmaps[ai]->size()))) + offset;
+		   auto dm = (-2.0)*(((*icmaps[ai])[it->first])/(numXtalIcRecTime[it->first]));
+                   //const auto & map_time = (((*icmaps[ai])[it->first])/(numXtalIcRecTime[it->first]) - (drift/(icmaps[ai]->size()))) + offset;
 		   //std::cout << "Fill hist for Algo " << i << " at " << fill_idinfo.i2 << " " << fill_idinfo.i1 << " with " << map_time << " for iter " << iter << std::endl;
                    if( fill_idinfo.ecal == ECAL::EB ){
 //		   std::cout << "Fill EB hist for Algo " << ai << " at " << fill_idinfo.i2 << " " << fill_idinfo.i1 << " with " << map_time << " for iter " << iter << std::endl;
-                           (IcMapEB[ai][iter+1])->Fill( fill_idinfo.i2, fill_idinfo.i1, map_time );
+			   auto ci = (((IcMapEB[ai][iter])->GetBinContent( fill_idinfo.i2 + bin_offset, fill_idinfo.i1))/mfcor) - offset;
+//			   auto cim = (((IcMapEB[ai][previter])->GetBinContent( fill_idinfo.i2 + bin_offset, fill_idinfo.i1))/mfcor) - offset;
+			   //auto gamma = (ci - cim)*((curDMmap[it->first]) - ((*prevDMmaps[ai])[it->first]))/mddm; if( gamma == 0 ) gamma = 1.0;	
+			   // above ::  auto gamma = nM[iter]/M[iter];
+                           //auto gamma = ((*icmaps2[ai])[it->first])/(numXtalIcRecTime[it->first]);
+			   //std::cout << " " << ci << " " << gamma << " " << curDMmap[it->first] << std::endl;
+                           //std::cout << " " << ci << " " << gamma << " " << dm << std::endl;
+                           //(IcMapEB[ai][iter+1])->Fill( fill_idinfo.i2, fill_idinfo.i1, (ci - gamma*curDMmap[it->first]) + offset );
+                           (IcMapEB[ai][iter+1])->Fill( fill_idinfo.i2, fill_idinfo.i1, (ci - gamma*dm) + offset );
                    } else if( fill_idinfo.ecal == ECAL::EP ){
 //                 std::cout << "Fill EP hist for Algo " << ai << " at " << fill_idinfo.i2 << " " << fill_idinfo.i1 << " with " << map_time << " for iter " << iter << std::endl;
-                           (IcMapEP[ai][iter+1])->Fill( fill_idinfo.i2, fill_idinfo.i1, map_time );
+                           auto ci = (((IcMapEP[ai][iter])->GetBinContent( fill_idinfo.i2, fill_idinfo.i1))/mfcor) - offset;
+//                           auto cim = (((IcMapEP[ai][previter])->GetBinContent( fill_idinfo.i2, fill_idinfo.i1))/mfcor) - offset;
+//                           auto gamma = (ci - cim)*(curDMmap[it->first] - (*prevDMmaps[ai])[it->first])/mddm; if( gamma == 0 ) gamma = 1.0;
+                           (IcMapEP[ai][iter+1])->Fill( fill_idinfo.i2, fill_idinfo.i1, (ci - gamma*dm) + offset );
                    } else if( fill_idinfo.ecal == ECAL::EM ){
 //                 std::cout << "Fill EM hist for Algo " << ai << " at " << fill_idinfo.i2 << " " << fill_idinfo.i1 << " with " << map_time << " for iter " << iter << std::endl;
-                           (IcMapEM[ai][iter+1])->Fill( fill_idinfo.i2, fill_idinfo.i1, map_time );
+                           auto ci = (((IcMapEM[ai][iter])->GetBinContent( fill_idinfo.i2, fill_idinfo.i1))/mfcor) - offset;
+//                           auto cim = (((IcMapEM[ai][previter])->GetBinContent( fill_idinfo.i2, fill_idinfo.i1))/mfcor) - offset;
+//                           auto gamma = (ci - cim)*(curDMmap[it->first] - (*prevDMmaps[ai])[it->first])/mddm; if( gamma == 0 ) gamma = 1.0;
+                           (IcMapEM[ai][iter+1])->Fill( fill_idinfo.i2, fill_idinfo.i1, (ci - gamma*dm) + offset );
                    }
          }
+//	 (*prevDMmaps[ai]).clear();
+//         for( std::map<UInt_t,Float_t>::iterator it=(*icmaps[ai]).begin(); it!=(*icmaps[ai]).end(); ++it){
+//                (*prevDMmaps[ai])[it->first] = curDMmap[it->first]; 
+//         }
     }
 
     std::cout << "For iter " << iter << " found: " << M[iter]/nM[iter] << std::endl;
@@ -558,7 +600,9 @@ void wc_ku_InterCali_global_v2( string infilename, string outfilename, int mfc  
     //normRtOOTStc = 0.0;
     //normWtOOTStc = 0.0;
     sumXtalRtStcPhoIcRecTime.clear();
+//    sum2XtalRtStcPhoIcRecTime.clear();
     sumXtalRtOOTStcPhoIcRecTime.clear();
+//    sum2XtalRtOOTStcPhoIcRecTime.clear();
     sumXtalWtOOTStcPhoIcRecTime.clear();
     numXtalIcRecTime.clear();
 
@@ -567,7 +611,7 @@ void wc_ku_InterCali_global_v2( string infilename, string outfilename, int mfc  
 
     std::cout << "Fill M hists  ( M vs iter )" << std::endl;
     for( auto  iter = 0; iter < nIterations; iter++){  
-	std::cout << "For iter " << iter << " filling " << M[iter]/nM[iter] << " for " << M[iter] << " / " << nM[iter] << std::endl;
+	std::cout << "For iter " << iter+1 << " filling " << M[iter]/nM[iter] << " for " << M[iter] << " / " << nM[iter] << std::endl;
 	MHist->Fill( iter, M[iter]/nM[iter] );
  	MnotHist->Fill( iter, Mnot[iter]/nM[iter] );
     }
@@ -598,8 +642,8 @@ int main ( int argc, char *argv[] ){
         else {
                 auto infilename = argv[1];
                 auto outfilename = argv[2];
-                auto mfc = atoi(argv[3]);
-                wc_ku_InterCali_global_v2( infilename, outfilename, mfc );
+		auto mf = atoi(argv[3]);
+                wc_ku_InterCali_global_v3b( infilename, outfilename, mf );
         }
         return 1;
 }

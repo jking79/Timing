@@ -112,8 +112,8 @@ def subcrab( runs, events, reqmem ):
         inputDataAndOpts = [
 
             #['/EGamma/Run2018A-17Sep2018-v2/MINIAOD'],
-            #['/EGamma/Run2018B-26Sep2018-v1/MINIAOD'],
-            ['/EGamma/Run2018C-17Sep2018-v1/MINIAOD'],
+            ['/EGamma/Run2018B-26Sep2018-v1/MINIAOD'],
+            #['/EGamma/Run2018C-17Sep2018-v1/MINIAOD'],
             #['/EGamma/Run2018D-22Jan2019-v2/MINIAOD'],
             #['/EGamma/Run2018E-PromptReco-v1/MINIAOD'],
 
@@ -142,8 +142,8 @@ def subcrab( runs, events, reqmem ):
             #trial          = "twotier_rm_w_woot_ks_kscc_lhc0_v5"  # endfill0 mini+raw for kurechits/uncal: true,true,false, jwkpupv3, unitsPerJob=3750, reduced size
             #trial          = "twotier_rm_w_woot_ks_kscc_lhc0_v6"  # startfill mini+raw for kurechits/uncal: true,true,false, jwkpupv3, unitsPerJob=3750, reduced size
             #trial          = "twotier_rm_w_woot_ks_kscc_nolhc_v7"  # no lhc mini+raw for kurechits/uncal: true,true,false, jwkpupv3, unitsPerJob=3750, reduced size
-            #trial          = "twotier_rt_rtnot_wt_woot_ks_kscc_v8"  # no lhc mini+raw for kurechits/uncal: true,true,false, jwkpupv3, unitsPerJob=3750, reduced size
-            trial          = "twotier_allRT_noSTC_test"  # no lhc mini+raw for kurechits/uncal: true,true,false, jwkpupv3, unitsPerJob=3750, reduced size
+            trial          = "twotier_rt_rtnot_wt_woot_ks_kscc_nolhc_v8"  # no lhc mini+raw for kurechits/uncal: true,true,false, jwkpupv3, unitsPerJob=3750, reduced size
+            #trial          = "twotier_allRT_noSTC_test"  # no lhc mini+raw for kurechits/uncal: true,true,false, jwkpupv3, unitsPerJob=3750, reduced size
 
             config.General.requestName   = trial+"_"+primaryDataset+"_"+runEra+"_"+runs+"_"+dataset+"_dispho"
             config.Data.outputDatasetTag = trial+"_"+primaryDataset+"_"+dataset+"_"+runEra+"_"+runs+"_dispho"
@@ -311,7 +311,7 @@ def submit_run2018D():
 
 
 #submit_run2018A()
-#submit_run2018B()
-submit_run2018C()
+submit_run2018B()
+#submit_run2018C()
 #submit_run2018D()
 

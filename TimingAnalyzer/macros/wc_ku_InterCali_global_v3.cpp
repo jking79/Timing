@@ -98,14 +98,13 @@ void SetupDetIDsEE( std::map<UInt_t,DetIDStruct> &DetIDMap )
 }
 
 
-void wc_ku_InterCali_global_v2( string infilename, string outfilename  ){
+void wc_ku_InterCali_global_v3( string infilename, string outfilename, int mfcorrection  ){
 
-    const int  nIterations = 40;
+    const int  nIterations = 100;
     const int  nAlgos = 2; // RtStc, RtOOTStc //, WtOOTStc
     const int  nPhotons = 4;
     const double offset = 100.0;
     const int bin_offset = 86;
-    const int mfcorrection = 6;
 
     const double ri_ecut = 5.0;
     const double rj_ecut = 5.0;
@@ -192,7 +191,9 @@ void wc_ku_InterCali_global_v2( string infilename, string outfilename  ){
 //{sumXtalRtStcPhoIcRecTime, sumXtalRtOOTStcPhoIcRecTime }; //, sumXtalWtOOTStcPhoIcRecTime };
 
     std::map<UInt_t,Float_t> sumXtalRtStcPhoIcRecTime;
+//    std::map<UInt_t,Float_t> sum2XtalRtStcPhoIcRecTime;
     std::map<UInt_t,Float_t> sumXtalRtOOTStcPhoIcRecTime;
+//    std::map<UInt_t,Float_t> sum2XtalRtOOTStcPhoIcRecTime;
     std::map<UInt_t,Float_t> sumXtalWtOOTStcPhoIcRecTime;
     std::map<UInt_t,Float_t> numXtalIcRecTime;
     std::map<UInt_t,Float_t> prevDMRtStc;
@@ -455,7 +456,7 @@ void wc_ku_InterCali_global_v2( string infilename, string outfilename  ){
                   for (auto j = 0U; j < nRecHits2; j++){
                   //for (auto j = 0U; j < 1; j++){
 
-			//if( i == j ) continue;
+			if( i == j ) continue;
 			//std::cout << "Getting cluster info" << std::endl;
                         const auto rh_j = (*(cluster[ipho1]))[j]; // position within event rec hits vector
                         //const auto E_j  = seedE_1; //(*fInRecHits_E) [rh_j];
@@ -516,7 +517,9 @@ void wc_ku_InterCali_global_v2( string infilename, string outfilename  ){
                   //normRtOOTStc += subsumnot;
                   //normWtOOTStc += subsumwoot;
                   sumXtalRtStcPhoIcRecTime[id_i] += subsum; //(subsum/subsumnum);
+//                  sum2XtalRtStcPhoIcRecTime[id_i] += subM; //(subsum/subsumnum);
                   sumXtalRtOOTStcPhoIcRecTime[id_i] += subsumnot; //(subsumnot/subsumnum);
+//                  sum2XtalRtOOTStcPhoIcRecTime[id_i] += subMnot; //(subsumnot/subsumnum);
                   //sumXtalWtOOTStcPhoIcRecTime[id_i] += subsumwoot; //(subsumwoot/subsumnum);
                   numXtalIcRecTime[id_i] += subsumnum; //1;
              } // end outer double loop over rechits
@@ -530,52 +533,58 @@ void wc_ku_InterCali_global_v2( string infilename, string outfilename  ){
 
     //double  norm[nAlgos] = { normRtStc, normRtOOTStc };
     std::map<UInt_t,Float_t> *  icmaps[nAlgos] = {&sumXtalRtStcPhoIcRecTime, &sumXtalRtOOTStcPhoIcRecTime }; //, sumXtalWtOOTStcPhoIcRecTime };
-    std::map<UInt_t,Float_t> *  prevDMmaps[nAlgos] = { &prevDMRtStc, &prevDMRtOOTStc };
-    auto previter = iter - 1;  
-    if( previter < 0 ) previter = 0;
+//    std::map<UInt_t,Float_t> *  icmaps2[nAlgos] = {&sum2XtalRtStcPhoIcRecTime, &sum2XtalRtOOTStcPhoIcRecTime }; //, sumXtalWtOOTStcPhoIcRecTime };
+//    std::map<UInt_t,Float_t> *  prevDMmaps[nAlgos] = { &prevDMRtStc, &prevDMRtOOTStc };
+//    auto previter = iter - 1;  
+//    if( previter < 0 ) previter = 0;
+    auto gamma = nM[iter]/M[iter];
     for( auto ai = 0; ai < nAlgos; ai++ ){
-	 double mddm = 0.0;
+//	 double mddm = 0.0;
          double mfcor = 1.0;
-	 std::map<UInt_t,Float_t> curDMmap;
+//	 std::map<UInt_t,Float_t> curDMmap;
          if( iter == 0 ) mfcor = mfcorrection;
-         for( std::map<UInt_t,Float_t>::iterator it=(*icmaps[ai]).begin(); it!=(*icmaps[ai]).end(); ++it){
-		if( iter == 0 ) (*prevDMmaps[ai])[it->first] = 0.0;
-                curDMmap[it->first] = (-2.0)*(((*icmaps[ai])[it->first])/(numXtalIcRecTime[it->first]));
-         }
-	 for( std::map<UInt_t,Float_t>::iterator it=(*icmaps[ai]).begin(); it!=(*icmaps[ai]).end(); ++it){ 
-		auto dif = curDMmap[it->first] - (*prevDMmaps[ai])[it->first];
-		mddm += dif*dif; 
-	 }
+//         for( std::map<UInt_t,Float_t>::iterator it=(*icmaps[ai]).begin(); it!=(*icmaps[ai]).end(); ++it){
+//		if( iter == 0 ) (*prevDMmaps[ai])[it->first] = 0.0;
+//                curDMmap[it->first] = (-2.0)*(((*icmaps[ai])[it->first])/(numXtalIcRecTime[it->first]));
+//         }
+//	 for( std::map<UInt_t,Float_t>::iterator it=(*icmaps[ai]).begin(); it!=(*icmaps[ai]).end(); ++it){ 
+//		auto dif = curDMmap[it->first] - (*prevDMmaps[ai])[it->first];
+//		mddm += dif*dif; 
+//	 }
          for( std::map<UInt_t,Float_t>::iterator it=(*icmaps[ai]).begin(); it!=(*icmaps[ai]).end(); ++it){
                    const auto & fill_idinfo = DetIDMap[it->first];
+		   auto dm = (-2.0)*(((*icmaps[ai])[it->first])/(numXtalIcRecTime[it->first]));
                    //const auto & map_time = (((*icmaps[ai])[it->first])/(numXtalIcRecTime[it->first]) - (drift/(icmaps[ai]->size()))) + offset;
 		   //std::cout << "Fill hist for Algo " << i << " at " << fill_idinfo.i2 << " " << fill_idinfo.i1 << " with " << map_time << " for iter " << iter << std::endl;
                    if( fill_idinfo.ecal == ECAL::EB ){
 //		   std::cout << "Fill EB hist for Algo " << ai << " at " << fill_idinfo.i2 << " " << fill_idinfo.i1 << " with " << map_time << " for iter " << iter << std::endl;
 			   auto ci = (((IcMapEB[ai][iter])->GetBinContent( fill_idinfo.i2 + bin_offset, fill_idinfo.i1))/mfcor) - offset;
-			   auto cim = (((IcMapEB[ai][previter])->GetBinContent( fill_idinfo.i2 + bin_offset, fill_idinfo.i1))/mfcor) - offset;
-			   auto gamma = (ci - cim)*((curDMmap[it->first]) - ((*prevDMmaps[ai])[it->first]))/mddm; if( gamma == 0 ) gamma = 1.0;	
-			   //auto gamma = 1.0;
-			   std::cout << " " << ci << " " << gamma << " " << curDMmap[it->first] << std::endl;
-                           (IcMapEB[ai][iter+1])->Fill( fill_idinfo.i2, fill_idinfo.i1, (ci - gamma*curDMmap[it->first]) + offset );
+//			   auto cim = (((IcMapEB[ai][previter])->GetBinContent( fill_idinfo.i2 + bin_offset, fill_idinfo.i1))/mfcor) - offset;
+			   //auto gamma = (ci - cim)*((curDMmap[it->first]) - ((*prevDMmaps[ai])[it->first]))/mddm; if( gamma == 0 ) gamma = 1.0;	
+			   // above ::  auto gamma = nM[iter]/M[iter];
+                           //auto gamma = ((*icmaps2[ai])[it->first])/(numXtalIcRecTime[it->first]);
+			   //std::cout << " " << ci << " " << gamma << " " << curDMmap[it->first] << std::endl;
+                           //std::cout << " " << ci << " " << gamma << " " << dm << std::endl;
+                           //(IcMapEB[ai][iter+1])->Fill( fill_idinfo.i2, fill_idinfo.i1, (ci - gamma*curDMmap[it->first]) + offset );
+                           (IcMapEB[ai][iter+1])->Fill( fill_idinfo.i2, fill_idinfo.i1, (ci - gamma*dm) + offset );
                    } else if( fill_idinfo.ecal == ECAL::EP ){
 //                 std::cout << "Fill EP hist for Algo " << ai << " at " << fill_idinfo.i2 << " " << fill_idinfo.i1 << " with " << map_time << " for iter " << iter << std::endl;
                            auto ci = (((IcMapEP[ai][iter])->GetBinContent( fill_idinfo.i2, fill_idinfo.i1))/mfcor) - offset;
-                           auto cim = (((IcMapEP[ai][previter])->GetBinContent( fill_idinfo.i2, fill_idinfo.i1))/mfcor) - offset;
-                           auto gamma = (ci - cim)*(curDMmap[it->first] - (*prevDMmaps[ai])[it->first])/mddm; if( gamma == 0 ) gamma = 1.0;
-                           (IcMapEP[ai][iter+1])->Fill( fill_idinfo.i2, fill_idinfo.i1, (ci - gamma*curDMmap[it->first]) + offset );
+//                           auto cim = (((IcMapEP[ai][previter])->GetBinContent( fill_idinfo.i2, fill_idinfo.i1))/mfcor) - offset;
+//                           auto gamma = (ci - cim)*(curDMmap[it->first] - (*prevDMmaps[ai])[it->first])/mddm; if( gamma == 0 ) gamma = 1.0;
+                           (IcMapEP[ai][iter+1])->Fill( fill_idinfo.i2, fill_idinfo.i1, (ci - gamma*dm) + offset );
                    } else if( fill_idinfo.ecal == ECAL::EM ){
 //                 std::cout << "Fill EM hist for Algo " << ai << " at " << fill_idinfo.i2 << " " << fill_idinfo.i1 << " with " << map_time << " for iter " << iter << std::endl;
                            auto ci = (((IcMapEM[ai][iter])->GetBinContent( fill_idinfo.i2, fill_idinfo.i1))/mfcor) - offset;
-                           auto cim = (((IcMapEM[ai][previter])->GetBinContent( fill_idinfo.i2, fill_idinfo.i1))/mfcor) - offset;
-                           auto gamma = (ci - cim)*(curDMmap[it->first] - (*prevDMmaps[ai])[it->first])/mddm; if( gamma == 0 ) gamma = 1.0;
-                           (IcMapEM[ai][iter+1])->Fill( fill_idinfo.i2, fill_idinfo.i1, (ci - gamma*curDMmap[it->first]) + offset );
+//                           auto cim = (((IcMapEM[ai][previter])->GetBinContent( fill_idinfo.i2, fill_idinfo.i1))/mfcor) - offset;
+//                           auto gamma = (ci - cim)*(curDMmap[it->first] - (*prevDMmaps[ai])[it->first])/mddm; if( gamma == 0 ) gamma = 1.0;
+                           (IcMapEM[ai][iter+1])->Fill( fill_idinfo.i2, fill_idinfo.i1, (ci - gamma*dm) + offset );
                    }
          }
-	 (*prevDMmaps[ai]).clear();
-         for( std::map<UInt_t,Float_t>::iterator it=(*icmaps[ai]).begin(); it!=(*icmaps[ai]).end(); ++it){
-                (*prevDMmaps[ai])[it->first] = curDMmap[it->first]; 
-         }
+//	 (*prevDMmaps[ai]).clear();
+//         for( std::map<UInt_t,Float_t>::iterator it=(*icmaps[ai]).begin(); it!=(*icmaps[ai]).end(); ++it){
+//                (*prevDMmaps[ai])[it->first] = curDMmap[it->first]; 
+//         }
     }
 
     std::cout << "For iter " << iter << " found: " << M[iter]/nM[iter] << std::endl;
@@ -583,7 +592,9 @@ void wc_ku_InterCali_global_v2( string infilename, string outfilename  ){
     //normRtOOTStc = 0.0;
     //normWtOOTStc = 0.0;
     sumXtalRtStcPhoIcRecTime.clear();
+//    sum2XtalRtStcPhoIcRecTime.clear();
     sumXtalRtOOTStcPhoIcRecTime.clear();
+//    sum2XtalRtOOTStcPhoIcRecTime.clear();
     sumXtalWtOOTStcPhoIcRecTime.clear();
     numXtalIcRecTime.clear();
 
@@ -619,11 +630,12 @@ void wc_ku_InterCali_global_v2( string infilename, string outfilename  ){
 
 int main ( int argc, char *argv[] ){
 
-        if( argc != 3 ) { std::cout << "Insufficent arguments." << std::endl; }
+        if( argc != 4 ) { std::cout << "Insufficent arguments." << std::endl; }
         else {
                 auto infilename = argv[1];
                 auto outfilename = argv[2];
-                wc_ku_InterCali_global_v2( infilename, outfilename );
+		auto mf = atoi(argv[3]);
+                wc_ku_InterCali_global_v3( infilename, outfilename, mf );
         }
         return 1;
 }

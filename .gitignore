@@ -26,3 +26,4 @@ multicrab*/
 *.obj
 trees/
 .DS_STORE
+local_skims/

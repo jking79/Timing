@@ -452,7 +452,7 @@ void wc_ku_InterCali_global_v2( string infilename, string outfilename, int mfc )
                   for (auto j = 0U; j < nRecHits2; j++){
                   //for (auto j = 0U; j < 1; j++){
 
-			//if( i == j ) continue;
+			if( i == j ) continue;
 			//std::cout << "Getting cluster info" << std::endl;
                         const auto rh_j = (*(cluster[ipho1]))[j]; // position within event rec hits vector
                         //const auto E_j  = seedE_1; //(*fInRecHits_E) [rh_j];

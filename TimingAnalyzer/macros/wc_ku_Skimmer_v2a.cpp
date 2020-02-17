@@ -840,21 +840,21 @@ void Skimmer::EventLoop()
   // do loop over events, reading in branches as needed, skimming, filling output trees and hists
   const auto nEntries = fInTree->GetEntries();
   float minRecE0 = 0.5;
-  float minRecE1 = 1.f;
-  float minRecE2 = 2.f;
-  float minRecE5 = 5.f;
-  float minRecE10 = 10.f;
+  float minRecE1 = 1.0;
+  float minRecE2 = 2.0;
+  float minRecE5 = 5.0;
+  float minRecE10 = 10.0;
   bool useTOF = true;
   //bool useTOF = false;
   //const auto nEntries = 100;
-  for (auto entry = 0U; entry < nEntries; entry++)
+  for (auto entry = 0; entry < nEntries; entry++)
   {
     // dump status check
     if (entry%Common::nEvCheck == 0 || entry == 0) //std::cout << "Processing Entry: " << entry << " out of " << nEntries << std::endl;
     //if( entry > 100 ) break;
     // get event weight: no scaling by BR, xsec, lumi, etc.
     if (fIsMC) fInEvent.b_genwgt->GetEntry(entry);
-    const auto wgt    = (fIsMC ? fInEvent.genwgt : 1.f);
+    const auto wgt    = (fIsMC ? fInEvent.genwgt : 1.0);
     const auto evtwgt = fSampleWeight * wgt; // sample weight for data == 1
 
     // always fill to ensure no data was lost
@@ -888,10 +888,10 @@ void Skimmer::EventLoop()
         const auto t_i = (*fInRecHits.time)[idx];
         const auto e_i = (*fInRecHits.E)[idx];
         const auto tof_i = (*fInRecHits.TOF)[idx];
-        auto RtStc_t_i = 0.f;
-        auto RtOOTStc_t_i = 0.f;
-        auto WtOOTStc_t_i = 0.f;
-	auto t_tof = t_i;
+        float RtStc_t_i = 0.0;
+        float RtOOTStc_t_i = 0.0;
+        float WtOOTStc_t_i = 0.0;
+	float t_tof = t_i;
 	tofHist->Fill(tof_i);
 	//if( e_i >= minRecE ){
 //	//std::cout << "With: id_i: " << id_i << " time: " << t_i << " energy: " << e_i << " tof: " << tof_i << " and " << RtOOTStc_t_i << std::endl;
@@ -1046,7 +1046,7 @@ void Skimmer::EventLoop()
 
       // double loop over photons, make masse
       //cout << "good pho loop " << endl;
-      for (auto i = 0U; i < good_phos.size(); i++)
+      for (auto i = 0; i < good_phos.size(); i++)
       {
 	auto & pho1 = fInPhos[good_phos[i]];
 	pho1.b_pt ->GetEntry(entry);
@@ -1072,7 +1072,7 @@ void Skimmer::EventLoop()
         pho1.b_recHits->GetEntry(entry);
         const auto n = pho1.recHits->size();
        //std::cout << "Looping over zee recHits n = " << n << std::endl;
-        for (auto i = 0U; i < n; i++)
+        for (auto i = 0; i < n; i++)
         {
           float subsum = 0.f;
           float subsumnot = 0.f;
