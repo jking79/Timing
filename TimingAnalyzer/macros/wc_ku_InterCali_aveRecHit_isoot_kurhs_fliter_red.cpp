@@ -105,9 +105,7 @@ void wc_ku_InterCali_aveRecHit_mini( string indir, string infilelist, string out
     //const int  nPhotons = 4;
     const double offset = 0.0;
     const int bin_offset = 86;
-    const float kscc_offset = 0.0;//3101.0;//3351.0;
-    const float outlier = 1000.f;
-    const double ri_ecut = 20.0;
+    const double ri_ecut = 5.0;
 
     const string treename("tree/disphotree");
 
@@ -365,14 +363,14 @@ void wc_ku_InterCali_aveRecHit_mini( string indir, string infilelist, string out
                   //WtOOTStc_t_i += tof_i;
                   //MfOOTStc_t_i += tof_i;
                   //MfOOTCCStc_t_i += tof_i;
-                  if( abs(Mini_t_i)   < outlier ) { sumXtalMiniRecTime[id_i] += Mini_t_i; numXtalMiniRecTime[id_i] += 1;}
-                  //if( abs(RtStc_t_i)      < outlier ) { sumXtalRtStcRecTime[id_i] += RtStc_t_i;           numXtalRtStcRecTime[id_i] += 1;     }
-                  if( abs(RtOOTStc_t_i)   < outlier ) { sumXtalRtOOTStcRecTime[id_i] += RtOOTStc_t_i;     numXtalRtOOTStcRecTime[id_i] += 1;  }
-                  if( abs(WtStc_t_i)      < outlier ) { sumXtalWtStcRecTime[id_i] += WtStc_t_i;           numXtalWtStcRecTime[id_i] += 1;     }
-                  //if( abs(WtOOTStc_t_i)   < outlier ) { sumXtalWtOOTStcRecTime[id_i] += WtOOTStc_t_i;     numXtalWtOOTStcRecTime[id_i] += 1;  }
-                  if( abs(MfOOTStc_t_i)   < outlier ) { sumXtalMfOOTStcRecTime[id_i] += MfOOTStc_t_i;     numXtalMfOOTStcRecTime[id_i] += 1;  }
-                  if( abs(MfOOTCCStc_t_i+kscc_offset) < outlier ) { sumXtalMfOOTCCStcRecTime[id_i] += MfOOTCCStc_t_i; numXtalMfOOTCCStcRecTime[id_i] += 1;}
-                  //if( abs(MfOOTCCStc_t_i) < outlier ) { sumXtalMfOOTCCStcRecTime[id_i] += MfOOTCCStc_t_i; numXtalMfOOTCCStcRecTime[id_i] += 1;}
+                  if( abs(Mini_t_i)   	     < 10000 ) { sumXtalMiniRecTime[id_i] += Mini_t_i; numXtalMiniRecTime[id_i] += 1;}
+                  //if( abs(RtStc_t_i)        < outlier ) { sumXtalRtStcRecTime[id_i] += RtStc_t_i;           numXtalRtStcRecTime[id_i] += 1;     }
+                  if( abs(RtOOTStc_t_i)     < 10000 ) { sumXtalRtOOTStcRecTime[id_i] += RtOOTStc_t_i;     numXtalRtOOTStcRecTime[id_i] += 1;  }
+                  if( abs(WtStc_t_i)        < 500000 ) { sumXtalWtStcRecTime[id_i] += WtStc_t_i;           numXtalWtStcRecTime[id_i] += 1;     }
+                  //if( abs(WtOOTStc_t_i)     < outlier ) { sumXtalWtOOTStcRecTime[id_i] += WtOOTStc_t_i;     numXtalWtOOTStcRecTime[id_i] += 1;  }
+                  if( abs(MfOOTStc_t_i)     < 1000 ) { sumXtalMfOOTStcRecTime[id_i] += MfOOTStc_t_i;     numXtalMfOOTStcRecTime[id_i] += 1;  }
+                  if( abs(MfOOTCCStc_t_i)   < 5000 ) { sumXtalMfOOTCCStcRecTime[id_i] += MfOOTCCStc_t_i; numXtalMfOOTCCStcRecTime[id_i] += 1;}
+                  //if( abs(MfOOTCCStc_t_i)   < outlier ) { sumXtalMfOOTCCStcRecTime[id_i] += MfOOTCCStc_t_i; numXtalMfOOTCCStcRecTime[id_i] += 1;}
 
              } // end loop over rechits
              //std::cout << "RecHits Loop done "<< std::endl;

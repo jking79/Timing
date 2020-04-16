@@ -211,12 +211,15 @@ void plot2dResolution( string califilename, string infilename, string outfilenam
 
         //std::cout << "Fill 2D Hist" << std::endl;
 		  auto skip = false;
-        auto kscc_offset = 3101.f;
+        auto skip_cali = false;
+        auto kscc_offset = 5000.f;
 		  auto outlier = 1000.f;
 		  auto offset = 0.f;
         auto outlier_offset = 0.f;
-	     if( tvarname == "phoseedkuMfootCCStctime" ) { outlier_offset = kscc_offset; } //std::cout << "KsCC ";} 
-        if( (abs(phoseedtime_0 + outlier_offset ) > outlier) and (abs(phoseedtime_1 + outlier_offset ) > outlier) ) skip = true;
+	     if( tvarname == "phoseedkuMfootCCStctime" ) { outlier  = kscc_offset; } //std::cout << "KsCC ";} 
+        if( tvarname == "phoseedkuWtStctime" ) { outlier  = 500000; } //std::cout << "KsCC ";} 
+        if( (abs(phoseedtime_0 + offset - phoseedtimeCaliIc_0 ) > outlier) or (abs(phoseedtime_1 + offset - phoseedtimeCaliIc_1 ) > outlier) ) skip_cali = true;
+        if( (abs(phoseedtime_0 + offset ) > outlier) or (abs(phoseedtime_1 + offset ) > outlier) ) skip = true;
         //if( tvarname == "phoseedkuMfootCCStctime" ) { skip = false; }
 
         auto yfill = (phoseedtime_0-phoseedtimeCaliIc_0)-(phoseedtime_1-phoseedtimeCaliIc_1)+(phoseedTOF_0-phoseedTOF_1);
@@ -231,11 +234,11 @@ void plot2dResolution( string califilename, string infilename, string outfilenam
         if( isd_type == "Same") isd_cut = (phoseedTT_0==phoseedTT_1); //same
 	     auto event_good = e_cut && eta_cut && isd_cut;
 
-	     if( event_good and not skip ) theHist->Fill(xfill,yfill);
+	     if( event_good and not skip_cali ) theHist->Fill(xfill,yfill);
         if( event_good ) { thetdHist->Fill(phoseedtime_0+offset); thetdHist->Fill(phoseedtime_1+offset);}
         if( event_good ) { thetdcHist->Fill(phoseedtime_0+offset-phoseedtimeCaliIc_0); thetdcHist->Fill(phoseedtime_1+offset-phoseedtimeCaliIc_1);}
         if( event_good and not skip ) { thetdfHist->Fill(phoseedtime_0+offset); thetdfHist->Fill(phoseedtime_1+offset);}
-        if( event_good and not skip ) { thetdfcHist->Fill(phoseedtime_0+offset-phoseedtimeCaliIc_0); thetdfcHist->Fill(phoseedtime_1+offset-phoseedtimeCaliIc_1);}       
+        if( event_good and not skip_cali ) { thetdfcHist->Fill(phoseedtime_0+offset-phoseedtimeCaliIc_0); thetdfcHist->Fill(phoseedtime_1+offset-phoseedtimeCaliIc_1);}       
 
     }
 
