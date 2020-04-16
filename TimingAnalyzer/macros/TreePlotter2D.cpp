@@ -7,7 +7,7 @@ TreePlotter2D::TreePlotter2D(const TString & infilename, const TString & insigna
     fVarWgtMapConfig(varwgtmapconfig), fPlotConfig(plotconfig), fMiscConfig(miscconfig), 
     fEra(era), fOutFileText(outfiletext)
 {
-  std::cout << "Initializing..." << std::endl;
+  std::cout << "Initializing TreePlotter2D..." << std::endl;
 
   ////////////////
   //            //
@@ -93,6 +93,9 @@ void TreePlotter2D::MakeHistFromTrees(TFile *& inFile, TFile *& inSignalFile)
       hist->SetDirectory(infile);
       
       // Fill from tree
+      std::cout << "Form1 : " << Form("%s:%s>>%s",Common::YVarMap[sample].Data(),Common::XVarMap[sample].Data(),hist->GetName()) << std::endl;
+      std::cout << "Form2 : " << Form("%s",Common::CutWgtMap[sample].Data()) << std::endl; 
+      std::cout << "intree->Draw(Form1,Form2,\"goff\")" << std::endl;
       intree->Draw(Form("%s:%s>>%s",Common::YVarMap[sample].Data(),Common::XVarMap[sample].Data(),hist->GetName()),Form("%s",Common::CutWgtMap[sample].Data()),"goff");
 
       // delete tree;

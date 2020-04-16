@@ -1,8 +1,33 @@
-#include "Skimmer_chain.hh"
+// ROOT includes
+#include "TFile.h"
+#include "TTree.h"
+#include "TH1F.h"
+#include "TH1D.h"
+#include "TH2F.h"
+#include "TGraphAsymmErrors.h"
+#include "TF1.h"
+#include "TMath.h"
+#include "TCanvas.h"
 #include "TROOT.h"
+#include "TStyle.h"
+#include "TString.h"
+#include "TColor.h"
+#include "TPaveText.h"
+#include "TText.h"
 
+// STL includes
+#include <map>
+#include <vector>
+#include <string>
 #include <iostream>
+#include <fstream>
+#include <sstream>
+#include <cstdlib>
+#include <utility>
+#include <algorithm>
+#include <sys/stat.h>
 
+#include "Skimmer_chain.hh"
 
 Skimmer::Skimmer(const TString & indir, const TString & outdir, const TString & filename, const TString & skimconfig)
 
@@ -10,7 +35,7 @@ Skimmer::Skimmer(const TString & indir, const TString & outdir, const TString & 
 {
 
   // because root is dumb?
-  gROOT->ProcessLine("#include <vector>");
+//  gROOT->ProcessLine("#include <vector>");
 
   ////////////////////////
   // Get all the inputs //
@@ -31,36 +56,36 @@ Skimmer::Skimmer(const TString & indir, const TString & outdir, const TString & 
 
   // Get input file
   //const TString infilename = Form("%s/%s", fInDir.Data(), fFileName.Data());
-  const string infilenamestr(fFileName.Data());
+  const std::string ifn_str(fFileName.Data());
  //std::cout << "Getting input file " << infilename.Data() << std::endl;
-  auto theend = infilenamestr.length();
-  auto outfilename = infilenamestr.substr(0,(theend-3)) + "root";
+  auto outfilename = ifn_str.substr(0,(ifn_str.length()-3)) + "root";
   std::cout << "Outfile Name : " << outfilename << std::endl;
-  std::ifstream infile(infilenamestr);
+  std::ifstream infile(ifn_str);
   //fInFile = TFile::Open(fFilename.Data());
   //Common::CheckValidFile(fInFile,fFilename);
-  std::cout << "Finished getting input file " << infilenamestr << std::endl;
+  std::cout << "Finished getting input file " << ifn_str << std::endl;
 
   // Get input config tree
-  const TString inconfigtreename = Form("%s/%s",Common::rootdir.Data(),Common::configtreename.Data());
- //std::cout << "Getting input config tree " << inconfigtreename.Data() << std::endl;
-  string inconfigchainname(inconfigtreename.Data());
-  fInConfigTree = new TChain(inconfigchainname.c_str());//(TTree*)fInFile->Get(inconfigtreename.Data());
+  //const TString inconfigtreename = Form("%s/%s",Common::rootdir.Data(),Common::configtreename.Data());
+  //std::cout << "Getting input config tree " << inconfigtreename.Data() << std::endl;
+//  std::string inconfigchainname(inconfigtreename.Data());
+//  fInConfigTree = new TChain(inconfigchainname.c_str());//(TTree*)fInFile->Get(inconfigtreename.Data());
   const TString indisphotreename = Form("%s/%s",Common::rootdir.Data(),Common::disphotreename.Data());
-  string indisphochainname(indisphotreename.Data());
+  std::string indisphochainname(indisphotreename.Data());
   fInTree = new TChain(indisphochainname.c_str());
   std::string str;
   std::cout << "Adding files to TChain." << std::endl;
   while (std::getline(infile,str)){
-	const string indir(fInDir.Data());
+	const std::string indir(fInDir.Data());
 	auto tfilename = indir + "/" + str;
 	std::cout << "--  adding file: " << tfilename << std::endl;
-  	fInConfigTree->Add(tfilename.c_str());
+  //	fInConfigTree->Add(tfilename.c_str());
         fInTree->Add(tfilename.c_str());
   }
   //Common::CheckValidTree(fInConfigTree,inconfigtreename,infilename);
-  Skimmer::GetInConfig();
-  std::cout << "Finished getting input chains " << inconfigchainname << " , " << indisphochainname << std::endl;
+  //Skimmer::GetInConfig();
+  //std::cout << "Finished getting input chains " << inconfigchainname << " , " << indisphochainname << std::endl;
+  std::cout << "Finished getting input chain " << indisphochainname << std::endl;
 
   // get sample weight from in config
   Skimmer::GetSampleWeight();
@@ -105,14 +130,16 @@ Skimmer::Skimmer(const TString & indir, const TString & outdir, const TString & 
   std::cout << "Setting up output skim" << std::endl;
 
   // Make the output file, make trees, then init them
-  fOutFile = TFile::Open(Form("%s/%s", fOutDir.Data(), outfilename.c_str()),"recreate");
+  std::string outpath( fOutDir.Data() + outfilename );
+  std::cout << "Opening Outfile : " << outpath << std::endl;
+  fOutFile = TFile::Open(outpath.c_str(),"recreate");
   fOutFile->cd();
   
-  fOutConfigTree = new TTree(Common::configtreename.Data(),Common::configtreename.Data());
+  //fOutConfigTree = new TTree(Common::configtreename.Data(),Common::configtreename.Data());
   fOutTree = new TTree(Common::disphotreename.Data(),Common::disphotreename.Data());
 
   // Init output info
-  Skimmer::InitAndSetOutConfig();
+  //Skimmer::InitAndSetOutConfig();
   Skimmer::InitOutTree();
   //Skimmer::InitOutCutFlowHists();
   std::cout << "Finished setting up output skim" << std::endl;
@@ -626,7 +653,7 @@ Skimmer::~Skimmer()
   //  delete fInCutFlowWgt;
   //delete fInCutFlow;
   delete fInTree;
-  delete fInConfigTree;
+  //delete fInConfigTree;
   //delete fInFile;
 
   //delete fOutCutFlowScl;
@@ -850,7 +877,7 @@ Skimmer::~Skimmer()
   delete fOutDifXtalPhoRecTimeMapEM;
 
   delete fOutTree;
-  delete fOutConfigTree;
+  //delete fOutConfigTree;
   delete fOutFile;
 }
 
@@ -872,7 +899,7 @@ void Skimmer::EventLoop()
     // dump status check
     if (entry%Common::nEvCheck == 0 || entry == 0) std::cout << "Processing Entry: " << entry << " out of " << nEntries << std::endl;
     //if (entry%20 == 0 || entry == 0) std::cout << "Processing Entry: " << entry << " out of " << nEntries << std::endl;
-    //if( entry > 100 ) break;
+    if( entry > 100 ) break;
     // get event weight: no scaling by BR, xsec, lumi, etc.
     if (fIsMC) fInEvent.b_genwgt->GetEntry(entry);
     const auto wgt    = (fIsMC ? fInEvent.genwgt : 1.f);
@@ -2270,7 +2297,7 @@ void Skimmer::EventLoop()
   fOutAveXtalWtOOTStcPhoIcRecTimeMapEM->Write();
 
   std::cout << "write tree output!"<< std::endl;
-  fOutConfigTree->Write();
+  //fOutConfigTree->Write();
   fOutTree->Write();
 }
 
@@ -2518,7 +2545,8 @@ void Skimmer::FillOutPhos(const UInt_t entry)
     inpho.b_ootID->GetEntry(entry);
 
    //std::cout << "Finished Base Pho list" << std::endl;
-    if (fInConfig.storeRecHits)
+    //if (fInConfig.storeRecHits)
+    if( true )
     {
       inpho.b_seed->GetEntry(entry);
       inpho.b_recHits->GetEntry(entry);
@@ -2546,7 +2574,8 @@ void Skimmer::FillOutPhos(const UInt_t entry)
   }  
  //std::cout << "Finished Pho list" << std::endl;
   // get input recHits if needed
-  if (fInConfig.storeRecHits)
+  //if (fInConfig.storeRecHits)
+  if( true )
   {
     // fInRecHits.b_X->GetEntry(entry);
     // fInRecHits.b_Y->GetEntry(entry);
@@ -2683,7 +2712,8 @@ void Skimmer::FillOutPhos(const UInt_t entry)
     outpho.gedID = inpho.gedID;
     outpho.ootID = inpho.ootID;
 
-    if (fInConfig.storeRecHits)
+    //if (fInConfig.storeRecHits)
+    if ( true )
     {
       // something unholy and utterly disgusting
 
@@ -2998,8 +3028,8 @@ void Skimmer::CorrectMET()
 void Skimmer::GetInConfig()
 {
   // Get Input Config
-  Skimmer::InitInConfigStrings();
-  Skimmer::InitInConfigBranches();
+  //Skimmer::InitInConfigStrings();
+  //Skimmer::InitInConfigBranches();
 
   // read in first entry (will be the same for all entries in a given file)
   fInConfigTree->GetEntry(0);
@@ -3075,19 +3105,19 @@ void Skimmer::InitInTree()
 
 void Skimmer::InitInStructs()
 {
-  if (fIsMC)
+  if (false)//fIsMC)
   {
-    if (fInConfig.isGMSB)
+    if (false)//fInConfig.isGMSB)
     {
       fInGMSBs.clear(); 
       fInGMSBs.resize(Common::nGMSBs);
     }
-    if (fInConfig.isHVDS)
+    if (false)//fInConfig.isHVDS)
     {
       fInHVDSs.clear(); 
       fInHVDSs.resize(Common::nHVDSs);
     }
-    if (fInConfig.isToy)
+    if (false)//fInConfig.isToy)
     {
       fInToys.clear(); 
       fInToys.resize(Common::nToys);
@@ -3162,7 +3192,8 @@ void Skimmer::InitInBranchVecs()
    uRhId = 0;
   }
 
-  if (fInConfig.storeRecHits) 
+  //if (fInConfig.storeRecHits) 
+  if ( true )
   {
     // fInRecHits.X = 0;
     // fInRecHits.Y = 0;
@@ -3202,7 +3233,7 @@ void Skimmer::InitInBranches()
     fInTree->SetBranchAddress(fInEvent.s_genpuobs.c_str(), &fInEvent.genpuobs, &fInEvent.b_genpuobs);
     fInTree->SetBranchAddress(fInEvent.s_genputrue.c_str(), &fInEvent.genputrue, &fInEvent.b_genputrue);
     
-    if (fInConfig.isGMSB)
+    if (false)//fInConfig.isGMSB)
     {
       fInTree->SetBranchAddress(fInEvent.s_nNeutoPhGr.c_str(), &fInEvent.nNeutoPhGr, &fInEvent.b_nNeutoPhGr);
       for (auto igmsb = 0; igmsb < Common::nGMSBs; igmsb++) 
@@ -3232,7 +3263,7 @@ void Skimmer::InitInBranches()
       } // end loop over neutralinos
     } // end block over gmsb
 
-    if (fInConfig.isHVDS)
+    if (false)//fInConfig.isHVDS)
     {
       fInTree->SetBranchAddress(fInEvent.s_nvPions.c_str(), &fInEvent.nvPions, &fInEvent.b_nvPions);
       for (auto ihvds = 0; ihvds < Common::nHVDSs; ihvds++) 
@@ -3262,7 +3293,7 @@ void Skimmer::InitInBranches()
       } // end loop over nvpions 
     } // end block over hvds
 
-    if (fInConfig.isToy)
+    if (false)//fInConfig.isToy)
     {
       fInTree->SetBranchAddress(fInEvent.s_nToyPhs.c_str(), &fInEvent.nToyPhs, &fInEvent.b_nToyPhs);
       for (auto itoy = 0; itoy < Common::nToys; itoy++) 
@@ -3397,7 +3428,8 @@ void Skimmer::InitInBranches()
   //fInTree->SetBranchAddress("nkuNotStcrechits", &nkuNotStcrechits, &b_nkuNotStcrechits);
  // }
 
-  if (fInConfig.storeRecHits)
+  //if (fInConfig.storeRecHits)
+  if ( true )
   {
     // fInTree->SetBranchAddress(fInRecHits.s_X.c_str(), &fInRecHits.X, &fInRecHits.b_X);
     // fInTree->SetBranchAddress(fInRecHits.s_Y.c_str(), &fInRecHits.Y, &fInRecHits.b_Y);
@@ -3456,7 +3488,8 @@ void Skimmer::InitInBranches()
     fInTree->SetBranchAddress(Form("%s_%i",pho.s_smaj.c_str(),ipho), &pho.smaj, &pho.b_smaj);
     fInTree->SetBranchAddress(Form("%s_%i",pho.s_smin.c_str(),ipho), &pho.smin, &pho.b_smin);
     // fInTree->SetBranchAddress(Form("%s_%i",pho.s_alpha.c_str(),ipho), &pho.alpha, &pho.b_alpha);
-    if (fInConfig.storeRecHits)
+    //if (fInConfig.storeRecHits)
+    if ( true )
     {
       fInTree->SetBranchAddress(Form("%s_%i",pho.s_seed.c_str(),ipho), &pho.seed, &pho.b_seed);
       fInTree->SetBranchAddress(Form("%s_%i",pho.s_recHits.c_str(),ipho), &pho.recHits, &pho.b_recHits);
@@ -3815,7 +3848,8 @@ void Skimmer::InitOutBranches()
     // Derived types
     fOutTree->Branch(Form("%s_%i",pho.s_seedTT.c_str(),ipho), &pho.seedTT);
 
-    if (fInConfig.storeRecHits)
+    //if (fInConfig.storeRecHits)
+    if ( true )
     {
       fOutTree->Branch(Form("%s_%i",pho.s_nrechits.c_str(),ipho), &pho.nrechits);
       fOutTree->Branch(Form("%s_%i",pho.s_nrechitsLT120.c_str(),ipho), &pho.nrechitsLT120);
@@ -3906,7 +3940,7 @@ void Skimmer::InitOutCutFlowHist(const TH1F * inh_cutflow, TH1F *& outh_cutflow,
 void Skimmer::GetSampleWeight()
 {
   // include normalization to lumi!!! ( do we need to multiply by * fInConfig.BR)
-  fSampleWeight = (fIsMC ? fInConfig.xsec * fInConfig.filterEff * Common::EraMap["Full"].lumi * Common::invfbToinvpb / fSumWgts : 1.f); 
+  fSampleWeight = 1.f; //(fIsMC ? fInConfig.xsec * fInConfig.filterEff * Common::EraMap["Full"].lumi * Common::invfbToinvpb / fSumWgts : 1.f); 
 }
 
 void Skimmer::GetPUWeights()

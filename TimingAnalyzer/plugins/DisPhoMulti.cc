@@ -101,11 +101,11 @@ DisPhoMulti::DisPhoMulti(const edm::ParameterSet & iConfig) :
   recHitsEETag(iConfig.getParameter<edm::InputTag>("recHitsEE")),
 
   // KU recHits
-  kuRecHitsEBTag(iConfig.getParameter<edm::InputTag>("kuRecHitsEB")),
-  kuRecHitsEETag(iConfig.getParameter<edm::InputTag>("kuRecHitsEE")),
+  //kuRecHitsEBTag(iConfig.getParameter<edm::InputTag>("kuRecHitsEB")),
+  //kuRecHitsEETag(iConfig.getParameter<edm::InputTag>("kuRecHitsEE")),
 
-  kuStcRecHitsEBTag(iConfig.getParameter<edm::InputTag>("kuStcRecHitsEB")),
-  kuStcRecHitsEETag(iConfig.getParameter<edm::InputTag>("kuStcRecHitsEE")),
+  //kuStcRecHitsEBTag(iConfig.getParameter<edm::InputTag>("kuStcRecHitsEB")),
+  //kuStcRecHitsEETag(iConfig.getParameter<edm::InputTag>("kuStcRecHitsEE")),
 
   //kuNotRecHitsEBTag(iConfig.getParameter<edm::InputTag>("kuNotRecHitsEB")),
   //kuNotRecHitsEETag(iConfig.getParameter<edm::InputTag>("kuNotRecHitsEE")),
@@ -116,8 +116,8 @@ DisPhoMulti::DisPhoMulti(const edm::ParameterSet & iConfig) :
   kuWtStcRecHitsEBTag(iConfig.getParameter<edm::InputTag>("kuWtStcRecHitsEB")),
   kuWtStcRecHitsEETag(iConfig.getParameter<edm::InputTag>("kuWtStcRecHitsEE")),
 
-  kuWootStcRecHitsEBTag(iConfig.getParameter<edm::InputTag>("kuWootStcRecHitsEB")),
-  kuWootStcRecHitsEETag(iConfig.getParameter<edm::InputTag>("kuWootStcRecHitsEE")),
+  //kuWootStcRecHitsEBTag(iConfig.getParameter<edm::InputTag>("kuWootStcRecHitsEB")),
+  //kuWootStcRecHitsEETag(iConfig.getParameter<edm::InputTag>("kuWootStcRecHitsEE")),
 
   kuMfootStcRecHitsEBTag(iConfig.getParameter<edm::InputTag>("kuMfootStcRecHitsEB")),
   kuMfootStcRecHitsEETag(iConfig.getParameter<edm::InputTag>("kuMfootStcRecHitsEE")),
@@ -225,11 +225,11 @@ void DisPhoMulti::ConsumeTokens()
   recHitsEEToken = consumes<edm::SortedCollection<EcalRecHit,edm::StrictWeakOrdering<EcalRecHit> > > (recHitsEETag);
 
   if( kuRechitValid ){
-  	kuRecHitsEBToken = consumes<edm::SortedCollection<EcalRecHit,edm::StrictWeakOrdering<EcalRecHit> > > (kuRecHitsEBTag);
-  	kuRecHitsEEToken = consumes<edm::SortedCollection<EcalRecHit,edm::StrictWeakOrdering<EcalRecHit> > > (kuRecHitsEETag);
+  	//kuRecHitsEBToken = consumes<edm::SortedCollection<EcalRecHit,edm::StrictWeakOrdering<EcalRecHit> > > (kuRecHitsEBTag);
+  	//kuRecHitsEEToken = consumes<edm::SortedCollection<EcalRecHit,edm::StrictWeakOrdering<EcalRecHit> > > (kuRecHitsEETag);
 
-        kuStcRecHitsEBToken = consumes<edm::SortedCollection<EcalRecHit,edm::StrictWeakOrdering<EcalRecHit> > > (kuStcRecHitsEBTag);
-        kuStcRecHitsEEToken = consumes<edm::SortedCollection<EcalRecHit,edm::StrictWeakOrdering<EcalRecHit> > > (kuStcRecHitsEETag);
+        //kuStcRecHitsEBToken = consumes<edm::SortedCollection<EcalRecHit,edm::StrictWeakOrdering<EcalRecHit> > > (kuStcRecHitsEBTag);
+        //kuStcRecHitsEEToken = consumes<edm::SortedCollection<EcalRecHit,edm::StrictWeakOrdering<EcalRecHit> > > (kuStcRecHitsEETag);
 
         //kuNotRecHitsEBToken = consumes<edm::SortedCollection<EcalRecHit,edm::StrictWeakOrdering<EcalRecHit> > > (kuNotRecHitsEBTag);
         //kuNotRecHitsEEToken = consumes<edm::SortedCollection<EcalRecHit,edm::StrictWeakOrdering<EcalRecHit> > > (kuNotRecHitsEETag);
@@ -240,8 +240,8 @@ void DisPhoMulti::ConsumeTokens()
         kuWtStcRecHitsEBToken = consumes<edm::SortedCollection<EcalRecHit,edm::StrictWeakOrdering<EcalRecHit> > > (kuWtStcRecHitsEBTag);
         kuWtStcRecHitsEEToken = consumes<edm::SortedCollection<EcalRecHit,edm::StrictWeakOrdering<EcalRecHit> > > (kuWtStcRecHitsEETag);
 
-        kuWootStcRecHitsEBToken = consumes<edm::SortedCollection<EcalRecHit,edm::StrictWeakOrdering<EcalRecHit> > > (kuWootStcRecHitsEBTag);
-        kuWootStcRecHitsEEToken = consumes<edm::SortedCollection<EcalRecHit,edm::StrictWeakOrdering<EcalRecHit> > > (kuWootStcRecHitsEETag);
+        //kuWootStcRecHitsEBToken = consumes<edm::SortedCollection<EcalRecHit,edm::StrictWeakOrdering<EcalRecHit> > > (kuWootStcRecHitsEBTag);
+        //kuWootStcRecHitsEEToken = consumes<edm::SortedCollection<EcalRecHit,edm::StrictWeakOrdering<EcalRecHit> > > (kuWootStcRecHitsEETag);
 
         kuMfootStcRecHitsEBToken = consumes<edm::SortedCollection<EcalRecHit,edm::StrictWeakOrdering<EcalRecHit> > > (kuMfootStcRecHitsEBTag);
         kuMfootStcRecHitsEEToken = consumes<edm::SortedCollection<EcalRecHit,edm::StrictWeakOrdering<EcalRecHit> > > (kuMfootStcRecHitsEETag);
@@ -301,19 +301,19 @@ void DisPhoMulti::analyze(const edm::Event & iEvent, const edm::EventSetup & iSe
   /////////////////
   // Get Objects //
   /////////////////
-  std::cout << ">>> Get Objects" << std::endl;
+  //std::cout << ">>> Get Objects" << std::endl;
   if (!DisPhoMulti::GetObjects(iEvent,iSetup)) return;
 
   ////////////////////////
   // Initialize Objects //
   ////////////////////////  
-  std::cout << ">>> Initialize Objects" << std::endl;
+  //std::cout << ">>> Initialize Objects" << std::endl;
   DisPhoMulti::InitializeObjects(iEvent);
 
   /////////////////
   /// LHC Info ///
   /////////////////
-  if(lhcInfoValid) std::cout << ">>> LHC Info" << std::endl;
+  //if(lhcInfoValid) std::cout << ">>> LHC Info" << std::endl;
   if(lhcInfoValid) DisPhoMulti::GetLHCInfo(iEvent,iSetup);
 
   /////////////////
@@ -344,7 +344,7 @@ void DisPhoMulti::analyze(const edm::Event & iEvent, const edm::EventSetup & iSe
   //////////////////
   // Prep Objects //
   //////////////////
-  std::cout << ">>> Prep Objects" << std::endl;
+  //std::cout << ">>> Prep Objects" << std::endl;
   DisPhoMulti::PrepObjects(iEvent);
 
   /////////////////////////
@@ -364,10 +364,10 @@ void DisPhoMulti::analyze(const edm::Event & iEvent, const edm::EventSetup & iSe
   ////////////////////////////
   // Fill Tree From Objects //
   ////////////////////////////
-  std::cout << ">>> Fill Tree From Objects" << std::endl;
+  //std::cout << ">>> Fill Tree From Objects" << std::endl;
   DisPhoMulti::FillTreeFromObjects(iEvent);
 
-  std::cout << ">>>>>>  Event Processed" << std::endl;
+  //std::cout << ">>>>>>  Event Processed" << std::endl;
 
 }
 
@@ -422,9 +422,9 @@ bool DisPhoMulti::GetLHCInfo(const edm::Event & iEvent, const edm::EventSetup & 
 
   // Get event information
   fBX = iEvent.bunchCrossing() - 1; // Force the LHC info to match with the CMS convention
-  std::cout << "fBX = " << fBX << std::endl;
+  //std::cout << "fBX = " << fBX << std::endl;
   // Get LHCInfo handle
-  std::cout << "Getting lhcinfo handle" << std::endl; 
+  //std::cout << "Getting lhcinfo handle" << std::endl; 
   edm::ESHandle<LHCInfo> lhcInfo;
   iSetup.get<LHCInfoRcd>().get(lhcInfo);
 
@@ -435,12 +435,12 @@ bool DisPhoMulti::GetLHCInfo(const edm::Event & iEvent, const edm::EventSetup & 
     return false;
   }
   else{
-    std::cout << "Getting lhcinfo product" << std::endl;
+    //std::cout << "Getting lhcinfo product" << std::endl;
       
     const LHCInfo* info = lhcInfo.product();
     
     //fXangle = info->crossingAngle();
-    std::cout << "Getting lhcinfo beam data" << std::endl;
+    //std::cout << "Getting lhcinfo beam data" << std::endl;
     // Beam 1 VC
     fBunchNum = 0;
     std::vector<float> ( info->beam1VC() );
@@ -474,7 +474,7 @@ bool DisPhoMulti::GetLHCInfo(const edm::Event & iEvent, const edm::EventSetup & 
     }
 
     // Get train position
-    std::cout << "Getting lhcinfo train position from " << info->beam1VC().size() << " entries." << std::endl;
+    //std::cout << "Getting lhcinfo train position from " << info->beam1VC().size() << " entries." << std::endl;
     for( unsigned int i = 0; i < info->beam1VC().size(); i++ ){
       if( info->beam1VC()[i] == 0.0 ) {
 	if( first_zero == true ) {
@@ -506,7 +506,7 @@ bool DisPhoMulti::GetLHCInfo(const edm::Event & iEvent, const edm::EventSetup & 
     }
 
     // Store train positions for tree
-    std::cout << "Store train position" << std::endl;
+    //std::cout << "Store train position" << std::endl;
     subtrain_position = train_notzero[fBX];
     
     train_position = long_train_notzero[fBX];
@@ -514,7 +514,7 @@ bool DisPhoMulti::GetLHCInfo(const edm::Event & iEvent, const edm::EventSetup & 
     train_number = train_num[fBX];
 
     // Store beam conditions for bx
-    std::cout << "Store beam condition" << std::endl;
+    //std::cout << "Store beam condition" << std::endl;
     beam1_RF = fBeam1RF[fBX];
     beam2_RF = fBeam2RF[fBX];
     beam1_VC = fBeam1VC[fBX];
@@ -577,17 +577,17 @@ bool DisPhoMulti::GetStandardObjects(const edm::Event & iEvent)
   if (oot::BadHandle(recHitsEEH,"recHitsEE")) return false;
 
   if( kuRechitValid ){
-  	iEvent.getByToken(kuRecHitsEBToken,kuRecHitsEBH);
-  	if (oot::BadHandle(kuRecHitsEBH,"kuRecHitsEB")) return false;
+  	//iEvent.getByToken(kuRecHitsEBToken,kuRecHitsEBH);
+  	//if (oot::BadHandle(kuRecHitsEBH,"kuRecHitsEB")) return false;
 
-  	iEvent.getByToken(kuRecHitsEEToken,kuRecHitsEEH);
-  	if (oot::BadHandle(kuRecHitsEEH,"kuRecHitsEE")) return false;
+  	//iEvent.getByToken(kuRecHitsEEToken,kuRecHitsEEH);
+  	//if (oot::BadHandle(kuRecHitsEEH,"kuRecHitsEE")) return false;
 
-        iEvent.getByToken(kuStcRecHitsEBToken,kuStcRecHitsEBH);
-        if (oot::BadHandle(kuStcRecHitsEBH,"kuStcRecHitsEB")) return false;
+        //iEvent.getByToken(kuStcRecHitsEBToken,kuStcRecHitsEBH);
+        //if (oot::BadHandle(kuStcRecHitsEBH,"kuStcRecHitsEB")) return false;
  
-        iEvent.getByToken(kuStcRecHitsEEToken,kuStcRecHitsEEH);
-        if (oot::BadHandle(kuStcRecHitsEEH,"kuStcRecHitsEE")) return false;
+        //iEvent.getByToken(kuStcRecHitsEEToken,kuStcRecHitsEEH);
+        //if (oot::BadHandle(kuStcRecHitsEEH,"kuStcRecHitsEE")) return false;
 
         //iEvent.getByToken(kuNotRecHitsEBToken,kuNotRecHitsEBH);
         //if (oot::BadHandle(kuNotRecHitsEBH,"kuNotRecHitsEB")) return false;
@@ -607,11 +607,11 @@ bool DisPhoMulti::GetStandardObjects(const edm::Event & iEvent)
         iEvent.getByToken(kuWtStcRecHitsEEToken,kuWtStcRecHitsEEH);
         if (oot::BadHandle(kuWtStcRecHitsEEH,"kuWtStcRecHitsEE")) return false;
 
-        iEvent.getByToken(kuWootStcRecHitsEBToken,kuWootStcRecHitsEBH);
-        if (oot::BadHandle(kuWootStcRecHitsEBH,"kuWootStcRecHitsEB")) return false;
+        //iEvent.getByToken(kuWootStcRecHitsEBToken,kuWootStcRecHitsEBH);
+        //if (oot::BadHandle(kuWootStcRecHitsEBH,"kuWootStcRecHitsEB")) return false;
 
-        iEvent.getByToken(kuWootStcRecHitsEEToken,kuWootStcRecHitsEEH);
-        if (oot::BadHandle(kuWootStcRecHitsEEH,"kuWootStcRecHitsEE")) return false;
+        //iEvent.getByToken(kuWootStcRecHitsEEToken,kuWootStcRecHitsEEH);
+        //if (oot::BadHandle(kuWootStcRecHitsEEH,"kuWootStcRecHitsEE")) return false;
 
         iEvent.getByToken(kuMfootStcRecHitsEBToken,kuMfootStcRecHitsEBH);
         if (oot::BadHandle(kuMfootStcRecHitsEBH,"kuMfootStcRecHitsEB")) return false;
@@ -767,11 +767,11 @@ void DisPhoMulti::InitializeObjects(const edm::Event & iEvent)
   recHitsEE = recHitsEEH.product();
 
   if( kuRechitValid ){
-  	kuRecHitsEB = kuRecHitsEBH.product();
-  	kuRecHitsEE = kuRecHitsEEH.product();
+  	//kuRecHitsEB = kuRecHitsEBH.product();
+  	//kuRecHitsEE = kuRecHitsEEH.product();
 
-        kuStcRecHitsEB = kuStcRecHitsEBH.product();
-        kuStcRecHitsEE = kuStcRecHitsEEH.product();
+        //kuStcRecHitsEB = kuStcRecHitsEBH.product();
+        //kuStcRecHitsEE = kuStcRecHitsEEH.product();
 
         //kuNotRecHitsEB = kuNotRecHitsEBH.product();
         //kuNotRecHitsEE = kuNotRecHitsEEH.product();
@@ -782,8 +782,8 @@ void DisPhoMulti::InitializeObjects(const edm::Event & iEvent)
         kuWtStcRecHitsEB = kuWtStcRecHitsEBH.product();
         kuWtStcRecHitsEE = kuWtStcRecHitsEEH.product();
 
-        kuWootStcRecHitsEB = kuWootStcRecHitsEBH.product();
-        kuWootStcRecHitsEE = kuWootStcRecHitsEEH.product();
+        //kuWootStcRecHitsEB = kuWootStcRecHitsEBH.product();
+        //kuWootStcRecHitsEE = kuWootStcRecHitsEEH.product();
 
         kuMfootStcRecHitsEB = kuMfootStcRecHitsEBH.product();
         kuMfootStcRecHitsEE = kuMfootStcRecHitsEEH.product();
@@ -794,12 +794,12 @@ void DisPhoMulti::InitializeObjects(const edm::Event & iEvent)
 
   // OUTPUT RECHIT MAP
   recHitMap.clear();
-  kuRecHitMap.clear();
-  kuStcRecHitMap.clear();
+  //kuRecHitMap.clear();
+  //kuStcRecHitMap.clear();
   //kuNotRecHitMap.clear();
   kuNotStcRecHitMap.clear();
   kuWtStcRecHitMap.clear();
-  kuWootStcRecHitMap.clear();
+  //kuWootStcRecHitMap.clear();
   kuMfootStcRecHitMap.clear();
   kuMfootCCStcRecHitMap.clear();
 
@@ -946,12 +946,12 @@ void DisPhoMulti::PrepObjects(const edm::Event & iEvent)
 
   oot::PrepRecHits(recHitsEB,recHitsEE,recHitMap,rhEmin);
   if( kuRechitValid ){ 
-	oot::PrepRecHits(kuRecHitsEB,kuRecHitsEE,kuRecHitMap,rhEmin); 
-        oot::PrepRecHits(kuStcRecHitsEB,kuStcRecHitsEE,kuStcRecHitMap,rhEmin); 
+	     //oot::PrepRecHits(kuRecHitsEB,kuRecHitsEE,kuRecHitMap,rhEmin); 
+        //oot::PrepRecHits(kuStcRecHitsEB,kuStcRecHitsEE,kuStcRecHitMap,rhEmin); 
         //oot::PrepRecHits(kuNotRecHitsEB,kuNotRecHitsEE,kuNotRecHitMap,rhEmin); 
         oot::PrepRecHits(kuNotStcRecHitsEB,kuNotStcRecHitsEE,kuNotStcRecHitMap,rhEmin); 
         oot::PrepRecHits(kuWtStcRecHitsEB,kuWtStcRecHitsEE,kuWtStcRecHitMap,rhEmin);
-        oot::PrepRecHits(kuWootStcRecHitsEB,kuWootStcRecHitsEE,kuWootStcRecHitMap,rhEmin);
+        //oot::PrepRecHits(kuWootStcRecHitsEB,kuWootStcRecHitsEE,kuWootStcRecHitMap,rhEmin);
         oot::PrepRecHits(kuMfootStcRecHitsEB,kuMfootStcRecHitsEE,kuMfootStcRecHitMap,rhEmin);
         oot::PrepRecHits(kuMfootCCStcRecHitsEB,kuMfootCCStcRecHitsEE,kuMfootCCStcRecHitMap,rhEmin);
   } 
@@ -990,19 +990,19 @@ void DisPhoMulti::PrepObjects(const edm::Event & iEvent)
   // Object Counts for Storing //
   ///////////////////////////////
 
-  //nJets    = std::min(int(jets.size()),Config::nJets);
+  nJets    = 0;//std::min(int(jets.size()),Config::nJets);
   nRecHits = recHitMap.size();
-  nKuRecHits = kuRecHitMap.size();
-  nKuStcRecHits = kuStcRecHitMap.size();
-  //nKuNotRecHits = kuNotRecHitMap.size();
+  nKuRecHits = 0;//kuRecHitMap.size();
+  nKuStcRecHits = 0;//kuStcRecHitMap.size();
+  nKuNotRecHits = 0;//kuNotRecHitMap.size();
   nKuNotStcRecHits = kuNotStcRecHitMap.size();
   nKuWtStcRecHits = kuWtStcRecHitMap.size();
-  nKuWootStcRecHits = kuWootStcRecHitMap.size();
+  nKuWootStcRecHits = 0;//kuWootStcRecHitMap.size();
   nKuMfootStcRecHits = kuMfootStcRecHitMap.size();
   nKuMfootCCStcRecHits = kuMfootCCStcRecHitMap.size();
   nURecHits = uncalibratedRecHitMap.size();
-  //nKuURecHits = ku_uncalibratedRecHitMap.size();
-  //nKuNotURecHits = kuNot_uncalibratedRecHitMap.size();
+  nKuURecHits = 0;//ku_uncalibratedRecHitMap.size();
+  nKuNotURecHits = 0;//kuNot_uncalibratedRecHitMap.size();
   nDigis = digiMap.size();
   nPhotons = std::min(int(photons.size()),Config::nPhotons);
 }
@@ -2598,13 +2598,13 @@ void DisPhoMulti::SetRecHitBranches()
   if( kuRechitValid ){	 
 	//std::cout << ">>> KU Rec Hits" << std::endl; 
 	//for (const auto recHit : *kuRecHitsEB){//std::cout << "   Leading Pt KURecHit Time: " << recHit.time() << std::endl; break; }
-  	nkurechits = kuRecHitMap.size();
+  	nkurechits = kuNotStcRecHitMap.size();
 
-  	DisPhoMulti::SetKuRecHitBranches(kuRecHitsEB,barrelGeometry,adcToGeVEB);
-  	DisPhoMulti::SetKuRecHitBranches(kuRecHitsEE,endcapGeometry,adcToGeVEE);
+  	//DisPhoMulti::SetKuRecHitBranches(kuRecHitsEB,barrelGeometry,adcToGeVEB);
+  	//DisPhoMulti::SetKuRecHitBranches(kuRecHitsEE,endcapGeometry,adcToGeVEE);
 
-        DisPhoMulti::SetKuStcRecHitBranches(kuStcRecHitsEB,barrelGeometry,adcToGeVEB);
-        DisPhoMulti::SetKuStcRecHitBranches(kuStcRecHitsEE,endcapGeometry,adcToGeVEE);
+        //DisPhoMulti::SetKuStcRecHitBranches(kuStcRecHitsEB,barrelGeometry,adcToGeVEB);
+        //DisPhoMulti::SetKuStcRecHitBranches(kuStcRecHitsEE,endcapGeometry,adcToGeVEE);
 
         //DisPhoMulti::SetKuNotRecHitBranches(kuNotRecHitsEB,barrelGeometry,adcToGeVEB);
         //DisPhoMulti::SetKuNotRecHitBranches(kuNotRecHitsEE,endcapGeometry,adcToGeVEE);
@@ -2615,8 +2615,8 @@ void DisPhoMulti::SetRecHitBranches()
         DisPhoMulti::SetKuWtStcRecHitBranches(kuWtStcRecHitsEB,barrelGeometry,adcToGeVEB);
         DisPhoMulti::SetKuWtStcRecHitBranches(kuWtStcRecHitsEE,endcapGeometry,adcToGeVEE);
 
-        DisPhoMulti::SetKuWootStcRecHitBranches(kuWootStcRecHitsEB,barrelGeometry,adcToGeVEB);
-        DisPhoMulti::SetKuWootStcRecHitBranches(kuWootStcRecHitsEE,endcapGeometry,adcToGeVEE);
+        //DisPhoMulti::SetKuWootStcRecHitBranches(kuWootStcRecHitsEB,barrelGeometry,adcToGeVEB);
+        //DisPhoMulti::SetKuWootStcRecHitBranches(kuWootStcRecHitsEE,endcapGeometry,adcToGeVEE);
 
         DisPhoMulti::SetKuMfootStcRecHitBranches(kuMfootStcRecHitsEB,barrelGeometry,adcToGeVEB);
         DisPhoMulti::SetKuMfootStcRecHitBranches(kuMfootStcRecHitsEE,endcapGeometry,adcToGeVEE);
@@ -2667,6 +2667,11 @@ void DisPhoMulti::SetRecHitBranches(const EcalRecHitCollection * recHits, const 
       // detid
       rhID[pos] = rawId;
 
+	   //if( rawId == 872438723 or rawId == 872419876 or rawId == 838865986  or rawId == 838934064  ){
+      //	std::cout << "Pos : " << pos << " rawID :  " << rawId << std::endl;
+	   //	std::cout << "    |d_orig : " << d_orig << " d_pv : " << d_pv << std::endl;
+		//	std::cout << "    |rhX : " << rhX[pos] << " rhY : " << rhY[pos] << " rhZ : " << rhZ[pos] << std::endl;		
+	   //}
       // flags: isOOT, isGainSwitch6/1
       rhisOOT[pos] = recHit.checkFlag(EcalRecHit::kOutOfTime);
       rhisGS6[pos] = recHit.checkFlag(EcalRecHit::kHasSwitchToGain6);

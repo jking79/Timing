@@ -576,6 +576,8 @@ private:
    Int_t          nkuNotStcrechits;
    Int_t          nkuWtStcrechits;
    Int_t          nkuWootStcrechits;
+   Int_t          nkuMfootStcrechits;
+   Int_t          nkuMfootCCStcrechits;
    Int_t          ndigis;
 
    std::vector<Float_t>  * ootA0;
@@ -628,6 +630,18 @@ private:
    std::vector<Float_t> * kuWootStcrhTOF;
    std::vector<UInt_t>  * kuWootStcrhID;
 
+   std::vector<Float_t> * kuMfootStcrhE;
+   std::vector<Float_t> * kuMfootStcrhtime;
+   std::vector<Float_t> * kuMfootStcrhtimeErr;
+   std::vector<Float_t> * kuMfootStcrhTOF;
+   std::vector<UInt_t>  * kuMfootStcrhID;
+
+   std::vector<Float_t> * kuMfootCCStcrhE;
+   std::vector<Float_t> * kuMfootCCStcrhtime;
+   std::vector<Float_t> * kuMfootCCStcrhtimeErr;
+   std::vector<Float_t> * kuMfootCCStcrhTOF;
+   std::vector<UInt_t>  * kuMfootCCStcrhID;
+
    std::vector<Int_t> * out_npho_recHits_0;
    std::vector<Int_t> * out_npho_recHits_1;
    std::vector<Int_t> * out_npho_recHits_2;
@@ -643,6 +657,9 @@ private:
    std::vector<Float_t> *   out_kuNotStcrhtime;
    std::vector<Float_t> *   out_kuWtStcrhtime;
    std::vector<Float_t> *   out_kuWootStcrhtime;
+   std::vector<Float_t> *   out_kuMfootStcrhtime;
+   std::vector<Float_t> *   out_kuMfootCCStcrhtime;
+
 
    TBranch        *b_nurechits;
    TBranch        *b_nkurechits;
@@ -651,6 +668,8 @@ private:
    TBranch        *b_nkuNotStcrechits;
    TBranch        *b_nkuWtStcrechits;
    TBranch        *b_nkuWootStcrechits;
+   TBranch        *b_nkuMfootStcrechits;
+   TBranch        *b_nkuMfootCCStcrechits;
    TBranch        *b_ndigis;
    TBranch        *b_uRhId;
 
@@ -714,6 +733,19 @@ private:
    TBranch        *b_kuWootStcrhtimeErr;
    TBranch        *b_kuWootStcrhTOF;
    TBranch        *b_kuWootStcrhID;
+
+   TBranch        *b_kuMfootStcrhE;
+   TBranch        *b_kuMfootStcrhtime;
+   TBranch        *b_kuMfootStcrhtimeErr;
+   TBranch        *b_kuMfootStcrhTOF;
+   TBranch        *b_kuMfootStcrhID;
+
+   TBranch        *b_kuMfootCCStcrhE;
+   TBranch        *b_kuMfootCCStcrhtime;
+   TBranch        *b_kuMfootCCStcrhtimeErr;
+   TBranch        *b_kuMfootCCStcrhTOF;
+   TBranch        *b_kuMfootCCStcrhID;
+
 
 };
 

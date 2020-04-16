@@ -417,8 +417,8 @@ private:
 
    bool		isLHCInfo;
    bool		hasUncalDigi;
-   bool         hasKURecHit;
-   bool         hasMultiKURecHit;
+   bool     hasKURecHit;
+   bool     hasMultiKURecHit;
    bool		hasUrecDigi;
 
 
@@ -426,11 +426,14 @@ private:
    std::map<UInt_t,Float_t> sumXtalRecTime;
    //std::map<UInt_t,Float_t> sumXtalRtRecTime;
    std::map<UInt_t,Float_t> sumXtalRtStcRecTime;
+   std::map<UInt_t,Float_t> sumXtalWtStcRecTime;
    std::map<UInt_t,Float_t> sumXtalWtOOTStcRecTime;
    std::map<UInt_t,Float_t> sumXtalRtOOTStcRecTime;
+   std::map<UInt_t,Float_t> sumXtalMfOOTStcRecTime;
+   std::map<UInt_t,Float_t> sumXtalMfOOTCCStcRecTime;
 
    std::map<UInt_t,UInt_t> numXtalRecTime;
-   std::map<UInt_t,UInt_t> numXtalRtOOTStcRecTime;
+//   std::map<UInt_t,UInt_t> numXtalRtOOTStcRecTime;
 
 //   std::map<UInt_t,Float_t> sumXtalRecTimeEB;
 //   std::map<UInt_t,Float_t> sumXtalRtRecTimeEB;
@@ -556,7 +559,10 @@ private:
    Int_t          nkuStcrechits;
    Int_t          nkuNotrechits;
    Int_t          nkuNotStcrechits;
+   Int_t          nkuWtStcrechits;
    Int_t          nkuWootStcrechits;
+   Int_t          nkuMfootStcrechits;
+   Int_t          nkuMfootCCStcrechits;
    Int_t          ndigis;
 
    std::vector<Float_t>  * ootA0;
@@ -597,11 +603,29 @@ private:
    std::vector<Float_t> * kuNotStcrhTOF;
    std::vector<UInt_t>  * kuNotStcrhID;
 
+   std::vector<Float_t> * kuWtStcrhE;
+   std::vector<Float_t> * kuWtStcrhtime;
+   std::vector<Float_t> * kuWtStcrhtimeErr;
+   std::vector<Float_t> * kuWtStcrhTOF;
+   std::vector<UInt_t>  * kuWtStcrhID;
+
    std::vector<Float_t> * kuWootStcrhE;
    std::vector<Float_t> * kuWootStcrhtime;
    std::vector<Float_t> * kuWootStcrhtimeErr;
    std::vector<Float_t> * kuWootStcrhTOF;
    std::vector<UInt_t>  * kuWootStcrhID;
+
+   std::vector<Float_t> * kuMfootStcrhE;
+   std::vector<Float_t> * kuMfootStcrhtime;
+   std::vector<Float_t> * kuMfootStcrhtimeErr;
+   std::vector<Float_t> * kuMfootStcrhTOF;
+   std::vector<UInt_t>  * kuMfootStcrhID;
+
+   std::vector<Float_t> * kuMfootCCStcrhE;
+   std::vector<Float_t> * kuMfootCCStcrhtime;
+   std::vector<Float_t> * kuMfootCCStcrhtimeErr;
+   std::vector<Float_t> * kuMfootCCStcrhTOF;
+   std::vector<UInt_t>  * kuMfootCCStcrhID;
 
    std::vector<Int_t> * out_npho_recHits_0;
    std::vector<Int_t> * out_npho_recHits_1;
@@ -616,14 +640,20 @@ private:
    std::vector<Float_t> *   out_kuStcrhtime;
    std::vector<Float_t> *   out_kuNotrhtime;
    std::vector<Float_t> *   out_kuNotStcrhtime;
+   std::vector<Float_t> *   out_kuWtStcrhtime;
    std::vector<Float_t> *   out_kuWootStcrhtime;
+   std::vector<Float_t> *   out_kuMfootStcrhtime;
+   std::vector<Float_t> *   out_kuMfootCCStcrhtime;
 
    TBranch        *b_nurechits;
    TBranch        *b_nkurechits;
    TBranch        *b_nkuStcrechits;
    TBranch        *b_nkuNotrechits;
    TBranch        *b_nkuNotStcrechits;
+   TBranch        *b_nkuWtStcrechits;
    TBranch        *b_nkuWootStcrechits;
+   TBranch        *b_nkuMfootStcrechits;
+   TBranch        *b_nkuMfootCCStcrechits;
    TBranch        *b_ndigis;
    TBranch        *b_uRhId;
 
@@ -676,11 +706,29 @@ private:
    TBranch        *b_kuNotStcrhTOF;
    TBranch        *b_kuNotStcrhID;
 
+   TBranch        *b_kuWtStcrhE;
+   TBranch        *b_kuWtStcrhtime;
+   TBranch        *b_kuWtStcrhtimeErr;
+   TBranch        *b_kuWtStcrhTOF;
+   TBranch        *b_kuWtStcrhID;
+
    TBranch        *b_kuWootStcrhE;
    TBranch        *b_kuWootStcrhtime;
    TBranch        *b_kuWootStcrhtimeErr;
    TBranch        *b_kuWootStcrhTOF;
    TBranch        *b_kuWootStcrhID;
+
+   TBranch        *b_kuMfootStcrhE;
+   TBranch        *b_kuMfootStcrhtime;
+   TBranch        *b_kuMfootStcrhtimeErr;
+   TBranch        *b_kuMfootStcrhTOF;
+   TBranch        *b_kuMfootStcrhID;
+
+   TBranch        *b_kuMfootCCStcrhE;
+   TBranch        *b_kuMfootCCStcrhtime;
+   TBranch        *b_kuMfootCCStcrhtimeErr;
+   TBranch        *b_kuMfootCCStcrhTOF;
+   TBranch        *b_kuMfootCCStcrhID;
 
 };
 

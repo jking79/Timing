@@ -22,14 +22,23 @@ from RecoLocalCalo.EcalRecProducers.ecalDetailedTimeRecHit_cfi import *
 from Timing.TimingAnalyzer.jwk_ku_ecalMultiFitUncalRecHit_cff import *
 
 ku_ecalUncalibRecHitSequence = cms.Sequence(ecalMultiFitUncalibRecHit*
-					kuEcalMultiFitUncalibRecHit*
+					                  kuEcalMultiFitUncalibRecHit*
         	                        ecalDetIdToBeRecovered)
 
 ku_multi_ecalUncalibRecHitSequence = cms.Sequence(ecalMultiFitUncalibRecHit*
                                         kuEcalMultiFitUncalibRecHit*
                                         kuNotEcalMultiFitUncalibRecHit*
                                         kuWtEcalMultiFitUncalibRecHit*
-					kuWootEcalMultiFitUncalibRecHit*
+					                         kuWootEcalMultiFitUncalibRecHit*
+                                        kuMfootEcalMultiFitUncalibRecHit*
+                                        kuMfootCCEcalMultiFitUncalibRecHit*
+                                        ecalDetIdToBeRecovered)
+
+ku_reduced_multi_ecalUncalibRecHitSequence = cms.Sequence(ecalMultiFitUncalibRecHit*
+                                        #kuEcalMultiFitUncalibRecHit*
+                                        kuNotEcalMultiFitUncalibRecHit*
+                                        kuWtEcalMultiFitUncalibRecHit*
+                                        #kuWootEcalMultiFitUncalibRecHit*
                                         kuMfootEcalMultiFitUncalibRecHit*
                                         kuMfootCCEcalMultiFitUncalibRecHit*
                                         ecalDetIdToBeRecovered)
@@ -121,24 +130,34 @@ kuMfootCCStcEcalRecHit = ecalRecHit.clone(
         )
 
 ku_ecalRecHitSequence        = cms.Sequence(ecalRecHit*
-					 kuEcalRecHit*
-                                         ecalCompactTrigPrim*
-                                         ecalTPSkim+
-                                         ecalPreshowerRecHit)
+					                             kuEcalRecHit*
+                                            ecalCompactTrigPrim*
+                                            ecalTPSkim+
+                                            ecalPreshowerRecHit)
 
 ku_min_ecalRecHitSequence        = cms.Sequence(ecalRecHit*kuEcalRecHit)
 
 ku_only_ecalRecHitSequence        = cms.Sequence(kuEcalRecHit)
 
 ku_multi_ecalRecHitSequence        = cms.Sequence(kuEcalRecHit*
-						kuStcEcalRecHit*
-						#kuNotEcalRecHit*
-						kuNotStcEcalRecHit*
-                                                kuWtStcEcalRecHit*
-                                                kuWootStcEcalRecHit*
-						kuMfootStcEcalRecHit*
-                                                kuMfootCCStcEcalRecHit
-						)
+						                                kuStcEcalRecHit*
+						                                #kuNotEcalRecHit*
+						                                kuNotStcEcalRecHit*
+                                                  kuWtStcEcalRecHit*
+                                                  kuWootStcEcalRecHit*
+					 	                                kuMfootStcEcalRecHit*
+                                                  kuMfootCCStcEcalRecHit
+						                             )
+
+ku_reduced_multi_ecalRecHitSequence        = cms.Sequence(#kuEcalRecHit*
+                                                  #kuStcEcalRecHit*
+                                                  #kuNotEcalRecHit*
+                                                  kuNotStcEcalRecHit*
+                                                  kuWtStcEcalRecHit*
+                                                  #kuWootStcEcalRecHit*
+                                                  kuMfootStcEcalRecHit*
+                                                  kuMfootCCStcEcalRecHit
+                                               )
 
 # full sequences
 ku_ecalLocalRecoSequence     	= cms.Sequence(ku_ecalUncalibRecHitSequence*ku_ecalRecHitSequence)
@@ -148,6 +167,8 @@ ku_min_ecalLocalRecoSequence    = cms.Sequence(ku_ecalUncalibRecHitSequence*ku_o
 ku_only_ecalLocalRecoSequence  	= cms.Sequence(ku_only_ecalUncalibRecHitSequence*ku_only_ecalRecHitSequence)
 
 ku_multi_ecalLocalRecoSequence   = cms.Sequence(ku_multi_ecalUncalibRecHitSequence*ku_multi_ecalRecHitSequence)
+
+ku_reduced_multi_ecalLocalRecoSequence   = cms.Sequence(ku_reduced_multi_ecalUncalibRecHitSequence*ku_reduced_multi_ecalRecHitSequence)
 
 from RecoLocalCalo.EcalRecProducers.ecalDetailedTimeRecHit_cfi import *
 _phase2_timing_ecalRecHitSequence = cms.Sequence( ku_ecalRecHitSequence.copy() + ecalDetailedTimeRecHit )

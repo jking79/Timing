@@ -612,11 +612,11 @@ struct Pho
   //Float_t seedkuNotX;
   //Float_t seedkuNotY;
   //Float_t seedkuNotZ;
-  Float_t seedkuNotE;
-  Float_t seedkuNottime;
-  Float_t seedkuNottimeErr;
-  Float_t seedkuNotTOF;
-  UInt_t  seedkuNotID;
+  //Float_t seedkuNotE;
+  //Float_t seedkuNottime;
+  //Float_t seedkuNottimeErr;
+  //Float_t seedkuNotTOF;
+  //UInt_t  seedkuNotID;
   //Int_t   seedkuNotisGS6;
   //Int_t   seedkuNotisGS1;
   //Float_t seedkuNotadcToGeV;
@@ -656,6 +656,18 @@ struct Pho
   Float_t seedkuWootStctimeErr;
   Float_t seedkuWootStcTOF;
   UInt_t  seedkuWootStcID;
+
+  Float_t seedkuMfootStcE;
+  Float_t seedkuMfootStctime;
+  Float_t seedkuMfootStctimeErr;
+  Float_t seedkuMfootStcTOF;
+  UInt_t  seedkuMfootStcID;
+
+  Float_t seedkuMfootCCStcE;
+  Float_t seedkuMfootCCStctime;
+  Float_t seedkuMfootCCStctimeErr;
+  Float_t seedkuMfootCCStcTOF;
+  UInt_t  seedkuMfootCCStcID;
 
   // MC types
   Bool_t  isGen;
@@ -856,6 +868,18 @@ struct Pho
   std::string s_seedkuWootStcTOF = "phoseedkuWootStcTOF";
   std::string s_seedkuWootStcID = "phoseedkuWootStcID";
 
+  std::string s_seedkuMfootStcE = "phoseedkuMfootStcE";
+  std::string s_seedkuMfootStctime = "phoseedkuMfootStctime";
+  std::string s_seedkuMfootStctimeErr = "phoseedkuMfootStctimeErr";
+  std::string s_seedkuMfootStcTOF = "phoseedkuMfootStcTOF";
+  std::string s_seedkuMfootStcID = "phoseedkuMfootStcID";
+
+  std::string s_seedkuMfootCCStcE = "phoseedkuMfootCCStcE";
+  std::string s_seedkuMfootCCStctime = "phoseedkuMfootCCStctime";
+  std::string s_seedkuMfootCCStctimeErr = "phoseedkuMfootCCStctimeErr";
+  std::string s_seedkuMfootCCStcTOF = "phoseedkuMfootCCStcTOF";
+  std::string s_seedkuMfootCCStcID = "phoseedkuMfootCCStcID";
+
   // tbranches
   TBranch * b_E;
   TBranch * b_pt;
@@ -1037,6 +1061,18 @@ struct Pho
   TBranch * b_seedkuWootStctimeErr;
   TBranch * b_seedkuWootStcTOF;
   TBranch * b_seedkuWootStcID;
+
+  TBranch * b_seedkuMfootStcE;
+  TBranch * b_seedkuMfootStctime;
+  TBranch * b_seedkuMfootStctimeErr;
+  TBranch * b_seedkuMfootStcTOF;
+  TBranch * b_seedkuMfootStcID;
+
+  TBranch * b_seedkuMfootCCStcE;
+  TBranch * b_seedkuMfootCCStctime;
+  TBranch * b_seedkuMfootCCStctimeErr;
+  TBranch * b_seedkuMfootCCStcTOF;
+  TBranch * b_seedkuMfootCCStcID;
 
 };
 typedef std::vector<Pho> PhoVec;
