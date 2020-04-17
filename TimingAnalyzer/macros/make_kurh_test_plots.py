@@ -193,7 +193,7 @@ def do_plots( plot_list, caliinfile, linfile, ginfile  ):
           write_file=entry[1]+'_'+res+'_'+isd_type
           plot_file=entry[2]+'_'+res+'_'+isd_type
           #cmd2d=dotimeres2d+caliindir+caliinfile+sp+pskimindir+infile+sp+'./'+entry[1]+sp+entry[3]+sp+entry[4]+sp+isd_type
-          cmd2d=dotimeres2d+caliindir+caliinfile+sp+pskimindir+infile+sp+'./'+write_file+sp+entry[3]+sp+entry[4]+sp+isd_type
+          cmd2d=dotimeres2d+caliindir+caliinfile+sp+skimindir+infile+sp+'./'+write_file+sp+entry[3]+sp+entry[4]+sp+isd_type
           print( '>>>>>>>>>>>>>>>>>  ' + cmd2d )
           os.system(cmd2d)
           #----  add clean up
@@ -243,16 +243,9 @@ def do_skimmer_loc_chain(skiminlist):
 def do_avecalikurh(skiminlist,caliinfile):
 
         #cmdintercali=doocccalikurh+indir+sp+sldir+skiminlist+sp+calioutdir+caliinfile
-        cmdintercali=doocccalikurhootf+indir+sp+sldir+skiminlist+sp+calioutdir+caliinfile
+        cmdintercali=doocccalikurhootf+caliindir+sp+sldir+skiminlist+sp+calioutdir+caliinfile
         print(cmdintercali)
         os.system(cmdintercali)
-
-#wc_ku_CaliPlots.C
-def do_caliplots():
-
-	     cmdcaliplot=docaliplot+caliindir+cali1infile+sp+caliindir+cali2infile+sp+caliindir+calioutfile+sp+iterations
-        #print(cmdcaliplot)
-        #os.system(cmdcaliplot)
 
 ######################################################################################
 
