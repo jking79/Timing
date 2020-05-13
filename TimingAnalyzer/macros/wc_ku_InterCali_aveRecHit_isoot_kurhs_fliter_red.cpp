@@ -188,10 +188,14 @@ void wc_ku_InterCali_aveRecHit_mini( string indir, string infilelist, string out
          //TBranch * b_kuStcrhtime;
          //TBranch * b_kuNotrhtime;
          TBranch * b_kuNotStcrhtime;
+         TBranch * b_kuNotStcrhtimeErr;
          TBranch * b_kuWtStcrhtime;
+         TBranch * b_kuWtStcrhtimeErr;
          //TBranch * b_kuWootStcrhtime;
          TBranch * b_kuMfootStcrhtime;
+         TBranch * b_kuMfootStcrhtimeErr;
          TBranch * b_kuMfootCCStcrhtime;
+         TBranch * b_kuMfootCCStcrhtimeErr;
          TBranch * b_isOOT_0;
          TBranch * b_isOOT_1;
          TBranch * b_isOOT_2;
@@ -228,33 +232,43 @@ void wc_ku_InterCali_aveRecHit_mini( string indir, string infilelist, string out
          std::vector<Float_t> *   fInRecHits_E = 0;
          std::vector<UInt_t> *    fInRecHits_ID = 0;
          std::vector<Float_t> *   fInRecHits_time = 0;
+         std::vector<Float_t> *   fInRecHits_timeErr = 0;
          std::vector<Float_t> *   fInRecHits_TOF = 0;
          //std::vector<Float_t> *   kurhtime = 0;
          std::vector<UInt_t> *    kurhID = 0;
          //std::vector<Float_t> *   kuStcrhtime = 0;
          //std::vector<Float_t> * kuNotrhtime = 0;
          std::vector<Float_t> *   kuNotStcrhtime = 0;
+         std::vector<Float_t> *   kuNotStcrhtimeErr = 0;
          std::vector<Float_t> *   kuWtStcrhtime = 0;
+         std::vector<Float_t> *   kuWtStcrhtimeErr = 0;
          //std::vector<Float_t> *   kuWootStcrhtime = 0;
          std::vector<Float_t> *   kuMfootStcrhtime = 0;
+         std::vector<Float_t> *   kuMfootStcrhtimeErr = 0;
          std::vector<Float_t> *   kuMfootCCStcrhtime = 0;
+         std::vector<Float_t> *   kuMfootCCStcrhtimeErr = 0;
          std::vector<Float_t> *   rhisOOT = 0;
 
          fInTree->SetBranchAddress("rhisOOT",&rhisOOT,&b_rhisOOT);
          fInTree->SetBranchAddress("rhE",&fInRecHits_E,&b_fInRecHits_E);
          fInTree->SetBranchAddress("rhID",&fInRecHits_ID,&b_fInRecHits_ID);
          fInTree->SetBranchAddress("rhtime",&fInRecHits_time,&b_fInRecHits_time);
+         fInTree->SetBranchAddress("rhtimeErr",&fInRecHits_timeErr,&b_fInRecHits_timeErr);
          fInTree->SetBranchAddress("rhTOF",&fInRecHits_TOF,&b_fInRecHits_TOF);
          //fInTree->SetBranchAddress("kurhtime",&kurhtime,&b_kurhtime);
          fInTree->SetBranchAddress("kuNotStcrhID",&kurhID,&b_kurhID);
          //fInTree->SetBranchAddress("kuStcrhtime",&kuStcrhtime,&b_kuStcrhtime);
          //fInTree->SetBranchAddress("kuNotrhtime",&kuNotrhtime,&b_kuNotrhtime);
          fInTree->SetBranchAddress("kuNotStcrhtime",&kuNotStcrhtime,&b_kuNotStcrhtime);
+         fInTree->SetBranchAddress("kuNotStcrhtimeErr",&kuNotStcrhtimeErr,&b_kuNotStcrhtimeErr);
          fInTree->SetBranchAddress("kuWtStcrhtime",&kuWtStcrhtime,&b_kuWtStcrhtime);
+         fInTree->SetBranchAddress("kuWtStcrhtimeErr",&kuWtStcrhtimeErr,&b_kuWtStcrhtimeErr);
          //fInTree->SetBranchAddress("kuWootStcrhtime",&kuWootStcrhtime,&b_kuWootStcrhtime);
          fInTree->SetBranchAddress("kuMfootStcrhtime",&kuMfootStcrhtime,&b_kuMfootStcrhtime);
+         fInTree->SetBranchAddress("kuMfootStcrhtimeErr",&kuMfootStcrhtimeErr,&b_kuMfootStcrhtimeErr);
          fInTree->SetBranchAddress("kuMfootCCStcrhtime",&kuMfootCCStcrhtime,&b_kuMfootCCStcrhtime);
-     
+         fInTree->SetBranchAddress("kuMfootCCStcrhtimeErr",&kuMfootCCStcrhtimeErr,&b_kuMfootCCStcrhtimeErr);
+
          // >> calcs  <<
      
          std::cout << "Starting entry loops "<< std::endl;
@@ -296,6 +310,7 @@ void wc_ku_InterCali_aveRecHit_mini( string indir, string infilelist, string out
              b_fInRecHits_E->GetEntry(entry);
              b_fInRecHits_ID->GetEntry(entry);
              b_fInRecHits_time->GetEntry(entry);
+             b_fInRecHits_timeErr->GetEntry(entry);
              b_fInRecHits_TOF->GetEntry(entry);
              //std::cout << "GetEntries rh info Finished "<< std::endl;
              //b_kurhtime->GetEntry(entry);
@@ -304,10 +319,14 @@ void wc_ku_InterCali_aveRecHit_mini( string indir, string infilelist, string out
              //b_kuStcrhtime->GetEntry(entry);
              //b_kuNotrhtime->GetEntry(entry);
              b_kuNotStcrhtime->GetEntry(entry);
+             b_kuNotStcrhtimeErr->GetEntry(entry);
              b_kuWtStcrhtime->GetEntry(entry);
+             b_kuWtStcrhtimeErr->GetEntry(entry);
              //b_kuWootStcrhtime->GetEntry(entry);
              b_kuMfootStcrhtime->GetEntry(entry);
+             b_kuMfootStcrhtimeErr->GetEntry(entry);
              b_kuMfootCCStcrhtime->GetEntry(entry);
+             b_kuMfootCCStcrhtimeErr->GetEntry(entry);
              //std::cout << "GetEntries kurh times Finished "<< std::endl;
      
      	       //double cl_smin[nPhotons] = { smin_0, smin_1, smin_2, smin_3};
@@ -334,23 +353,33 @@ void wc_ku_InterCali_aveRecHit_mini( string indir, string infilelist, string out
                   const auto id_i = (*fInRecHits_ID)[rh_i];
                   const auto tof_i = (*fInRecHits_TOF)[rh_i];
                   const auto t_i = (*fInRecHits_time)[rh_i];
+                  const auto tErr = (*fInRecHits_timeErr)[rh_i];
      	            auto Mini_t_i = t_i;
+                  auto MiniErr = tErr;
                   //auto RtStc_t_i = 0.0;
                   auto RtOOTStc_t_i = 0.0;
+                  auto RtOOTStcErr = -99.0;
                   auto WtStc_t_i = 0.0;
+                  auto WtStcErr = -99.0;
                   //auto WtOOTStc_t_i = 0.0;
                   auto MfOOTStc_t_i = 0.0;
+                  auto MfOOTStcErr = -99.0;
                   auto MfOOTCCStc_t_i = 0.0;
+                  auto MfOOTCCStcErr = -99.0;
                   //std::cout << "Getting KU times " << std::endl;
      	     		   if( E_i < ri_ecut ) continue;
                   for(UInt_t kuseed = 0; kuseed < (*kurhID).size(); kuseed++ ){
                   		if( (*kurhID)[kuseed] == id_i ){
                                   //RtStc_t_i = (*kuStcrhtime)[kuseed];
                                   RtOOTStc_t_i = (*kuNotStcrhtime)[kuseed];
+                                  RtOOTStcErr = (*kuNotStcrhtimeErr)[kuseed];
                                   WtStc_t_i = (*kuWtStcrhtime)[kuseed];
+                                  WtStcErr = (*kuWtStcrhtimeErr)[kuseed];
                                   //WtOOTStc_t_i = (*kuWootStcrhtime)[kuseed];
                                   MfOOTStc_t_i = (*kuMfootStcrhtime)[kuseed];
+                                  MfOOTStcErr = (*kuMfootStcrhtimeErr)[kuseed];
                                   MfOOTCCStc_t_i = (*kuMfootCCStcrhtime)[kuseed];
+                                  MfOOTCCStcErr = (*kuMfootCCStcrhtimeErr)[kuseed];
                                   //MfOOTCCStc_t_i = kscc_offset + (*kuMfootCCStcrhtime)[kuseed];
                                   break;
                       	}
@@ -363,14 +392,14 @@ void wc_ku_InterCali_aveRecHit_mini( string indir, string infilelist, string out
                   //WtOOTStc_t_i += tof_i;
                   //MfOOTStc_t_i += tof_i;
                   //MfOOTCCStc_t_i += tof_i;
-                  if( abs(Mini_t_i)   	     < 10000 ) { sumXtalMiniRecTime[id_i] += Mini_t_i; numXtalMiniRecTime[id_i] += 1;}
-                  //if( abs(RtStc_t_i)        < outlier ) { sumXtalRtStcRecTime[id_i] += RtStc_t_i;           numXtalRtStcRecTime[id_i] += 1;     }
-                  if( abs(RtOOTStc_t_i)     < 10000 ) { sumXtalRtOOTStcRecTime[id_i] += RtOOTStc_t_i;     numXtalRtOOTStcRecTime[id_i] += 1;  }
-                  if( abs(WtStc_t_i)        < 500000 ) { sumXtalWtStcRecTime[id_i] += WtStc_t_i;           numXtalWtStcRecTime[id_i] += 1;     }
-                  //if( abs(WtOOTStc_t_i)     < outlier ) { sumXtalWtOOTStcRecTime[id_i] += WtOOTStc_t_i;     numXtalWtOOTStcRecTime[id_i] += 1;  }
-                  if( abs(MfOOTStc_t_i)     < 1000 ) { sumXtalMfOOTStcRecTime[id_i] += MfOOTStc_t_i;     numXtalMfOOTStcRecTime[id_i] += 1;  }
-                  if( abs(MfOOTCCStc_t_i)   < 5000 ) { sumXtalMfOOTCCStcRecTime[id_i] += MfOOTCCStc_t_i; numXtalMfOOTCCStcRecTime[id_i] += 1;}
-                  //if( abs(MfOOTCCStc_t_i)   < outlier ) { sumXtalMfOOTCCStcRecTime[id_i] += MfOOTCCStc_t_i; numXtalMfOOTCCStcRecTime[id_i] += 1;}
+                  if( MiniErr 		>= 0 ) { sumXtalMiniRecTime[id_i] += Mini_t_i; numXtalMiniRecTime[id_i] += 1;}
+                  //if( ) { sumXtalRtStcRecTime[id_i] += RtStc_t_i;           numXtalRtStcRecTime[id_i] += 1;     }
+                  if( RtOOTStcErr 	>= 0 ) { sumXtalRtOOTStcRecTime[id_i] += RtOOTStc_t_i;     numXtalRtOOTStcRecTime[id_i] += 1;  }
+                  if( WtStcErr		>= 0 ) { sumXtalWtStcRecTime[id_i] += WtStc_t_i;           numXtalWtStcRecTime[id_i] += 1;     }
+                  //if( ) { sumXtalWtOOTStcRecTime[id_i] += WtOOTStc_t_i;     numXtalWtOOTStcRecTime[id_i] += 1;  }
+                  if( MfOOTStcErr   >= 0 ) { sumXtalMfOOTStcRecTime[id_i] += MfOOTStc_t_i;     numXtalMfOOTStcRecTime[id_i] += 1;  }
+                  if( MfOOTCCStcErr >= 0 ) { sumXtalMfOOTCCStcRecTime[id_i] += MfOOTCCStc_t_i; numXtalMfOOTCCStcRecTime[id_i] += 1;}
+                  //if( ) { sumXtalMfOOTCCStcRecTime[id_i] += MfOOTCCStc_t_i; numXtalMfOOTCCStcRecTime[id_i] += 1;}
 
              } // end loop over rechits
              //std::cout << "RecHits Loop done "<< std::endl;

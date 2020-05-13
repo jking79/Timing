@@ -333,6 +333,35 @@ namespace oot
     std::sort(leps.begin(),leps.end(),sortByPt);
   }
 
+  template <typename Lep>
+  void PrepMatchedLeptons(const edm::Handle<std::vector<Lep> > & lepsH, std::vector<Lep> & leps,
+         const std::vector<pat::Photon> & photons, const float leppTmin = 0.f,
+         const float lepdRmin = 100.f)
+  {
+    for (const auto & lep : *lepsH)
+    {
+      if (lep.pt() < leppTmin) continue;
+
+      bool isMatched = false; // consider dR matching to photons only
+      for (const auto & photon : photons)
+      {
+   if (reco::deltaR(lep,photon) < lepdRmin)
+   {
+     isMatched = true;
+     break;
+   }
+      }
+
+      if ( not isMatched ) continue;
+
+      // emplace back
+      leps.emplace_back(lep);
+    }
+
+    // sort by pt for good measure
+    std::sort(leps.begin(),leps.end(),sortByPt);
+  }
+
   ////////////////////////
   // Matching Functions //
   ////////////////////////

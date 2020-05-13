@@ -3340,6 +3340,11 @@ void DisPhoMulti::InitializePhoBranches()
     phoBranch.passEleVeto_ = false;
     phoBranch.hasPixSeed_  = false;
 
+    phoBranch.elMatched_ = false;
+    phoBranch.elTrackX_ = -9999.f;
+    phoBranch.elTrackY_ = -9999.f;
+    phoBranch.elTrackZ_ = -9999.f;
+
     phoBranch.gedID_ = -1;
     phoBranch.ootID_ = -1;
   }
@@ -3522,13 +3527,25 @@ void DisPhoMulti::SetPhoBranches()
       if (track.pt() < trackpTmin) continue;
       if (reco::deltaR(photon,track) < trackdRmin){
         phoBranch.tdz_ = track.dz();
+        phoBranch.tdxy_ = track.dxy();
       } // end check over deltaR
     } // end loop over tracks
 
     // other track vetoes
     phoBranch.passEleVeto_ = photon.passElectronVeto();
     phoBranch.hasPixSeed_  = photon.hasPixelSeed();
-  
+ 
+    for (const auto & ele : *electronsH){
+          if (reco::deltaR(ele,photon) < 0.1 ){
+              phoBranch.elMatched_ = true;
+				  phoBranch.elTrackX_ = ele.trackPositionAtVtx().X();
+              phoBranch.elTrackY_ = ele.trackPositionAtVtx().Y();
+              phoBranch.elTrackZ_ = ele.trackPositionAtVtx().Z();
+				  //std::cout << " Matched Electron w/ : X " << phoBranch.elTrackX_ << " Y " << phoBranch.elTrackY_ << " Z " << phoBranch.elTrackZ_ << std::endl;
+              break;
+          }
+    }
+
     // 0 --> did not pass anything, 1 --> loose pass, 2 --> medium pass, 3 --> tight pass
     // GED first
     if      (photon.photonID("tight-ged"))  {phoBranch.gedID_ = 3;}
@@ -4226,6 +4243,7 @@ void DisPhoMulti::MakeEventTree()
     disphotree->Branch(Form("phoscphi_%i",iphoton), &phoBranch.scphi_);
 //    disphotree->Branch(Form("phodz_%i",iphoton), &phoBranch.dz_);
     disphotree->Branch(Form("photdz_%i",iphoton), &phoBranch.tdz_);
+    disphotree->Branch(Form("photdxy_%i",iphoton), &phoBranch.tdxy_);
 
     disphotree->Branch(Form("phoHoE_%i",iphoton), &phoBranch.HoE_);
     disphotree->Branch(Form("phor9_%i",iphoton), &phoBranch.r9_);
@@ -4295,6 +4313,11 @@ void DisPhoMulti::MakeEventTree()
     disphotree->Branch(Form("phohasPixSeed_%i",iphoton), &phoBranch.hasPixSeed_);
     disphotree->Branch(Form("phogedID_%i",iphoton), &phoBranch.gedID_);
     disphotree->Branch(Form("phoootID_%i",iphoton), &phoBranch.ootID_);
+
+    disphotree->Branch(Form("phoelMatched_%i",iphoton), &phoBranch.elMatched_);
+    disphotree->Branch(Form("phoelTrackX_%i",iphoton), &phoBranch.elTrackX_);
+    disphotree->Branch(Form("phoelTrackY_%i",iphoton), &phoBranch.elTrackY_);
+    disphotree->Branch(Form("phoelTrackZ_%i",iphoton), &phoBranch.elTrackZ_);
 
     if (isMC)
     {

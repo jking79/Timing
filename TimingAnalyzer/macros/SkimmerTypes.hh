@@ -669,6 +669,11 @@ struct Pho
   Float_t seedkuMfootCCStcTOF;
   UInt_t  seedkuMfootCCStcID;
 
+  bool      elMatched;
+  float     elTrackX;
+  float     elTrackY;
+  float     elTrackZ;
+
   // MC types
   Bool_t  isGen;
   Int_t   isSignal;
@@ -880,6 +885,11 @@ struct Pho
   std::string s_seedkuMfootCCStcTOF = "phoseedkuMfootCCStcTOF";
   std::string s_seedkuMfootCCStcID = "phoseedkuMfootCCStcID";
 
+  std::string s_elMatched = "phoelMatched";
+  std::string s_elTrackX = "phoelTrackX";
+  std::string s_elTrackY = "phoelTrackY";
+  std::string s_elTrackZ = "phoelTrackZ";
+
   // tbranches
   TBranch * b_E;
   TBranch * b_pt;
@@ -1073,6 +1083,11 @@ struct Pho
   TBranch * b_seedkuMfootCCStctimeErr;
   TBranch * b_seedkuMfootCCStcTOF;
   TBranch * b_seedkuMfootCCStcID;
+
+  TBranch * b_elMatched;
+  TBranch * b_elTrackX;
+  TBranch * b_elTrackY;
+  TBranch * b_elTrackZ;
 
 };
 typedef std::vector<Pho> PhoVec;

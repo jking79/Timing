@@ -111,9 +111,9 @@ def subcrab( runs, events, reqmem ):
         # Will submit one task for each of these input datasets.
         inputDataAndOpts = [
 
-            #['/EGamma/Run2018A-17Sep2018-v2/MINIAOD'],
+            ['/EGamma/Run2018A-17Sep2018-v2/MINIAOD'],
             #['/EGamma/Run2018B-26Sep2018-v1/MINIAOD'],
-            ['/EGamma/Run2018C-17Sep2018-v1/MINIAOD'],
+            #['/EGamma/Run2018C-17Sep2018-v1/MINIAOD'],
             #['/EGamma/Run2018D-22Jan2019-v2/MINIAOD'],
             ##['/EGamma/Run2018E-PromptReco-v1/MINIAOD'],
 
@@ -147,7 +147,8 @@ def subcrab( runs, events, reqmem ):
             #trial          = "tt_rt_rtnot_wt_woot_ks_kscc_nolhc_v9"  # no lhc mini+raw for kurechits/uncal: true,true,false, jwkpupv3, unitsPerJob=3750, reduced size, small file
             #trial          = "tt_rt_rtnot_wt_woot_ks_kscc_nolhc_v10"  # as v9 w/ units 2000, runtime 2400 
             #trial          = "tt_kurhs_nolhc_v12"  # as v9 w/ units 500, runtime 2800, mem 2250 GT 101X prompt 
-            trial          = "tt_kurhs_nolhc_v14"  # as v9 w/ units 500, runtime 2800, mem 2250 GT 102X prompt  same as 13 w/ NM pull redo
+            #trial          = "tt_kurhs_nolhc_v14"  # as v9 w/ units 500, runtime 2800, mem 2250 GT 102X prompt  same as 13 w/ NM pull redo
+            trial          = "tt_kurhs_nolhc_v15"  # as v9 w/ units 500, runtime 2800, mem 2250 GT 102X prompt  same as 13 w/ NM pull 12May20
 
             config.General.requestName   = trial+"_"+primaryDataset+"_"+runEra+"_"+runs+"_"+dataset+"_dispho"
             config.Data.outputDatasetTag = trial+"_"+primaryDataset+"_"+dataset+"_"+runEra+"_"+runs+"_dispho"
@@ -316,8 +317,8 @@ def submit_run2018D():
         #subcrab( "325057-325170", event_list_path + "sel_325057v325170_EG2018D.txt", 3000 )
 
 
-#submit_run2018A()
+submit_run2018A()
 #submit_run2018B()
-submit_run2018C()
+#submit_run2018C()
 #submit_run2018D()
 

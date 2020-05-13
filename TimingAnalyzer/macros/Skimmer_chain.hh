@@ -117,6 +117,9 @@ private:
   TH1F  * fOutCutFlowWgt;
   TH1F  * fOutCutFlowScl;
   TH1F  * tofHist;   
+  TH1F  * noEleMatchHist;
+  TH1F  * eleMatchTrueHist;
+  TH1F  * eleMatchFalseHist;
 
 //  ave and diff hists
   TH1F  * fOutAveXtalRecTimeHist;
@@ -421,6 +424,9 @@ private:
    bool     hasMultiKURecHit;
    bool		hasUrecDigi;
 
+   bool     isGoodPho;
+   bool     isEleMatched;
+   bool     isTrackMatched;
 
    //typedef std::map<UInt_t,Float_t> sumXtalRecTime_t;
    std::map<UInt_t,Float_t> sumXtalRecTime;
@@ -644,6 +650,10 @@ private:
    std::vector<Float_t> *   out_kuWootStcrhtime;
    std::vector<Float_t> *   out_kuMfootStcrhtime;
    std::vector<Float_t> *   out_kuMfootCCStcrhtime;
+
+   TBranch        *b_isGoodPho;
+   TBranch        *b_isEleMatched;
+   TBranch        *b_isTrackMatched;
 
    TBranch        *b_nurechits;
    TBranch        *b_nkurechits;

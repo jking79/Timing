@@ -92,17 +92,18 @@ def subcrab( runs, events, reqmem ):
         config.Data.inputDataset = None
         #config.Data.useParent      = True
         #config.Data.useParent      = False
-	#config.Data.secondaryInputDataset = secInputPaths
+	     #config.Data.secondaryInputDataset = secInputPaths
         config.Data.lumiMask     = inputJSON
         #config.Data.splitting    = 'LumiBased'
         config.Data.splitting    = 'EventAwareLumiBased'
         #config.Data.splitting    = 'Automatic'
-        config.Data.unitsPerJob  =  50000    
-	# unitsPerJob = 1000 for 321122-321128 and maxMemoryMB = 4000  on EventAwareLumiBased
-	config.Data.runRange	= runs #'321122-321128'
+        #config.Data.unitsPerJob  =  50000
+        config.Data.unitsPerJob  =  100000    
+	     # unitsPerJob = 1000 for 321122-321128 and maxMemoryMB = 4000  on EventAwareLumiBased
+        # config.Data.runRange	= runs #'321122-321128'
 
         #config.Data.outputDatasetTag = 'reducedRAW_EGamma_ntuple'
-	config.JobType.allowUndistributedCMSSW = True
+        config.JobType.allowUndistributedCMSSW = True
         config.Data.publication      = False
         config.Site.storageSite      = 'T2_US_Nebraska'
         config.Data.outLFNDirBase    = '/store/user/jaking/ecalTiming/'
@@ -111,22 +112,22 @@ def subcrab( runs, events, reqmem ):
         # Will submit one task for each of these input datasets.
         inputDataAndOpts = [
 
-            ['/EGamma/Run2018A-17Sep2018-v2/MINIAOD'],
+            #['/EGamma/Run2018A-17Sep2018-v2/MINIAOD'],
             #['/EGamma/Run2018B-26Sep2018-v1/MINIAOD'],
             #['/EGamma/Run2018C-17Sep2018-v1/MINIAOD'],
-            #['/EGamma/Run2018D-22Jan2019-v2/MINIAOD'],
+            ['/EGamma/Run2018D-22Jan2019-v2/MINIAOD'],
             #['/EGamma/Run2018E-PromptReco-v1/MINIAOD'],
 
 	    ]
  
         for inDO in inputDataAndOpts:
             # inDO[0] is of the form /A/B/C. Since A+B is unique for each inDS, use this in the CRAB request name.
-	    #print( inDO[0] )
+	         #print( inDO[0] )
             primaryDataset = inDO[0].split('/')[1]
             runEra         = inDO[0].split('/')[2]
-	    dataset	   = inDO[0].split('/')[3]
-	    #infilename	   = inDO[0].split('/')[11]
-	    #trial	   = "valtest5"
+            dataset	   = inDO[0].split('/')[3]
+	         #infilename	   = inDO[0].split('/')[11]
+	         #trial	   = "valtest5"
             #trial          = "valtest24_twotier"  # mini+raw for kurechits/uncal: true,true,false, jwkpupv3, unitsPerJob=25000, 320673-321730 2018D
             #trial          = "valtest25_twotierlist"  # mini+raw for kurechits/uncal: true,true,false, jwkpupv3, unitsPerJob=25000, lists run
             #trial          = "valtest29_twotier"  # mini+raw for kurechits/uncal: true,true,false, jwkpupv3, unitsPerJob=25000, 320673-321730 2018D
@@ -134,10 +135,10 @@ def subcrab( runs, events, reqmem ):
             #trial          = "valtest31_twotier"  # mini+raw for kurechits/uncal: true,true,false, jwkpupv3, unitsPerJob=25000, 321732-321973 2018D
             #trial          = "valtest36_twotier"  # mini+raw for kurechits/uncal: true,true,false, jwkpupv3, unitsPerJob=25000, 317080-319077 2018B
             #trial          = "valtest37_twotier"  # mini+raw for kurechits/uncal: true,true,false, jwkpupv3, unitsPerJob=25000, 317080-319077 2018B, reduced size
-	    #trial          = "twotier_rm_w_ks_kscc"  # mini+raw for kurechits/uncal: true,true,false, jwkpupv3, unitsPerJob=25000, reduced size
+	         #trial          = "twotier_rm_w_ks_kscc"  # mini+raw for kurechits/uncal: true,true,false, jwkpupv3, unitsPerJob=25000, reduced size
             #trial          = "twotier_rm_w_ks_kscc_v2"  # mini+raw for kurechits/uncal: true,true,false, jwkpupv3, unitsPerJob=5000?, reduced size
             #trial          = "twotier_orig_dispho_sl7_test"  # mini+raw for kurechits/uncal: true,true,false, jwkpupv3, unitsPerJob=25000, reduced size
-	    #trial          = "twotier_rm_w_ks_kscc_v3"  # mini+raw for kurechits/uncal: true,true,false, jwkpupv3, unitsPerJob=25000, reduced size
+	         #trial          = "twotier_rm_w_ks_kscc_v3"  # mini+raw for kurechits/uncal: true,true,false, jwkpupv3, unitsPerJob=25000, reduced size
             #trial          = "twotier_rm_w_ks_kscc_v5"  # mini+raw for kurechits/uncal: true,true,false, jwkpupv3, unitsPerJob=3750, reduced size
             #trial          = "twotier_rm_w_woot_ks_kscc_lhc0_v5"  # endfill0 mini+raw for kurechits/uncal: true,true,false, jwkpupv3, unitsPerJob=3750, reduced size
             #trial          = "twotier_rm_w_woot_ks_kscc_lhc0_v6"  # startfill mini+raw for kurechits/uncal: true,true,false, jwkpupv3, unitsPerJob=3750, reduced size
@@ -145,18 +146,19 @@ def subcrab( runs, events, reqmem ):
             #trial          = "twotier_rt_rtnot_wt_woot_ks_kscc_nolhc_v8"  # no lhc mini+raw for kurechits/uncal: true,true,false, jwkpupv3, unitsPerJob=3750, reduced size
             #trial          = "twotier_allRT_noSTC_test"  # no lhc mini+raw for kurechits/uncal: true,true,false, jwkpupv3, unitsPerJob=3750, reduced size
             #trial          = "onetier_mini_nolhc_v9"  # no lhc mini+noraw for kurechits/uncal: false,flase,false, jwkpupv3, unitsPerJob=37500, reduced size
-            trial          = "onetier_mini_nolhc_v9_GT102X"  # no lhc mini+noraw for kurechits/uncal: false,flase,false, jwkpupv3, unitsPerJob=37500, reduced size
+            #trial          = "onetier_mini_nolhc_v9_GT102X"  # no lhc mini+noraw for kurechits/uncal: false,flase,false, jwkpupv3, unitsPerJob=37500, reduced size
+            trial          = "onetier_mini_nolhc_v9_eMatch"  # no lhc mini+noraw for kurechits/uncal: false,flase,false, jwkpupv3, unitsPerJob=37500, reduced size
 
 
-            config.General.requestName   = trial+"_"+primaryDataset+"_"+runEra+"_"+runs+"_"+dataset+"_dispho"
-            config.Data.outputDatasetTag = trial+"_"+primaryDataset+"_"+dataset+"_"+runEra+"_"+runs+"_dispho"
+            config.General.requestName   = trial+"_"+primaryDataset+"_"+runEra+"_"+dataset+"_dispho"
+            config.Data.outputDatasetTag = trial+"_"+primaryDataset+"_"+dataset+"_"+runEra+"_dispho"
 
 
-	    # for 2018 EGamma 2tier   // globalTag=101X_dataRun2_Prompt_v11 have been using
+	         # for 2018 EGamma 2tier   // globalTag=101X_dataRun2_Prompt_v11 have been using
             config.JobType.pyCfgParams   = ['globalTag=102X_dataRun2_Prompt_v11',#'nThreads='+str(config.JobType.numCores), 
                                             'inputPaths='+inputPaths,'inputFilters='+inputFilters,'inputFlags='+inputFlags, 
                                             'onlyGED=True', 'outputFileName=output.root', #'rlelist='+events,
-					    'kuRechitValid=False','lhcInfoValid=False', 'rawCollectionsValid=False' ]
+					    								  'kuRechitValid=False','lhcInfoValid=False', 'rawCollectionsValid=False' ]
 
             config.Data.inputDataset     = inDO[0]
             # Submit.
@@ -195,8 +197,8 @@ event_list_path = "/home/t3-ku/jaking/trees/ecal/run_lumi_event_lists/sel_eg2018
 
 def submit_run2018A():
         subcrab( "315257-315713","",2500)
-        subcrab( "315721-316240","",2500)
-        subcrab( "316241-316995","",2500)
+        #subcrab( "315721-316240","",2500)
+        #subcrab( "316241-316995","",2500)
 
         #subcrab( "315257-315322", event_list_path + "sel_315257v315322_EG2018A.txt", 3000 )
         #subcrab( "315339-315366", event_list_path + "sel_315339v315366_EG2018A.txt", 3000 )
@@ -236,7 +238,7 @@ def submit_run2018B():
 #        subcrab( "318828-319077", event_list_path + "sel_318828v319077_EG2018B.txt", 3000 )
 
 def submit_run2018C():
-        #subcrab( "319337-319579","",2500)
+        subcrab( "319337-319579","",2500)
         #subcrab( "319625-319910","",2500)
         #subcrab( "319912-320065","",2500)
 
@@ -244,9 +246,9 @@ def submit_run2018C():
 	#subcrab( "319347-319486", event_list_path + "sel_319347v319486_EG2018C.txt", 3000 )
         #subcrab( "319503-319579", event_list_path + "sel_319503v319579_EG2018C.txt", 3000 )
 
-        subcrab( "319625-319678","",2500) # event_list_path + "sel_319625v319678_EG2018C.txt", 3000 )
-        subcrab( "319687-319756","",2500) #  event_list_path + "sel_319687v319756_EG2018C.txt", 3000 )
-        subcrab( "319840-319910","",2500) #  event_list_path + "sel_319840v319910_EG2018C.txt", 3000 )
+        #subcrab( "319625-319678","",2500) # event_list_path + "sel_319625v319678_EG2018C.txt", 3000 )
+        #subcrab( "319687-319756","",2500) #  event_list_path + "sel_319687v319756_EG2018C.txt", 3000 )
+        #subcrab( "319840-319910","",2500) #  event_list_path + "sel_319840v319910_EG2018C.txt", 3000 )
 
         #subcrab( "319912-319993", event_list_path + "sel_319912v319993_EG2018C.txt", 3000 )
         #subcrab( "320002-320038", event_list_path + "sel_320002v320038_EG2018C.txt", 3000 )
@@ -317,8 +319,9 @@ def submit_run2018D():
         #subcrab( "324997-325022", event_list_path + "sel_324997v325022_EG2018D.txt", 3000 )
         #subcrab( "325057-325170", event_list_path + "sel_325057v325170_EG2018D.txt", 3000 )
 
+subcrab("all","none", 2500 )
 
-submit_run2018A()
+#submit_run2018A()
 #submit_run2018B()
 #submit_run2018C()
 #submit_run2018D()

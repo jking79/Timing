@@ -170,10 +170,10 @@ calioutfile='caliplots_tt_Run2018pABCDmf_global_v2a_v2b_i50_e5e3.root'
 eta='EBEB'
 #eta='EPEM'
 era='Full'
-res='Local'
-isd_list=['Inclusive','Same','Different']
-#res='Global'
-#isd_list=['Inclusive']
+#res='Local'
+#isd_list=['Inclusive','Same','Different']
+res='Global'
+isd_list=['Inclusive']
 
 # Final output file
 outfile=res+'_'+eta+'_'+era
@@ -381,6 +381,8 @@ plot_list = [ base, baseE5 ]
 #skiminlist='dispho_tt_kurh_Run2018C_319912-320065.txt'
 #skiminlist='dispho_tt_kurh_Run2018C_319337-320065.txt'
 
+#skiminlist='dispho_tt_kurhs_Run2018C_319625_319910.txt' # 20_apr_20 
+
 #skiminlist='dispho_tt_kurh_Run2016C.txt'
 #skiminlist='dispho_tt_kurh_Run2017D.txt'
 
@@ -416,6 +418,26 @@ plot_list = [ base, baseE5 ]
 #skiminlist='dispho_ot_mini_GT102X_Run2018A.txt'
 #skiminlist='dispho_ot_mini_GT102X_Run2018A_ch.txt'
 #skiminlist='dispho_ot_mini_SP_Run2016B.txt'
+
+#skiminlist='dispho_ot_mini_Run2018C_319337_319579_ele.txt'
+#skiminlist='dispho_ot_mini_Run2018A_ele.txt'
+#skiminlist='dispho_ot_mini_Run2018B_ele.txt'
+#skiminlist='dispho_ot_mini_Run2018C_ele.txt'
+#skiminlist='dispho_ot_mini_Run2018D_ele.txt'
+#skiminlist='dispho_ot_mini_Run2017B_ele.txt'
+#skiminlist='dispho_ot_mini_Run2017C_ele.txt'
+#skiminlist='dispho_ot_mini_Run2017D_ele.txt'
+#skiminlist='dispho_ot_mini_Run2017E_ele.txt'
+#skiminlist='dispho_ot_mini_Run2017F_ele.txt'
+#skiminlist='dispho_ot_mini_Run2016B_ele.txt'
+#skiminlist='dispho_ot_mini_Run2016C_ele.txt'
+#skiminlist='dispho_ot_mini_Run2016D_ele.txt'
+#skiminlist='dispho_ot_mini_Run2016E_ele.txt'
+#skiminlist='dispho_ot_mini_Run2016F_ele.txt'
+#skiminlist='dispho_ot_mini_Run2016G_ele.txt'
+#skiminlist='dispho_ot_mini_Run2016H_ele.txt'
+
+#skiminlist='dispho_ot_mini_Run2018C_319337_319579_noele.txt'
 
 #skiminlist='dispho_ot_mini_rt3_Run2017B.txt'
 #skiminlist='dispho_ot_mini_rt3_Run2017C.txt'
@@ -467,6 +489,7 @@ skimoutfile002='dispho_tt94_rm_w_ks_Run2017F.root'
 skimoutfile003='dispho_tt_rt_rtnot_wt_woot_ks_kscc_Run2018C_319625-319910.root'
 skimoutfile004='dispho_tt_rm_w_ks_kscc_Run2018A_315257-315488.root'
 skimoutfile005='dispho_tt_kurh_Run2018C_319337-320065.root'
+skimoutfile006='dispho_tt_kurhs_Run2018C_319625_319910.root'
 
 skimoutfile006='dispho_ot_mini_Run2018D_321009-321396.root'
 skimoutfile007='dispho_ot_mini_Run2018D_321165-321219.root'
@@ -475,6 +498,8 @@ skimoutfile009='dispho_ot_mini_Run2018D_321221-321305.root'
 skimoutfile010='dispho_ot_mini_Run2018D_321311-321396.root'
 
 skimoutfile501='dispho_tt_kurh_Run2017D.root'
+skimoutfile502a='dispho_ot_mini_Run2018C_319337_319579_noele.root'
+skimoutfile502b='dispho_ot_mini_Run2018C_319337_319579_ele.root'
 
 caliinfile0da1='chain_test_multi_mf.root'
 caliinfile_test='test_multi_mf.root'
@@ -557,10 +582,11 @@ caliinfile7d_kurh='dispho_tt_kurh_Run2017D_ave_e5_cali.root'
 caliinfile6cv42_kurh='dispho_tt_kurh_Run2016Cv42_ave_ofe5_cali.root'
 caliinfilett6b='dispho_tt_rm_w_ks_Run2016B_ave_e5_cali.root'
 caliinfilett7f='dispho_tt_rm_w_ks_Run2017F_ave_e5i_cali.root'
+caliinfile_tt8c_april20='dispho_tt_kurhs_Run2018C_319625_319910_ave_e5_cali.root'
 
-caliinfile=caliinfile8c_kurhoot
+caliinfile=caliinfile_tt8c_april20
 #caliinfile=caliinfile7d_kurh
-infile=skimoutfile005
+infile=skimoutfile006
 
 cut_cf='ku_config/tmp_cut_config.txt'  # INCLUSIVE PLOTS
 #cut_cf='ku_config/tmp_same_cut_config.txt' # SAME PLOTS
@@ -575,8 +601,8 @@ skim_glo_cf='skim_config/Zee_kurecs_Skim.txt'  #  GLOBAL  SKIMS
 misc_fit_cf='ku_config/tmp_misc_fit.txt'
 
 #indir="/home/t3-ku/jaking/trees/ecal/datasets/"
-indir="/home/t3-ku/jaking/datasets/ecalTiming/EGamma/"
-#indir="/home/t3-ku/jaking/datasets/ecalTiming/DoubleEG/"
+#indir="/home/t3-ku/jaking/datasets/ecalTiming/EGamma/"
+indir="/home/t3-ku/jaking/datasets/ecalTiming/DoubleEG/"
 #indir="/scratch/jaking/"
 #indir="../test/"
 #indir='/home/t3-ku/jaking/ecaltiming/skimmed_trees/'
@@ -624,7 +650,8 @@ timefit='./runTimeFitter.obj '
 skim2a='./wc_runKUSkimmer_v2a.obj '
 skim2wt='root -b -q -l wc_runKUSkimmer_v2wt.C\(\\"'
 skim_chain_2a='./wc_runKUSkimmer_chain_v2a.obj '
-skim_chain_kurh_2a='./wc_runKUSkimmer_kurh_chain_v2a.obj '
+#skim_chain_kurh_2a='./wc_runKUSkimmer_kurh_chain_v2a.obj '
+skim_chain_kurh_2a='./wc_runKUSkimmer_kurh_chain_v2a_ele.obj '
 skim2b='root -b -q -l wc_runKUSkimmer_v2a.C\(\\"'
 #skim2='root -b -q -l wc_runKUSkimmer.C\(\\"'
 
@@ -910,23 +937,23 @@ def do_rhcoloplots():
 ######################################################################################
 
 #do_hadd(hadd_inlist)
-#do_skimmer()
-#do_skimmer_list(inlist_debug)
-#do_skimmer_list(inlist_tree_10)
-#do_skimmer_list(inlist_tree_94)
-#do_skimmer_list_wt(inlist_dataset_egamma_woot)
-#do_skimmer_list(inlist_dataset_1617)
-#do_skimmer_chain()
+##do_skimmer()
+##do_skimmer_list(inlist_debug)
+##do_skimmer_list(inlist_tree_10)
+##do_skimmer_list(inlist_tree_94)
+##do_skimmer_list_wt(inlist_dataset_egamma_woot)
+##do_skimmer_list(inlist_dataset_1617)
+##do_skimmer_chain()
 #do_skimmer_loc_chain()
 #do_skimmer_glo_chain()
-#do_avecali()
+##do_avecali()
 #do_avecalikurh()
 #do_avecalimini()
-#do_avecaliminipho()
-#do_intercaliXX()
+##do_avecaliminipho()
+##do_intercaliXX()
 #do_plots( plot_list )         ##########     <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<     change the local/global type!!!!!!!!!!!!
-#do_plots_chain( plot_list )
-#do_occcalimini()
+do_plots_chain( plot_list )
+##do_occcalimini()
 #do_globalplots()
 #do_caliplots()
 #do_rhcoloplots()

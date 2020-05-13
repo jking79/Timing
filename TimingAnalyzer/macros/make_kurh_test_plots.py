@@ -115,8 +115,8 @@ timefit='./runTimeFitter.obj '
 skim_chain_kurh_2a='./wc_runKUSkimmer_kurh_chain_v2a_red.obj '
 
 dotimeres2d='./wc_ku_plot2dResolution.obj '
-dotimeres2d_ch='./wc_ku_plot2dResolution_chain.obj '
-dotimeres2d_mf='./wc_ku_plot2dResolution_mf.obj '
+#dotimeres2d_ch='./wc_ku_plot2dResolution_chain.obj '
+#dotimeres2d_mf='./wc_ku_plot2dResolution_mf.obj '
 
 doocccalikurhootf='./wc_ku_InterCali_aveRecHit_isoot_kurhs_fliter_red.obj '
 

@@ -88,6 +88,7 @@ struct phoStruct
   float r9_;
   float dz_;
   float tdz_;
+  float tdxy_;
 
   float ChgHadIso_;
   float NeuHadIso_;
@@ -153,6 +154,11 @@ struct phoStruct
   bool isTrk_;
   bool passEleVeto_;
   bool hasPixSeed_;
+
+  bool elMatched_;
+  float elTrackX_;
+  float elTrackY_;
+  float elTrackZ_;
 
   int  gedID_;
   int  ootID_;

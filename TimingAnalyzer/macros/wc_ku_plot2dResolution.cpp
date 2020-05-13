@@ -35,6 +35,7 @@ void plot2dResolution( string califilename, string infilename, string outfilenam
     Float_t phoseedpedrms12_0;
     Float_t phoseedTOF_0;
     Float_t phoseedtime_0;
+    Float_t phoseedtimeErr_0;
 
     TBranch * b_phoseedI1_0;
     TBranch * b_phoseedI2_0;
@@ -45,6 +46,7 @@ void plot2dResolution( string califilename, string infilename, string outfilenam
     TBranch * b_phoseedpedrms12_0;
     TBranch * b_phoseedTOF_0;
     TBranch * b_phoseedtime_0;
+    TBranch * b_phoseedtimeErr_0;
 
     Int_t   phoseedI1_1; // EB: iphi, EE: ix
     Int_t   phoseedI2_1; // EB: ieta, EE: iy
@@ -55,6 +57,7 @@ void plot2dResolution( string califilename, string infilename, string outfilenam
     Float_t phoseedpedrms12_1;
     Float_t phoseedTOF_1;
     Float_t phoseedtime_1;
+    Float_t phoseedtimeErr_1;
 
     TBranch * b_phoseedI1_1;
     TBranch * b_phoseedI2_1;
@@ -64,7 +67,8 @@ void plot2dResolution( string califilename, string infilename, string outfilenam
     TBranch * b_phoseedadcToGeV_1;
     TBranch * b_phoseedpedrms12_1;
     TBranch * b_phoseedTOF_1;
-    TBranch * b_phoseedtime_1;   
+    TBranch * b_phoseedtime_1;  
+    TBranch * b_phoseedtimeErr_1; 
  
     fInTree->SetBranchAddress("phoseedI1_0", &phoseedI1_0, &b_phoseedI1_0);
     fInTree->SetBranchAddress("phoseedI2_0", &phoseedI2_0, &b_phoseedI2_0);
@@ -77,6 +81,8 @@ void plot2dResolution( string califilename, string infilename, string outfilenam
     //fInTree->SetBranchAddress("phoseedkuStctime_0", &phoseedtime_0, &b_phoseedtime_0);
     string tvarname_0(tvarname+"_0");
     fInTree->SetBranchAddress( tvarname_0.c_str(), &phoseedtime_0, &b_phoseedtime_0);
+    string tvarnameErr_0(tvarname+"Err_0");
+    fInTree->SetBranchAddress( tvarnameErr_0.c_str(), &phoseedtimeErr_0, &b_phoseedtimeErr_0);
 
     fInTree->SetBranchAddress("phoseedI1_1", &phoseedI1_1, &b_phoseedI1_1);
     fInTree->SetBranchAddress("phoseedI2_1", &phoseedI2_1, &b_phoseedI2_1);
@@ -89,6 +95,8 @@ void plot2dResolution( string califilename, string infilename, string outfilenam
     //fInTree->SetBranchAddress("phoseedkuStctime_1", &phoseedtime_1, &b_phoseedtime_1);
     string tvarname_1(tvarname+"_1");
     fInTree->SetBranchAddress( tvarname_1.c_str(), &phoseedtime_1, &b_phoseedtime_1);
+    string tvarnameErr_1(tvarname+"Err_1");
+    fInTree->SetBranchAddress( tvarnameErr_1.c_str(), &phoseedtimeErr_1, &b_phoseedtimeErr_1);
 
 //     get maps from fCaliFile
     std::cout << "get maps from fCaliFile" << std::endl;
@@ -177,6 +185,7 @@ void plot2dResolution( string califilename, string infilename, string outfilenam
         b_phoseedpedrms12_0->GetEntry(entry);
         b_phoseedTOF_0->GetEntry(entry);
         b_phoseedtime_0->GetEntry(entry);
+        b_phoseedtimeErr_0->GetEntry(entry);
 
         b_phoseedI1_1->GetEntry(entry);
         b_phoseedI2_1->GetEntry(entry);
@@ -187,6 +196,7 @@ void plot2dResolution( string califilename, string infilename, string outfilenam
         b_phoseedpedrms12_1->GetEntry(entry);
         b_phoseedTOF_1->GetEntry(entry);
         b_phoseedtime_1->GetEntry(entry);
+        b_phoseedtimeErr_1->GetEntry(entry);
 
 	     int bin_offset = 86;
 	     int adjust = 0.0;
@@ -212,15 +222,16 @@ void plot2dResolution( string califilename, string infilename, string outfilenam
         //std::cout << "Fill 2D Hist" << std::endl;
 		  auto skip = false;
         auto skip_cali = false;
-        auto kscc_offset = 5000.f;
-		  auto outlier = 1000.f;
-		  auto offset = 0.f;
-        auto outlier_offset = 0.f;
-	     if( tvarname == "phoseedkuMfootCCStctime" ) { outlier  = kscc_offset; } //std::cout << "KsCC ";} 
-        if( tvarname == "phoseedkuWtStctime" ) { outlier  = 500000; } //std::cout << "KsCC ";} 
-        if( (abs(phoseedtime_0 + offset - phoseedtimeCaliIc_0 ) > outlier) or (abs(phoseedtime_1 + offset - phoseedtimeCaliIc_1 ) > outlier) ) skip_cali = true;
-        if( (abs(phoseedtime_0 + offset ) > outlier) or (abs(phoseedtime_1 + offset ) > outlier) ) skip = true;
+        //auto kscc_offset = 5000.f;
+		  //auto outlier = 1000.f;
+		  //auto offset = 0.f;
+        //auto outlier_offset = 0.f;
+	     //if( tvarname == "phoseedkuMfootCCStctime" ) { outlier  = kscc_offset; } //std::cout << "KsCC ";} 
+        //if( tvarname == "phoseedkuWtStctime" ) { outlier  = 500000; } //std::cout << "KsCC ";} 
+        //if( (abs(phoseedtime_0 + offset - phoseedtimeCaliIc_0 ) > outlier) or (abs(phoseedtime_1 + offset - phoseedtimeCaliIc_1 ) > outlier) ) skip_cali = true;
+        //if( (abs(phoseedtime_0 + offset ) > outlier) or (abs(phoseedtime_1 + offset ) > outlier) ) skip = true;
         //if( tvarname == "phoseedkuMfootCCStctime" ) { skip = false; }
+		  if( ( phoseedtimeErr_0 < 0 ) or ( phoseedtimeErr_1 < 0  )  ) { skip = true; }
 
         auto yfill = (phoseedtime_0-phoseedtimeCaliIc_0)-(phoseedtime_1-phoseedtimeCaliIc_1)+(phoseedTOF_0-phoseedTOF_1);
         auto effa0 = (phoseedE_0/phoseedadcToGeV_0)/phoseedpedrms12_0;
@@ -234,11 +245,11 @@ void plot2dResolution( string califilename, string infilename, string outfilenam
         if( isd_type == "Same") isd_cut = (phoseedTT_0==phoseedTT_1); //same
 	     auto event_good = e_cut && eta_cut && isd_cut;
 
-	     if( event_good and not skip_cali ) theHist->Fill(xfill,yfill);
-        if( event_good ) { thetdHist->Fill(phoseedtime_0+offset); thetdHist->Fill(phoseedtime_1+offset);}
-        if( event_good ) { thetdcHist->Fill(phoseedtime_0+offset-phoseedtimeCaliIc_0); thetdcHist->Fill(phoseedtime_1+offset-phoseedtimeCaliIc_1);}
-        if( event_good and not skip ) { thetdfHist->Fill(phoseedtime_0+offset); thetdfHist->Fill(phoseedtime_1+offset);}
-        if( event_good and not skip_cali ) { thetdfcHist->Fill(phoseedtime_0+offset-phoseedtimeCaliIc_0); thetdfcHist->Fill(phoseedtime_1+offset-phoseedtimeCaliIc_1);}       
+	     if( event_good and not skip ) theHist->Fill(xfill,yfill);
+        if( event_good ) { thetdHist->Fill(phoseedtime_0); thetdHist->Fill(phoseedtime_1);}
+        if( event_good ) { thetdcHist->Fill(phoseedtime_0-phoseedtimeCaliIc_0); thetdcHist->Fill(phoseedtime_1-phoseedtimeCaliIc_1);}
+        if( event_good and not skip ) { thetdfHist->Fill(phoseedtime_0); thetdfHist->Fill(phoseedtime_1);}
+        if( event_good and not skip ) { thetdfcHist->Fill(phoseedtime_0-phoseedtimeCaliIc_0); thetdfcHist->Fill(phoseedtime_1-phoseedtimeCaliIc_1);}       
 
     }
 
