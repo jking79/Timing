@@ -3,7 +3,10 @@ import sys
 import shutil
 import time
 
-infile = (sys.argv[1:])[0]
+indir = (sys.argv[1:])[0]
+infilename = (sys.argv[1:])[1]
+
+infile = indir+'/'+infilename
 
 #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<   !!!!   set res for plots    !!!!  <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 eta='EBEB'
@@ -112,7 +115,7 @@ sp=' '
 
 timefit='./runTimeFitter.obj '
 
-skim_chain_kurh_2a='./wc_runKUSkimmer_kurh_chain_v2a_red.obj '
+skim_chain_kurh_2a='./wc_runKUSkimmer_kurh_chain_v2a_ele.obj '
 
 dotimeres2d='./wc_ku_plot2dResolution.obj '
 #dotimeres2d_ch='./wc_ku_plot2dResolution_chain.obj '
@@ -250,29 +253,29 @@ def do_avecalikurh(skiminlist,caliinfile):
 ######################################################################################
 
 
-lfile=infile[:-5]+'_loc.txt'
+lfile=infilename[:-5]+'_loc.txt'
 lofile=lfile[:-3]+'root'
 fl=open(lfile,'w')
 fl.write(infile)
 fl.close()
 do_skimmer_loc_chain(lfile)
 os.remove(lfile)
-#gfile=infile[:-5]+'_glo.txt'
+#gfile=infilename[:-5]+'_glo.txt'
 #gofile=gfile[:-3]+'root'
 #fg=open(gfile,'w')
 #fg.write(infile)
 #fg.close()
 #do_skimmer_glo_chain(gfile)
 #os.remove(gfile)
-cfile=infile[:-5]+'_cali.txt'
-cofile=infile[:-5]+'_cali.root'
+cfile=infilename[:-5]+'_cali.txt'
+cofile=infilename[:-5]+'_cali.root'
 fc=open(cfile,'w')
 fc.write(infile)
 fc.close()
 do_avecalikurh(cfile,cofile)
 os.remove(cfile)
-do_2dplot( plot_list, cofile, lofile, '' )
-#do_plots( plot_list, cofile, lofile, ''  )
+#do_2dplot( plot_list, cofile, lofile, '' )
+do_plots( plot_list, cofile, lofile, ''  )
 
 
 

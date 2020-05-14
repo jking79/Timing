@@ -93,7 +93,7 @@ options.register('demoMode',False,VarParsing.multiplicity.singleton,VarParsing.v
 options.register('processName','TREE',VarParsing.multiplicity.singleton,VarParsing.varType.string,'process name to be considered');
 
 ## outputFile Name
-options.register('outputFileName','ku_ksMulti_algo_test_tt_dispho.root',VarParsing.multiplicity.singleton,VarParsing.varType.string,'output file name created by cmsRun');
+options.register('outputFileName','ku_ksMulti_algo_test_tt_dispho_v2.root',VarParsing.multiplicity.singleton,VarParsing.varType.string,'output file name created by cmsRun');
 
 ## etra bits
 options.register('nThreads',8,VarParsing.multiplicity.singleton,VarParsing.varType.int,'number of threads per job');
@@ -209,7 +209,7 @@ process.load('Configuration.StandardSequences.EndOfProcess_cff')
 ## Message Logger settings
 process.load("FWCore.MessageService.MessageLogger_cfi")
 process.MessageLogger.destinations = ['cout', 'cerr']
-process.MessageLogger.cerr.FwkReport.reportEvery = 1000
+process.MessageLogger.cerr.FwkReport.reportEvery = 10
 
 # LHC Info
 #process.LHCInfoReader = cms.ESSource("PoolDBESSource",
@@ -293,7 +293,7 @@ process.source = cms.Source("PoolSource",
 #else                  : process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(options.maxEvents))
 #process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(10))
 #process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(100))
-process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(100000))
+process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(1000))
 #process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(-1))
 
 # Set the global tag depending on the sample type

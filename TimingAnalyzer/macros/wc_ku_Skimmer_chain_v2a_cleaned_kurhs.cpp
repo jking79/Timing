@@ -395,14 +395,16 @@ void Skimmer::EventLoop()
       std::cerr << "How did this happen?? Somehow SkimType Enum is not one that is specified... Exiting..."  << std::endl;
       exit(1);
     }
-    //std::cout << "Finished proccessing skim." << std::endl;
+    //std::cout << "Finished proccessing skimtype." << std::endl;
 
     Skimmer::FillOutEvent(entry,evtwgt);
+    //std::cout << "Finished proccessing fill event." << std::endl;
     Skimmer::FillOutPhos(entry);
+    //std::cout << "Finished proccessing fill pho." << std::endl;
     // fill the tree
     fOutTree->Fill();
   } // end loop over events
-  std::cout << "Finished proccessing skim." << std::endl;
+  std::cout << "Finished proccessing events." << std::endl;
 
   std::cout << "write hist output!"<< std::endl;
   fOutFile->cd();
@@ -627,13 +629,13 @@ void Skimmer::FillOutPhos(const UInt_t entry)
   b_kuNotStcrhtimeErr->GetEntry(entry);
   b_kuNotStcrhID->GetEntry(entry);
   b_kuWtStcrhtime->GetEntry(entry);
-  b_kuNotStcrhtimeErr->GetEntry(entry);
+  b_kuWtStcrhtimeErr->GetEntry(entry);
   b_kuWtStcrhID->GetEntry(entry);
   b_kuWootStcrhtime->GetEntry(entry);
-  b_kuNotStcrhtimeErr->GetEntry(entry);
+  b_kuWootStcrhtimeErr->GetEntry(entry);
   b_kuWootStcrhID->GetEntry(entry);
   b_kuMfootStcrhtime->GetEntry(entry);
-  b_kuNotStcrhtimeErr->GetEntry(entry);
+  b_kuMfootStcrhtimeErr->GetEntry(entry);
   b_kuMfootStcrhID->GetEntry(entry);
   b_kuMfootCCStcrhtime->GetEntry(entry);
   b_kuMfootCCStcrhtimeErr->GetEntry(entry);
@@ -748,11 +750,12 @@ void Skimmer::FillOutPhos(const UInt_t entry)
    	noEleMatchHist->Fill(outpho.seedtime);
    	if ( inpho.elMatched ) { 
          fInEvent.b_vtxZ->GetEntry(entry);
+         inpho.b_elTrackZ->GetEntry(entry);
       	if ( abs( inpho.elTrackZ - fInEvent.vtxZ ) > 0.1 ) eleMatchFalseHist->Fill(outpho.seedtime);
       	else eleMatchTrueHist->Fill(outpho.seedtime);
 		}
    }
-
+   //std::cout << "hit flag for outpho fill" << std::endl;
 	// get trigger tower
 	outpho.seedTT = Common::GetTriggerTower((*fInRecHits.ID)[seed]);
 	
@@ -790,6 +793,7 @@ void Skimmer::FillOutPhos(const UInt_t entry)
 	outpho.seedpedrms6  = (*fInRecHits.pedrms6) [seed];
 	outpho.seedpedrms1  = (*fInRecHits.pedrms1) [seed];
 
+        //std::cout << "hit flag for outpho fill ku" << std::endl;
         for(UInt_t kuseed = 0; kuseed < (*kurhID).size(); kuseed++ ){
                 if( (*kurhID)[kuseed] == (*fInRecHits.ID)[seed] ){
         		outpho.seedkutime = (*kurhtime)[kuseed];
@@ -797,7 +801,7 @@ void Skimmer::FillOutPhos(const UInt_t entry)
         		outpho.seedkuID = (*kurhID)[kuseed];			
                 }
         }
-
+        //std::cout << "hit flag for outpho fill kustc" << std::endl;
   	     if( hasMultiKURecHit ){
         for(UInt_t kuStcseed = 0; kuStcseed < (*kuStcrhID).size(); kuStcseed++ ){
                 if( (*kuStcrhID)[kuStcseed] == (*fInRecHits.ID)[seed] ){
@@ -806,7 +810,7 @@ void Skimmer::FillOutPhos(const UInt_t entry)
                         outpho.seedkuStcID = (*kuStcrhID)[kuStcseed];
                 }
         }
-
+        //std::cout << "hit flag for outpho fill kunotstc" << std::endl;
         for(UInt_t kuNotStcseed = 0; kuNotStcseed < (*kuNotStcrhID).size(); kuNotStcseed++ ){
                 if( (*kuNotStcrhID)[kuNotStcseed] == (*fInRecHits.ID)[seed] ){
                         outpho.seedkuNotStctime = (*kuNotStcrhtime)[kuNotStcseed];
@@ -814,6 +818,7 @@ void Skimmer::FillOutPhos(const UInt_t entry)
                         outpho.seedkuNotStcID = (*kuNotStcrhID)[kuNotStcseed];
                 }
         }
+        //std::cout << "hit flag for outpho fill kuwtstc" << std::endl;
         for(UInt_t kuWtStcseed = 0; kuWtStcseed < (*kuWtStcrhID).size(); kuWtStcseed++ ){
                 if( (*kuWtStcrhID)[kuWtStcseed] == (*fInRecHits.ID)[seed] ){
                         outpho.seedkuWtStctime = (*kuWtStcrhtime)[kuWtStcseed];
@@ -821,6 +826,7 @@ void Skimmer::FillOutPhos(const UInt_t entry)
                         outpho.seedkuWtStcID = (*kuWtStcrhID)[kuWtStcseed];
                 }
         }
+        //std::cout << "hit flag for outpho fill kuwootstc" << std::endl;
         for(UInt_t kuWootStcseed = 0; kuWootStcseed < (*kuWootStcrhID).size(); kuWootStcseed++ ){
                 if( (*kuWootStcrhID)[kuWootStcseed] == (*fInRecHits.ID)[seed] ){
                         outpho.seedkuWootStctime = (*kuWootStcrhtime)[kuWootStcseed];
@@ -828,12 +834,15 @@ void Skimmer::FillOutPhos(const UInt_t entry)
                         outpho.seedkuWootStcID = (*kuWootStcrhID)[kuWootStcseed];
                 }
         }
+        //std::cout << "hit flag for outpho fill kumfootstc" << std::endl;
         for(UInt_t kuMfootStcseed = 0; kuMfootStcseed < (*kuMfootStcrhID).size(); kuMfootStcseed++ ){
                 if( (*kuMfootStcrhID)[kuMfootStcseed] == (*fInRecHits.ID)[seed] ){
                         outpho.seedkuMfootStctime = (*kuMfootStcrhtime)[kuMfootStcseed];
+                        outpho.seedkuMfootStctimeErr = (*kuMfootStcrhtimeErr)[kuMfootStcseed];
                         outpho.seedkuMfootStcID = (*kuMfootStcrhID)[kuMfootStcseed];
                 }
         }
+        //std::cout << "hit flag for outpho fill kumfootccstc" << std::endl;
         for(UInt_t kuMfootCCStcseed = 0; kuMfootCCStcseed < (*kuMfootCCStcrhID).size(); kuMfootCCStcseed++ ){
                 if( (*kuMfootCCStcrhID)[kuMfootCCStcseed] == (*fInRecHits.ID)[seed] ){
                         outpho.seedkuMfootCCStctime = (*kuMfootCCStcrhtime)[kuMfootCCStcseed];
@@ -841,9 +850,9 @@ void Skimmer::FillOutPhos(const UInt_t entry)
                         outpho.seedkuMfootCCStcID = (*kuMfootCCStcrhID)[kuMfootCCStcseed];
                 }
         }
-
+        
         }
-
+        //std::cout << "hit flag for kurh outpho time fill" << std::endl;
         if( hasUrecDigi ){
 		   for(UInt_t urseed = 0; urseed < (*uRhId).size(); urseed++ ){
 			  if( (*uRhId)[urseed] == (*fInRecHits.ID)[seed] ){
@@ -957,7 +966,7 @@ void Skimmer::FillOutPhos(const UInt_t entry)
 	outpho.seedE = -9999.f;
 
 	outpho.seedtime    = -9999.f;
-	// outpho.seedtimeErr = -9999.f;
+	outpho.seedtimeErr = -9999.f;
 	outpho.seedTOF     = -9999.f;	
 
 	// outpho.seedID    = 0;
@@ -1036,7 +1045,7 @@ void Skimmer::FillOutPhos(const UInt_t entry)
       // outpho.seedZ = inpho.seedZ;
       outpho.seedE = inpho.seedE;
       outpho.seedtime = inpho.seedtime;
-      // outpho.seedtimeErr = inpho.seedtimeErr;
+      outpho.seedtimeErr = inpho.seedtimeErr;
       outpho.seedTOF = inpho.seedTOF;
       // outpho.seedID = inpho.seedID;
       // outpho.seedisOOT = inpho.seedisOOT;
