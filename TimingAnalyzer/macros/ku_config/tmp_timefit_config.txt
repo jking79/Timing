@@ -1,0 +1,10 @@
+time_text=t_{1}-t_{2}
+fit_type=Gaus1core
+range_low=2
+range_up=2
+do_sigma_fit=1
+use_sqrt2=1
+sigma_var_text=A_{eff}/#sigma_{n}
+sigma_var_unit=NONE
+sigma_init_N_params=0 50 100
+sigma_init_C_params=0 .5 1

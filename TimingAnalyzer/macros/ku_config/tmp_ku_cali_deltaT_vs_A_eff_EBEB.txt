@@ -1,0 +1,10 @@
+plot_title=#KU Delta(Photon Seed Time) [ns] vs. A_{eff}/#sigma_{n} (EBEB)
+x_title=A_{eff}/#sigma_{n} (EBEB)
+x_var=(((phoseedE_0/phoseedadcToGeV_0)/phoseedpedrms12_0*(phoseedE_1/phoseedadcToGeV_1)/phoseedpedrms12_1)/sqrt(pow((phoseedE_0/phoseedadcToGeV_0)/phoseedpedrms12_0,2)+pow((phoseedE_1/phoseedadcToGeV_1)/phoseedpedrms12_1,2)))
+x_bins=VARIABLE 75 100 125 150 175 225 275 325 375 475 600 750 950 1275 1700 2250
+y_title=#Delta(KU Photon Seed Time) [ns] (EBEB)
+y_var=phoseedkutime_0-phoseedkutime_1
+y_bins=CONSTANT 30 -3 3
+y_var_data=+(phoseedTOF_0-phoseedTOF_1)+(phoseedtimeCali_1-phoseedtimeCali_0)
+y_var_bkgd=+(phoseedTOF_0-phoseedTOF_1)
+y_var_sign=+(phoseedTOF_0-phoseedTOF_1)
