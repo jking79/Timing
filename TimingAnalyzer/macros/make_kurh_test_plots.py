@@ -88,7 +88,7 @@ kuWtStcE5 = [ plot_kuWtStc_e5_2D, outfile_kuWtStc_e5_2D, kuWtStc_e5_outfile, tva
 kuMfootStcE5 = [ plot_kuMfootStc_e5_2D, outfile_kuMfootStc_e5_2D, kuMfootStc_e5_outfile, tvarname_kuMfootStc, calimapname_AveMfootStcE5 ]
 kuMfootCCStcE5 = [ plot_kuMfootCCStc_e5_2D, outfile_kuMfootCCStc_e5_2D, kuMfootCCStc_e5_outfile, tvarname_kuMfootCCStc, calimapname_AveMfootCCStcE5 ]
 
-plot_list = [ baseE5, kuNotStcE5, kuWtStcE5, kuMfootStcE5, kuMfootCCStcE5 ]
+plot_list = [ baseE5, kuWtStcE5, kuMfootStcE5, kuMfootCCStcE5 ]
 
 cut_cf='ku_config/tmp_cut_config.txt'  
 misc_cf='misc_config/misc.txt'
