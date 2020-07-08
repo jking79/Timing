@@ -7,8 +7,8 @@ options = VarParsing('python')
 
 ## LHC Info
 #options.register('lhcInfoValid',False,VarParsing.multiplicity.singleton,VarParsing.varType.bool,'flag to get lhc info');
-options.register('rawCollectionsValid',True,VarParsing.multiplicity.singleton,VarParsing.varType.bool,'flag to get digi/uncalRechit');
-options.register('kuRechitValid',True,VarParsing.multiplicity.singleton,VarParsing.varType.bool,'flag to get kuRechit');
+options.register('rawCollectionsValid',False,VarParsing.multiplicity.singleton,VarParsing.varType.bool,'flag to get digi/uncalRechit');
+options.register('kuRechitValid',False,VarParsing.multiplicity.singleton,VarParsing.varType.bool,'flag to get kuRechit');
 
 #options.register('rlelist','events2018.txt',VarParsing.multiplicity.singleton,VarParsing.varType.string,'Events to Process');
 ## blinding
@@ -94,7 +94,7 @@ options.register('demoMode',False,VarParsing.multiplicity.singleton,VarParsing.v
 options.register('processName','TREE',VarParsing.multiplicity.singleton,VarParsing.varType.string,'process name to be considered');
 
 ## outputFile Name
-options.register('outputFileName','ku_test_twotier_run17_dispho.root',VarParsing.multiplicity.singleton,VarParsing.varType.string,'output file name created by cmsRun');
+options.register('outputFileName','ku_test_twotier_multi_run17_dispho.root',VarParsing.multiplicity.singleton,VarParsing.varType.string,'output file name created by cmsRun');
 
 ## etra bits
 options.register('nThreads',8,VarParsing.multiplicity.singleton,VarParsing.varType.int,'number of threads per job');
@@ -214,8 +214,8 @@ process.load('Configuration.StandardSequences.EndOfProcess_cff')
 ## Message Logger settings
 process.load("FWCore.MessageService.MessageLogger_cfi")
 process.MessageLogger.destinations = ['cout', 'cerr']
-process.MessageLogger.cerr.FwkReport.reportEvery = 1
-#process.MessageLogger.cerr.FwkReport.reportEvery = 1000
+#process.MessageLogger.cerr.FwkReport.reportEvery = 1
+process.MessageLogger.cerr.FwkReport.reportEvery = 100000
 
 # LHC Info
 #process.LHCInfoReader = cms.ESSource("PoolDBESSource",
@@ -238,10 +238,11 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 1
 #eventList = open(options.rlelist,'r')
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(#'file:jwk_reco_data_DIGI2RAW.root'),
-	'/store/data/Run2017D/DoubleEG/MINIAOD/31Mar2018-v1/00000/A20F8F1B-4137-E811-A406-B083FED12B5C.root'
+	#'/store/data/Run2017D/DoubleEG/MINIAOD/31Mar2018-v1/00000/A20F8F1B-4137-E811-A406-B083FED12B5C.root'
+	'/store/data/Run2016B/DoubleEG/MINIAOD/17Jul2018_ver2-v1/00000/FA955B82-4C8D-E811-B99F-008CFA165F44.root'
 	#'file:rootSourceFiles/run2017D/miniaod/A20F8F1B-4137-E811-A406-B083FED12B5C.root'
         ),
-    secondaryFileNames = cms.untracked.vstring(
+#    secondaryFileNames = cms.untracked.vstring(
 	#323414
 
 #        '/store/data/Run2017D/DoubleEG/RAW/v1/000/302/634/00000/DAC2DFF0-D997-E711-A34C-02163E0143AD.root',
@@ -255,7 +256,7 @@ process.source = cms.Source("PoolSource",
 #        '/store/data/Run2017D/DoubleEG/RAW/v1/000/302/634/00000/36BE6CCD-D297-E711-8D54-02163E019E1B.root',
 #        '/store/data/Run2017D/DoubleEG/RAW/v1/000/302/634/00000/361700E4-D497-E711-B8B9-02163E019C43.root',
 #        '/store/data/Run2017D/DoubleEG/RAW/v1/000/302/634/00000/1A117DB3-D297-E711-BF5F-02163E01A571.root',
-        '/store/data/Run2017D/DoubleEG/RAW/v1/000/302/634/00000/E6D783BA-D297-E711-9E48-02163E019DB9.root', # first 100 events
+#        '/store/data/Run2017D/DoubleEG/RAW/v1/000/302/634/00000/E6D783BA-D297-E711-9E48-02163E019DB9.root', # first 100 events
 #        '/store/data/Run2017D/DoubleEG/RAW/v1/000/302/634/00000/00BDA6C5-D297-E711-8A62-02163E01A50A.root',
 #        '/store/data/Run2017D/DoubleEG/RAW/v1/000/302/596/00000/F0667189-D896-E711-832E-02163E01A550.root',
 #        '/store/data/Run2017D/DoubleEG/RAW/v1/000/302/596/00000/C4293084-D896-E711-B007-02163E01A5C5.root',
@@ -327,7 +328,7 @@ process.source = cms.Source("PoolSource",
 #        'file:rootSourceFiles/run2017D/raw/F04E8394-D797-E711-BBFE-02163E01A76B.root',
 #        'file:rootSourceFiles/run2017D/raw/F0667189-D896-E711-832E-02163E01A550.root',
 #        'file:rootSourceFiles/run2017D/raw/F491E3F9-6E94-E711-BAF5-02163E0141EE.root'
-	),
+#	),
     #eventsToProcess = cms.untracked.VEventRange(eventList)
 )
 
@@ -336,7 +337,7 @@ process.source = cms.Source("PoolSource",
 #if   options.demoMode : process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(1000))
 #else                  : process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(options.maxEvents))
 #process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(1))
-process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(100))
+process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(10000))
 #process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(-1))
 
 # Set the global tag depending on the sample type
@@ -378,7 +379,7 @@ process.ecalBadCalibReducedMINIAODFilter = cms.EDFilter("EcalBadCalibFilter",
 )
 
 # Make the tree 
-process.tree = cms.EDAnalyzer("DisPho",
+process.tree = cms.EDAnalyzer("DisPhoMulti",
    ## additional collections
    kuRechitValid = cms.bool(options.kuRechitValid),
    rawCollectionsValid = cms.bool(options.rawCollectionsValid),
@@ -463,27 +464,47 @@ process.tree = cms.EDAnalyzer("DisPho",
    recHitsEE = cms.InputTag("reducedEgamma", "reducedEERecHits"),
 
    ## ecal kuRecHits
-   kuRecHitsEB = cms.InputTag("kuEcalRecHit", "kuEcalRecHitsEB"),
-   kuRecHitsEE = cms.InputTag("kuEcalRecHit", "kuEcalRecHitsEE"),
+   kuRecHitsEB = cms.InputTag("kuEcalRecHit", "kuRecHitsEB"),
+   kuRecHitsEE = cms.InputTag("kuEcalRecHit", "kuRecHitsEE"),
 
-   kuStcRecHitsEB = cms.InputTag("kuStcEcalRecHit", "kuStcEcalRecHitsEB"),
-   kuStcRecHitsEE = cms.InputTag("kuStcEcalRecHit", "kuStcEcalRecHitsEE"),
+   kuStcRecHitsEB = cms.InputTag("kuStcEcalRecHit", "kuStcRecHitsEB"),
+   kuStcRecHitsEE = cms.InputTag("kuStcEcalRecHit", "kuStcRecHitsEE"),
 
-   kuNotRecHitsEB = cms.InputTag("kuNotEcalRecHit", "kuNotEcalRecHitsEB"),
-   kuNotRecHitsEE = cms.InputTag("kuNotEcalRecHit", "kuNotEcalRecHitsEE"),
+   kuNotRecHitsEB = cms.InputTag("kuNotEcalRecHit", "kuNotRecHitsEB"),
+   kuNotRecHitsEE = cms.InputTag("kuNotEcalRecHit", "kuNotRecHitsEE"),
 
-   kuNotStcRecHitsEB = cms.InputTag("kuNotStcEcalRecHit", "kuNotStcEcalRecHitsEB"),
-   kuNotStcRecHitsEE = cms.InputTag("kuNotStcEcalRecHit", "kuNotStcEcalRecHitsEE"),
+   kuNotStcRecHitsEB = cms.InputTag("kuNotStcEcalRecHit", "kuNotStcRecHitsEB"),
+   kuNotStcRecHitsEE = cms.InputTag("kuNotStcEcalRecHit", "kuNotStcRecHitsEE"),
+
+   ## ecal Multi rechits
+
+   ##kuWtRecHitsEB = cms.InputTag("kuWtEcalRecHit", "kuWtRecHitsEB"),
+   ##kuWtRecHitsEE = cms.InputTag("kuWtEcalRecHit", "kuWtRecHitsEE"),
+
+   kuWtStcRecHitsEB = cms.InputTag("kuWtStcEcalRecHit", "kuWtStcRecHitsEB"),
+   kuWtStcRecHitsEE = cms.InputTag("kuWtStcEcalRecHit", "kuWtStcRecHitsEE"),
+
+   ##kuWootRecHitsEB = cms.InputTag("kuWootEcalRecHit", "kuWootRecHitsEB"),
+   ##kuWootRecHitsEE = cms.InputTag("kuWootEcalRecHit", "kuWootRecHitsEE"),
+
+   kuWootStcRecHitsEB = cms.InputTag("kuWootStcEcalRecHit", "kuWootStcRecHitsEB"),
+   kuWootStcRecHitsEE = cms.InputTag("kuWootStcEcalRecHit", "kuWootStcRecHitsEE"),
+
+   kuMfootStcRecHitsEB = cms.InputTag("kuMfootStcEcalRecHit", "kuMfootStcRecHitsEB"),
+   kuMfootStcRecHitsEE = cms.InputTag("kuMfootStcEcalRecHit", "kuMfootStcRecHitsEE"),
+
+   kuMfootCCStcRecHitsEB = cms.InputTag("kuMfootCCStcEcalRecHit", "kuMfootCCStcRecHitsEB"),
+   kuMfootCCStcRecHitsEE = cms.InputTag("kuMfootCCStcEcalRecHit", "kuMfootCCStcRecHitsEE"),
 
    ## ecal uncalib recHits
    uncalibratedRecHitsEB = cms.InputTag("ecalMultiFitUncalibRecHit","EcalUncalibRecHitsEB"),
    uncalibratedRecHitsEE = cms.InputTag("ecalMultiFitUncalibRecHit","EcalUncalibRecHitsEE"),
 
-   ku_uncalibratedRecHitsEB = cms.InputTag("kuEcalMultiFitUncalibRecHit","kuEcalUncalibRecHitsEB"),
-   ku_uncalibratedRecHitsEE = cms.InputTag("kuEcalMultiFitUncalibRecHit","kuEcalUncalibRecHitsEE"),
+   #ku_uncalibratedRecHitsEB = cms.InputTag("kuEcalMultiFitUncalibRecHit","kuEcalUncalibRecHitsEB"),
+   #ku_uncalibratedRecHitsEE = cms.InputTag("kuEcalMultiFitUncalibRecHit","kuEcalUncalibRecHitsEE"),
 
-   kuNot_uncalibratedRecHitsEB = cms.InputTag("kuNotEcalMultiFitUncalibRecHit","kuNotEcalUncalibRecHitsEB"),
-   kuNot_uncalibratedRecHitsEE = cms.InputTag("kuNotEcalMultiFitUncalibRecHit","kuNotEcalUncalibRecHitsEE"),
+   #kuNot_uncalibratedRecHitsEB = cms.InputTag("kuNotEcalMultiFitUncalibRecHit","kuNotEcalUncalibRecHitsEB"),
+   #kuNot_uncalibratedRecHitsEE = cms.InputTag("kuNotEcalMultiFitUncalibRecHit","kuNotEcalUncalibRecHitsEE"),
 
    ## digis
    EBdigiCollection = cms.InputTag("ecalDigis","ebDigis"),
@@ -510,17 +531,17 @@ process.tree = cms.EDAnalyzer("DisPho",
 # Set up the path
 #process.treePath = cms.Path(
 process.tree_step = cms.EndPath(
-	     process.unpackedTracksAndVertices +
+	process.unpackedTracksAndVertices +
         #process.ecalBadCalibReducedMINIAODFilter +
-	     process.tree
+	process.tree
 )
 
 process.jwk_digisunpacker = cms.Sequence(
 				process.L1TRawToDigi+
 				#siPixelDigis+
 				#siStripDigis+
-        	   process.ecalDigis+
-        		process.ecalPreshowerDigis#+
+        			process.ecalDigis+
+        			process.ecalPreshowerDigis#+
 	                        #hcalDigis+
 	                        #muonCSCDigis+
 	                        #muonDTDigis+
@@ -533,7 +554,7 @@ process.jwk_digisunpacker = cms.Sequence(
 
 process.jwk_calolocalreco = cms.Sequence(
 				#process.ku_min_ecalLocalRecoSequence
-            process.ku_multi_ecalLocalRecoSequence
+                                process.ku_multi_ecalLocalRecoSequence
                                 #process.ku_ecalLocalRecoSequence
                                 #process.ecalLocalRecoSequence
 				#process.hcalLocalRecoSequence
@@ -565,7 +586,7 @@ process.jwk_highlevelreco = cms.Sequence(
 
 process.jwk_reconstruction = cms.Sequence(
 				#process.localreco*
-            process.jwk_localreco*
+                                process.jwk_localreco*
 				#process.globalreco*
 				#process.jwk_highlevelreco*
 				process.logErrorHarvester
@@ -582,11 +603,11 @@ process.endjob_step = cms.EndPath(process.endOfProcess)
 
 process.schedule = cms.Schedule(
 		#process.raw2digi_step,
-		process.ecalraw2digi_step,
-      process.L1Reco_step,
-		process.reconstruction_step,
+		#process.ecalraw2digi_step,
+                #process.L1Reco_step,
+		#process.reconstruction_step,
 		#process.content_step,
-		process.endjob_step,
+		#process.endjob_step,
 		process.tree_step
 )
 

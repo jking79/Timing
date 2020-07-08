@@ -6,7 +6,7 @@ from FWCore.ParameterSet.VarParsing import VarParsing
 options = VarParsing('python')
 
 ## LHC Info
-#options.register('lhcInfoValid',False,VarParsing.multiplicity.singleton,VarParsing.varType.bool,'flag to get lhc info');
+options.register('lhcInfoValid',False,VarParsing.multiplicity.singleton,VarParsing.varType.bool,'flag to get lhc info');
 options.register('rawCollectionsValid',True,VarParsing.multiplicity.singleton,VarParsing.varType.bool,'flag to get digi/uncalRechit');
 options.register('kuRechitValid',True,VarParsing.multiplicity.singleton,VarParsing.varType.bool,'flag to get kuRechit');
 
@@ -94,7 +94,7 @@ options.register('demoMode',False,VarParsing.multiplicity.singleton,VarParsing.v
 options.register('processName','TREE',VarParsing.multiplicity.singleton,VarParsing.varType.string,'process name to be considered');
 
 ## outputFile Name
-options.register('outputFileName','ku_test_twotier_run17_dispho.root',VarParsing.multiplicity.singleton,VarParsing.varType.string,'output file name created by cmsRun');
+options.register('outputFileName','ku_test_tt_kurhs_dispho.root',VarParsing.multiplicity.singleton,VarParsing.varType.string,'output file name created by cmsRun');
 
 ## etra bits
 options.register('nThreads',8,VarParsing.multiplicity.singleton,VarParsing.varType.int,'number of threads per job');
@@ -378,7 +378,7 @@ process.ecalBadCalibReducedMINIAODFilter = cms.EDFilter("EcalBadCalibFilter",
 )
 
 # Make the tree 
-process.tree = cms.EDAnalyzer("DisPho",
+process.tree = cms.EDAnalyzer("DisPhoMulti",
    ## additional collections
    kuRechitValid = cms.bool(options.kuRechitValid),
    rawCollectionsValid = cms.bool(options.rawCollectionsValid),
@@ -463,27 +463,41 @@ process.tree = cms.EDAnalyzer("DisPho",
    recHitsEE = cms.InputTag("reducedEgamma", "reducedEERecHits"),
 
    ## ecal kuRecHits
-   kuRecHitsEB = cms.InputTag("kuEcalRecHit", "kuEcalRecHitsEB"),
-   kuRecHitsEE = cms.InputTag("kuEcalRecHit", "kuEcalRecHitsEE"),
+   #kuRecHitsEB = cms.InputTag("kuEcalRecHit", "kuRecHitsEB"),
+   #kuRecHitsEE = cms.InputTag("kuEcalRecHit", "kuRecHitsEE"),
 
-   kuStcRecHitsEB = cms.InputTag("kuStcEcalRecHit", "kuStcEcalRecHitsEB"),
-   kuStcRecHitsEE = cms.InputTag("kuStcEcalRecHit", "kuStcEcalRecHitsEE"),
+   #kuStcRecHitsEB = cms.InputTag("kuStcEcalRecHit", "kuStcRecHitsEB"),
+   #kuStcRecHitsEE = cms.InputTag("kuStcEcalRecHit", "kuStcRecHitsEE"),
 
-   kuNotRecHitsEB = cms.InputTag("kuNotEcalRecHit", "kuNotEcalRecHitsEB"),
-   kuNotRecHitsEE = cms.InputTag("kuNotEcalRecHit", "kuNotEcalRecHitsEE"),
+   #kuNotRecHitsEB = cms.InputTag("kuNotEcalRecHit", "kuNotRecHitsEB"),
+   #kuNotRecHitsEE = cms.InputTag("kuNotEcalRecHit", "kuNotRecHitsEE"),
 
-   kuNotStcRecHitsEB = cms.InputTag("kuNotStcEcalRecHit", "kuNotStcEcalRecHitsEB"),
-   kuNotStcRecHitsEE = cms.InputTag("kuNotStcEcalRecHit", "kuNotStcEcalRecHitsEE"),
+   kuNotStcRecHitsEB = cms.InputTag("kuNotStcEcalRecHit", "kuNotStcRecHitsEB"),
+   kuNotStcRecHitsEE = cms.InputTag("kuNotStcEcalRecHit", "kuNotStcRecHitsEE"),
+
+   ## ecal Multi rechits
+
+   ##kuWtRecHitsEB = cms.InputTag("kuWtEcalRecHit", "kuWtRecHitsEB"),
+   ##kuWtRecHitsEE = cms.InputTag("kuWtEcalRecHit", "kuWtRecHitsEE"),
+
+   kuWtStcRecHitsEB = cms.InputTag("kuWtStcEcalRecHit", "kuWtStcRecHitsEB"),
+   kuWtStcRecHitsEE = cms.InputTag("kuWtStcEcalRecHit", "kuWtStcRecHitsEE"),
+
+   ##kuWootRecHitsEB = cms.InputTag("kuWootEcalRecHit", "kuWootRecHitsEB"),
+   ##kuWootRecHitsEE = cms.InputTag("kuWootEcalRecHit", "kuWootRecHitsEE"),
+
+   #kuWootStcRecHitsEB = cms.InputTag("kuWootStcEcalRecHit", "kuWootStcRecHitsEB"),
+   #kuWootStcRecHitsEE = cms.InputTag("kuWootStcEcalRecHit", "kuWootStcRecHitsEE"),
+
+   kuMfootStcRecHitsEB = cms.InputTag("kuMfootStcEcalRecHit", "kuMfootStcRecHitsEB"),
+   kuMfootStcRecHitsEE = cms.InputTag("kuMfootStcEcalRecHit", "kuMfootStcRecHitsEE"),
+
+   kuMfootCCStcRecHitsEB = cms.InputTag("kuMfootCCStcEcalRecHit", "kuMfootCCStcRecHitsEB"),
+   kuMfootCCStcRecHitsEE = cms.InputTag("kuMfootCCStcEcalRecHit", "kuMfootCCStcRecHitsEE"),
 
    ## ecal uncalib recHits
    uncalibratedRecHitsEB = cms.InputTag("ecalMultiFitUncalibRecHit","EcalUncalibRecHitsEB"),
    uncalibratedRecHitsEE = cms.InputTag("ecalMultiFitUncalibRecHit","EcalUncalibRecHitsEE"),
-
-   ku_uncalibratedRecHitsEB = cms.InputTag("kuEcalMultiFitUncalibRecHit","kuEcalUncalibRecHitsEB"),
-   ku_uncalibratedRecHitsEE = cms.InputTag("kuEcalMultiFitUncalibRecHit","kuEcalUncalibRecHitsEE"),
-
-   kuNot_uncalibratedRecHitsEB = cms.InputTag("kuNotEcalMultiFitUncalibRecHit","kuNotEcalUncalibRecHitsEB"),
-   kuNot_uncalibratedRecHitsEE = cms.InputTag("kuNotEcalMultiFitUncalibRecHit","kuNotEcalUncalibRecHitsEE"),
 
    ## digis
    EBdigiCollection = cms.InputTag("ecalDigis","ebDigis"),
@@ -510,10 +524,10 @@ process.tree = cms.EDAnalyzer("DisPho",
 # Set up the path
 #process.treePath = cms.Path(
 process.tree_step = cms.EndPath(
-	     process.unpackedTracksAndVertices +
-        #process.ecalBadCalibReducedMINIAODFilter +
-	     process.tree
-)
+		      process.unpackedTracksAndVertices +
+            #process.ecalBadCalibReducedMINIAODFilter +
+		      process.tree
+            )
 
 process.jwk_digisunpacker = cms.Sequence(
 				process.L1TRawToDigi+
@@ -521,21 +535,22 @@ process.jwk_digisunpacker = cms.Sequence(
 				#siStripDigis+
         	   process.ecalDigis+
         		process.ecalPreshowerDigis#+
-	                        #hcalDigis+
-	                        #muonCSCDigis+
-	                        #muonDTDigis+
-	                        #muonRPCDigis+
-	                      	#castorDigis+
-	                      	#scalersRawToDigi+
-	                      	#tcdsDigis+
-	                      	#onlineMetaDataDigis
-        			)
+	         #hcalDigis+
+	         #muonCSCDigis+
+	         #muonDTDigis+
+	         #muonRPCDigis+
+	         #castorDigis+
+	         #scalersRawToDigi+
+	         #tcdsDigis+
+	         #onlineMetaDataDigis
+        	   )
 
 process.jwk_calolocalreco = cms.Sequence(
 				#process.ku_min_ecalLocalRecoSequence
-            process.ku_multi_ecalLocalRecoSequence
-                                #process.ku_ecalLocalRecoSequence
-                                #process.ecalLocalRecoSequence
+            #process.ku_multi_ecalLocalRecoSequence
+            process.ku_reduced_multi_ecalLocalRecoSequence
+            #process.ku_ecalLocalRecoSequence
+            #process.ecalLocalRecoSequence
 				#process.hcalLocalRecoSequence
 				)
 
@@ -548,20 +563,20 @@ process.jwk_localreco = cms.Sequence(
 				)
 
 process.jwk_highlevelreco = cms.Sequence(
-			      #process.egammaHighLevelRecoPrePF*
-                              #process.particleFlowReco*
-                              #process.egammaHighLevelRecoPostPF*
-                              #process.muoncosmichighlevelreco*
-                              #process.muonshighlevelreco *
-                              #process.particleFlowLinks*
-                              #process.jetHighLevelReco*
-                              #process.metrecoPlusHCALNoise*
-                              #process.btagging*
-                              #process.recoPFMET*
-                              #process.PFTau*
-                              #process.reducedRecHits #*
-                              #process.cosmicDCTracksSeq
-                             )
+			   #process.egammaHighLevelRecoPrePF*
+            #process.particleFlowReco*
+            #process.egammaHighLevelRecoPostPF*
+            #process.muoncosmichighlevelreco*
+            #process.muonshighlevelreco *
+            #process.particleFlowLinks*
+            #process.jetHighLevelReco*
+            #process.metrecoPlusHCALNoise*
+            #process.btagging*
+            #process.recoPFMET*
+            #process.PFTau*
+            #process.reducedRecHits #*
+            #process.cosmicDCTracksSeq
+            )
 
 process.jwk_reconstruction = cms.Sequence(
 				#process.localreco*
@@ -569,7 +584,7 @@ process.jwk_reconstruction = cms.Sequence(
 				#process.globalreco*
 				#process.jwk_highlevelreco*
 				process.logErrorHarvester
-)
+            )
 
 process.content = cms.EDAnalyzer("EventContentAnalyzer")
 process.content_step = cms.Path(process.content)

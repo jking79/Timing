@@ -50,7 +50,7 @@ def getOptions():
     return options
 
 
-def docrab():
+def docrab( dataset ):
 
     options = getOptions()
 
@@ -60,14 +60,16 @@ def docrab():
         # External files needed by CRAB
         #inputDir     = '/home/t3-ku/jaking/ecaltiming/ku_cmssw_ecaltiming/CMSSW_10_2_5/src/Timing/TimingAnalyzer/test/input/'
 	#inputDir     = '/home/t3-ku/jaking/ecaltiming/CMSSW_9_4_10/src/Timing/TimingAnalyzer/test/input/'
-        inputDir     = '/home/t3-ku/jaking/ecaltiming/ku_cmssw_ecaltiming/CMSSW_9_4_10/src/Timing/TimingAnalyzer/test/input/'
+        inputDir     = '/home/t3-ku/jaking/ecaltiming/CMSSW_9_4_10/src/Timing/TimingAnalyzer/test/input/'
         inputPaths   = 'HLTpathsWExtras.txt'
         inputFilters = 'HLTfilters.txt'
         inputFlags   = 'METflags.txt'
+        #inputJSON    = 'golden2016.json'
         inputJSON    = 'golden2017.json'
         #inputJSON    = 'Cert_314472-325175_13TeV_PromptReco_Collisions18_JSON.txt'
-        inputRuns  =   'All'
-	secInputPaths = '/DoubleEG/Run2017D-v1/RAW'
+        inputRuns  =   'FULL'
+
+	secInputPaths = dataset[1] 
 
         #--------------------------------------------------------
         # This is the base config:
@@ -81,7 +83,8 @@ def docrab():
         config.JobType.pluginName  = 'Analysis'
         #config.JobType.psetName    = 'dispho_twotier.py'
         #config.JobType.psetName    = 'dispho_raw_twotier.py'
-        config.JobType.psetName    = 'dispho_raw_twotier_2017D.py'
+        #config.JobType.psetName    = 'dispho_raw_twotier_2017D_multi.py'
+        config.JobType.psetName    = 'dispho_noraw_notwotier_nomulti.py'
         #config.JobType.numCores    = 8
         config.JobType.pyCfgParams = None
         config.JobType.inputFiles  = [ inputDir+inputPaths , inputDir+inputFilters , inputDir+inputFlags ]
@@ -91,43 +94,29 @@ def docrab():
         #config.Data.secondaryInputDataset = secInputPaths
         config.Data.lumiMask       = inputJSON
         config.Data.splitting      = 'EventAwareLumiBased'
-        config.Data.unitsPerJob    = 25000
+        #config.Data.unitsPerJob    = 25000
         #config.Data.splitting     = 'Automatic'
-        #config.Data.unitsPerJob   = 200000
+        config.Data.unitsPerJob   = 100000
         #config.Data.runRange       = inputRuns
 
+	config.JobType.allowUndistributedCMSSW = True
         config.Data.publication    = False
         config.Site.storageSite    = 'T2_US_Nebraska'
         config.Data.outLFNDirBase  = '/store/user/jaking/ecalTiming/'
         #--------------------------------------------------------
 
         # Will submit one task for each of these input datasets.
-        inputDataAndOpts = [
-            #['/SinglePhoton/Run2017B-09May2018-v1/MINIAOD'],
-            #['/SinglePhoton/Run2017C-09May2018-v1/MINIAOD'],
-            #['/SinglePhoton/Run2017D-09May2018-v1/MINIAOD'],
-            #['/SinglePhoton/Run2017E-09May2018-v1/MINIAOD'],
-            #['/SinglePhoton/Run2017F-09May2018-v1/MINIAOD'],
+        inputDataAndOpts = [[dataset[0]]]
 
-            #['/DoubleEG/Run2017B-31Mar2018-v1/MINIAOD'],
-            #['/DoubleEG/Run2017C-31Mar2018-v1/MINIAOD'],
-            ['/DoubleEG/Run2017D-31Mar2018-v1/MINIAOD'],
-            #['/DoubleEG/Run2017E-31Mar2018-v1/MINIAOD'],
-            #['/DoubleEG/Run2017F-31Mar2018-v1/MINIAOD'],
-
-            ##['/DoubleEG/Run2017B-17Nov2017-v1/MINIAOD'],
-            ##['/DoubleEG/Run2017C-17Nov2017-v1/MINIAOD'],
-            ##['/DoubleEG/Run2017D-17Nov2017-v1/MINIAOD'],
-            ##['/DoubleEG/Run2017E-17Nov2017-v1/MINIAOD'],
-            ##['/DoubleEG/Run2017F -17Nov2017-v1/MINIAOD'],
-
-            ]
- 
         for inDO in inputDataAndOpts:
+	    print( inDO )
             # inDO[0] is of the form /A/B/C. Since A+B is unique for each inDS, use this in the CRAB request name.
             primaryDataset = inDO[0].split('/')[1]
+	    print( primaryDataset )
             runEra         = inDO[0].split('/')[2]
+            print( runEra )
             dataset        = inDO[0].split('/')[3]
+            print( dataset )
             #trial          = "valtest12_twotier" # useParent=True; rawCollectionsValid=True 
             #trial          = "valtest13_twotier"  # useParent=True; rawCollectionsValid=False
             #trial          = "valtest14_twotier"  # useParent=False; rawCollectionsValid=False
@@ -147,12 +136,20 @@ def docrab():
             #trial          = "valtest33_2t_2017" # as 28 with /DoubleEG/Run2017D-09Aug2019_UL2017-v1/MINIAOD
             #trial          = "valtest34_2t94_2017" # as 28 with /DoubleEG/Run2017D-17Nov2017-v1/MINIAOD
             #trial          = "valtest35_2t94_2017" # as 28 with /DoubleEG/Run2017D-17Nov2017-v1/MINIAOD
-	    #trial          = "valtest38_2t94_2017D" # as 28 with /DoubleEG/Run2017D-17Nov2017-v1/MINIAOD globalTag=94X_dataRun2_ReReco_EOY17_v2
+	         #trial          = "valtest38_2t94_2017D" # as 28 with /DoubleEG/Run2017D-17Nov2017-v1/MINIAOD globalTag=94X_dataRun2_ReReco_EOY17_v2
             #trial          = "valtest39_2t94_2017D" # as 28 with /DoubleEG/Run2017D-31Mar2018-v1/MINIAOD  globalTag=94X_dataRun2_ReReco_EOY17_v2
-            trial          = "valtest40_2t94_2017D" # as 28 with grandparent /DoubleEG/Run2017D-31Mar2018-v1/MINIAOD  globalTag=94X_dataRun2_ReReco_EOY17_v2
+            #trial          = "valtest40_2t94_2017D" # as 28 with grandparent /DoubleEG/Run2017D-31Mar2018-v1/MINIAOD  globalTag=94X_dataRun2_ReReco_EOY17_v2
+            #trial          = "valtest41_2t94_multi_2017D" # as 28 with multi rh and grandparent /DoubleEG/Run2017D-31Mar2018-v1/MINIAOD  globalTag=94X_dataRun2_ReReco_EOY17_v2
+            #trial          = "twotier94_rm_w_ks" # as 41 above
+            #trial          = "onetier94_mini_v9" # as 41 above  onetier_mini_nolhc_v9
+            #trial          = "onetier_mini_v9_2017_rt3" # as 41 above  onetier_mini_nolhc_v9
+            #trial          = "onetier_mini_v9_early" # as 41 above  onetier_mini_nolhc_v9
+	         #trial          = "onetier_mini_singlephoton_v9" # as 41 above  onetier_mini_nolhc_v9
+            trial          = "onetier_mini_v10_2017_redele" # as 41 above  onetier_mini_nolhc_v9
+            #trial          = "onetier_mini_v10_2016_redele" # as 41 above  onetier_mini_nolhc_v9
 
-            runs           = inputRuns
-	    #runs	   = "Full"
+            #runs           = inputRuns
+	    runs	   = "Full"
 
             #config.General.requestName   = primaryDataset+"_"+runEra+"_v7"
             config.General.requestName   = trial+"_"+primaryDataset+"_"+runEra+"_"+runs+"_"+dataset+"_dispho"
@@ -160,21 +157,21 @@ def docrab():
 
             #config.Data.secondaryInputDataset = secInputPaths
 
-            #config.JobType.pyCfgParams   = ['globalTag=106X_dataRun2_v20',#'nThreads='+str(config.JobType.numCores),
-            #                                'inputPaths='+inputPaths,'inputFilters='+inputFilters,'inputFlags='+inputFlags, 'onlyGED=True', 
-	    #				    'outputFileName=output.root', 'kuRechitValid=True','lhcInfoValid=False', 'rawCollectionsValid=True']
 
-            config.JobType.pyCfgParams   = ['globalTag=94X_dataRun2_ReReco_EOY17_v2',#'nThreads='+str(config.JobType.numCores),
+#>>>>>>>>>>>>>>>>>>>	    #2017   #globalTag=94X_dataRun2_ReReco_EOY17_v2
+            config.JobType.pyCfgParams   = ['globalTag=94X_dataRun2_v11',#'nThreads='+str(config.JobType.numCores),
                                             'inputPaths='+inputPaths,'inputFilters='+inputFilters,'inputFlags='+inputFlags, 'onlyGED=True',
-                                            'outputFileName=output.root', 'kuRechitValid=True','rawCollectionsValid=True']
+                                            'outputFileName=output.root', 'kuRechitValid=False','rawCollectionsValid=False']
 
-            #config.JobType.pyCfgParams   = ['globalTag=94X_dataRun2_ReReco17_forValidation',#'nThreads='+str(config.JobType.numCores),
+#>>>>>>>>>>>>>>>>>>>	    #2016
+            #config.JobType.pyCfgParams   = ['globalTag=94X_dataRun2_v10',#'nThreads='+str(config.JobType.numCores),
             #                                'inputPaths='+inputPaths,'inputFilters='+inputFilters,'inputFlags='+inputFlags, 'onlyGED=True',
-            #                                'outputFileName=output.root', 'kuRechitValid=True', 'rawCollectionsValid=True']
+            #                                'outputFileName=output.root', 'kuRechitValid=False','rawCollectionsValid=False']
+
 
             config.Data.inputDataset     = inDO[0]
             #config.Data.outputDatasetTag = '%s_%s' % (config.General.workArea, config.General.requestName)
-	    config.Data.secondaryInputDataset = secInputPaths
+	         #config.Data.secondaryInputDataset = secInputPaths
             # Submit.
             try:
                 print "Submitting for input dataset %s" % (inDO[0])
@@ -205,5 +202,36 @@ def docrab():
                 print "Failed executing command %s for task %s: %s" % (options.crabCmd, projDir, cle)
 
 
-docrab();
+##33333333333333333333333333333333333333333333333333333333333
+
+def run_multi():
+
+        datasets = [
+            #['/DoubleEG/Run2016H-17Jul2018-v1/MINIAOD','/DoubleEG/Run2016H-v1/RAW'],
+            #['/DoubleEG/Run2016G-17Jul2018-v1/MINIAOD','/DoubleEG/Run2016G-v1/RAW'],
+            #['/DoubleEG/Run2016F-17Jul2018-v1/MINIAOD','/DoubleEG/Run2016F-v1/RAW'],
+            #['/DoubleEG/Run2016E-17Jul2018-v1/MINIAOD','/DoubleEG/Run2016E-v2/RAW'],
+            #['/DoubleEG/Run2016D-17Jul2018-v1/MINIAOD','/DoubleEG/Run2016D-v2/RAW'],
+            #['/DoubleEG/Run2016C-17Jul2018-v1/MINIAOD','/DoubleEG/Run2016C-v2/RAW'],
+            #['/DoubleEG/Run2016B-17Jul2018_ver2-v1/MINIAOD','/DoubleEG/Run2016B-v2/RAW'],
+            
+            #['/DoubleEG/Run2017B-31Mar2018-v1/MINIAOD',''],
+            #['/DoubleEG/Run2017C-31Mar2018-v1/MINIAOD',''],
+            ['/DoubleEG/Run2017D-31Mar2018-v1/MINIAOD',''],
+            #['/DoubleEG/Run2017E-31Mar2018-v1/MINIAOD',''],
+            #['/DoubleEG/Run2017F-31Mar2018-v1/MINIAOD',''],
+
+	         #['/DoubleEG/Run2017C-12Sep2017-v1/MINIAOD',''],
+
+            #['/SinglePhoton/Run2016C-17Jul2018-v1/MINIAOD',''],
+            #['/SinglePhoton/Run2016B-17Jul2018_ver2-v1/MINIAOD',''],
+
+            ]
+
+	for dataset in datasets :
+		docrab( dataset )
+
+
+
+run_multi()
 
