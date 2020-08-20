@@ -7,6 +7,6 @@ jet_scale=Nominal
 jet_resol=Nominal
 
 isLHCInfo=false
-hasUrecDigi=true
+hasUrecDigi=false
 hasMultiKURecHit=false
 

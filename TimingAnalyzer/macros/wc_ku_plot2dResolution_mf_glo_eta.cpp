@@ -53,6 +53,9 @@ void plot2dResolution( string indir, string infilelistname, string outfilename, 
     double phoseedtimeCaliIc_1(0.0);
 
     UInt_t   run;
+    Float_t vtxZ;
+    Float_t elTrackZ_0;
+    Float_t elTrackZ_1;
 
     Int_t   phoseedI1_0; // EB: iphi, EE: ix
     Int_t   phoseedI2_0; // EB: ieta, EE: iy
@@ -63,8 +66,12 @@ void plot2dResolution( string indir, string infilelistname, string outfilename, 
     Float_t phoseedpedrms12_0;
     Float_t phoseedTOF_0;
     Float_t phoseedtime_0;
+    Float_t photdz_0;
 
     TBranch * b_run;
+    TBranch * b_vtxZ;
+    TBranch * b_elTrackZ_0;
+    TBranch * b_elTrackZ_1;
 
     TBranch * b_phoseedI1_0;
     TBranch * b_phoseedI2_0;
@@ -192,6 +199,10 @@ void plot2dResolution( string indir, string infilelistname, string outfilename, 
 
         std::cout << "set branches to get from fInFile : fInTree" << std::endl;
         fInTree->SetBranchAddress("run", &run, &b_run);
+        fInTree->SetBranchAddress("vtxZ", &vtxZ, &b_vtxZ);
+        fInTree->SetBranchAddress("elTrackZ_0", &elTrackZ_0, &b_elTrackZ_0);
+        fInTree->SetBranchAddress("elTrackZ_1", &elTrackZ_1, &b_elTrackZ_1);
+
         fInTree->SetBranchAddress("phoseedI1_0", &phoseedI1_0, &b_phoseedI1_0);
         fInTree->SetBranchAddress("phoseedI2_0", &phoseedI2_0, &b_phoseedI2_0);
         fInTree->SetBranchAddress("phoseedEcal_0", &phoseedEcal_0, &b_phoseedEcal_0);
@@ -244,7 +255,10 @@ void plot2dResolution( string indir, string infilelistname, string outfilename, 
 	         if( entry%100000 == 0 ) std::cout << "Proccessed " << entry << " of " << nEntries << " entries." << std::endl;        
 
 	         fInFile->cd();
-			   b_run->GetEntry(entry);
+			   b_vtxZ->GetEntry(entry);
+            b_elTrackZ_0->GetEntry(entry);
+            b_elTrackZ_1->GetEntry(entry);
+            b_run->GetEntry(entry);
             b_phoseedI1_0->GetEntry(entry);
 	         b_phoseedI2_0->GetEntry(entry);	
 	         b_phoseedEcal_0->GetEntry(entry);
@@ -265,8 +279,7 @@ void plot2dResolution( string indir, string infilelistname, string outfilename, 
             b_phoseedTOF_1->GetEntry(entry);
             b_phoseedtime_1->GetEntry(entry);
 
-				if( brun < 200000 ) run = 200000;
-            if((run <= brun) or (run >= erun)) continue;
+            if( (run <= brun) or (run >= erun) ) continue;
             auto i10 = phoseedI1_0;
             auto i11 = phoseedI1_1;
             auto i20 = phoseedI2_0;     
@@ -274,8 +287,7 @@ void plot2dResolution( string indir, string infilelistname, string outfilename, 
             auto i21 = phoseedI2_1;
             //auto i21 = abs(phoseedI2_1);
             //std::cout << "I2_0 : " << i20 << " I2_1 : " << i21  << " " << leta << " " << heta << std::endl;
-            if( (i20 < leta ) or ( i20 > heta ) ) continue;
-            if( (i21 < leta ) or ( i21 > heta ) ) continue;
+            //if( ((i20 < leta ) or ( i20 > heta )) and ((i21 < leta ) or ( i21 > heta )) ) continue;
             //std::cout << "Passed eta filter" << std::endl;
 
 	         int bin_offset = 86;
@@ -301,11 +313,12 @@ void plot2dResolution( string indir, string infilelistname, string outfilename, 
 
             //std::cout << "Fill 2D Hist" << std::endl;
 		      auto skip = false;
-            //auto kscc_offset = 3101.f;
+            auto kscc_offset = 3101.f;
 		      auto outlier = 1000.f;
 		      auto offset = 0.f;
             auto outlier_offset = 0.f;
-	         //if( tvarname == "phoseedkuMfootCCStctime" ) { outlier_offset = kscc_offset; } //std::cout << "KsCC ";} 
+            auto ele_dz = 0.005; //  0.1 or 0.005 
+	         if( tvarname == "phoseedkuMfootCCStctime" ) { outlier_offset = kscc_offset; } //std::cout << "KsCC ";} 
             if( (abs(phoseedtime_0 + outlier_offset ) > outlier) and (abs(phoseedtime_1 + outlier_offset ) > outlier) ) skip = true;
             //if( tvarname == "phoseedkuMfootCCStctime" ) { skip = false; }
 
@@ -317,14 +330,16 @@ void plot2dResolution( string indir, string infilelistname, string outfilename, 
 		      auto e_cut = (phoseedE_0>=10)&&(phoseedE_0<=120)&&(phoseedE_1>=10)&&(phoseedE_1<=120);
             //auto e_cut = (phoseedE_0>=5)&&(phoseedE_0<=100)&&(phoseedE_1>=5)&&(phoseedE_1<=100);
 	         auto eta_cut = (phoseedEcal_0 == ECAL::EB)&&(phoseedEcal_1 == ECAL::EB);
+            auto dz_cut = (abs(elTrackZ_0 - vtxZ) < ele_dz)&&(abs(elTrackZ_1 - vtxZ) < ele_dz);
 	         auto isd_cut = true; //inclusive
             if( isd_type == "Different") isd_cut = (phoseedTT_0!=phoseedTT_1); //diffrent
             if( isd_type == "Same") isd_cut = (phoseedTT_0==phoseedTT_1); //same
-	         auto event_good = e_cut && eta_cut && isd_cut;
+	         auto event_good = e_cut && eta_cut && isd_cut && dz_cut;
 
             //if( (run >= brun) and (run <= erun) ) {
 	         if( event_good and not skip ){ 
-					theHist->Fill(xfill,yfill);
+               if((i20 >= leta ) and ( i20 <= heta )) theHist->Fill(xfill,yfill);
+					else if((i21 >= leta ) and ( i21 <= heta )) theHist->Fill(xfill,yfill);
 					if( xfill < 75 ) effBinHists[0]->Fill(xfill);
 					else if( xfill < 100 ) effBinHists[1]->Fill(xfill);
                else if( xfill < 125 ) effBinHists[2]->Fill(xfill);
@@ -357,10 +372,10 @@ void plot2dResolution( string indir, string infilelistname, string outfilename, 
 						thetdfcHist->Fill(phoseedtime_1+offset-phoseedtimeCaliIc_1);
 				}       
             if( event_good and not skip ) {
-						theetaHist->Fill(i20,yfill); 
-						theetaHist->Fill(i21,yfill);
-                  thephiHist->Fill(i10,yfill);
-                  thephiHist->Fill(i11,yfill);
+						if((i20 >= leta ) and ( i20 <= heta )) theetaHist->Fill(i20,yfill); 
+						else if((i21 >= leta ) and ( i21 <= heta )) theetaHist->Fill(i21,yfill);
+                  if((i20 >= leta ) and ( i20 <= heta )) thephiHist->Fill(i10,yfill);
+                  else if((i21 >= leta ) and ( i21 <= heta )) thephiHist->Fill(i11,yfill);
 				}
         } // end of for loop
 	 	  delete fInFile;

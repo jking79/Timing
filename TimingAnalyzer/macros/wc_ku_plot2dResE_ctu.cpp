@@ -26,6 +26,11 @@ void plot2dResolution( string califilename, string infilename, string outfilenam
     double phoseedtimeCaliIc_0(0.0);
     double phoseedtimeCaliIc_1(0.0);
 
+    //Float_t phoE_0;
+    //Float_t phopt_0;
+    //Float_t phoeta_0;
+    //Float_t phophi_0;
+
     Int_t   phoseedI1_0; // EB: iphi, EE: ix
     Int_t   phoseedI2_0; // EB: ieta, EE: iy
     Int_t   phoseedEcal_0; // EB, EM, EP
@@ -36,6 +41,11 @@ void plot2dResolution( string califilename, string infilename, string outfilenam
     Float_t phoseedTOF_0;
     Float_t phoseedtime_0;
     Float_t phoseedtimeErr_0;
+
+    //TBranch * b_phoE_0;
+    //TBranch * b_phopt_0;
+    //TBranch * b_phoeta_0;
+    //TBranch * b_phophi_0;
 
     TBranch * b_phoseedI1_0;
     TBranch * b_phoseedI2_0;
@@ -48,6 +58,11 @@ void plot2dResolution( string califilename, string infilename, string outfilenam
     TBranch * b_phoseedtime_0;
     TBranch * b_phoseedtimeErr_0;
 
+    //Float_t phoE_1;
+    //Float_t phopt_1;
+    //Float_t phoeta_1;
+    //Float_t phophi_1;
+
     Int_t   phoseedI1_1; // EB: iphi, EE: ix
     Int_t   phoseedI2_1; // EB: ieta, EE: iy
     Int_t   phoseedEcal_1; // EB, EM, EP
@@ -58,6 +73,11 @@ void plot2dResolution( string califilename, string infilename, string outfilenam
     Float_t phoseedTOF_1;
     Float_t phoseedtime_1;
     Float_t phoseedtimeErr_1;
+
+    //TBranch * b_phoE_1;
+    //TBranch * b_phopt_1;
+    //TBranch * b_phoeta_1;
+    //TBranch * b_phophi_1;
 
     TBranch * b_phoseedI1_1;
     TBranch * b_phoseedI2_1;
@@ -70,6 +90,11 @@ void plot2dResolution( string califilename, string infilename, string outfilenam
     TBranch * b_phoseedtime_1;  
     TBranch * b_phoseedtimeErr_1; 
  
+    //fInTree->SetBranchAddress("phoE_0", &phoE_0, &b_phoE_0);
+    //fInTree->SetBranchAddress("phopt_0", &phopt_0, &b_phopt_0);
+    //fInTree->SetBranchAddress("phoeta_0", &phoeta_0, &b_phoeta_0);
+    //fInTree->SetBranchAddress("phophi_0", &phophi_0, &b_phophi_0);
+
     fInTree->SetBranchAddress("phoseedI1_0", &phoseedI1_0, &b_phoseedI1_0);
     fInTree->SetBranchAddress("phoseedI2_0", &phoseedI2_0, &b_phoseedI2_0);
     fInTree->SetBranchAddress("phoseedEcal_0", &phoseedEcal_0, &b_phoseedEcal_0);
@@ -81,8 +106,13 @@ void plot2dResolution( string califilename, string infilename, string outfilenam
     //fInTree->SetBranchAddress("phoseedkuStctime_0", &phoseedtime_0, &b_phoseedtime_0);
     string tvarname_0(tvarname+"_0");
     fInTree->SetBranchAddress( tvarname_0.c_str(), &phoseedtime_0, &b_phoseedtime_0);
-    string tvarnameErr_0(tvarname+"Err_0");
-    fInTree->SetBranchAddress( tvarnameErr_0.c_str(), &phoseedtimeErr_0, &b_phoseedtimeErr_0);
+    //string tvarnameErr_0(tvarname+"Err_0");
+    //fInTree->SetBranchAddress( tvarnameErr_0.c_str(), &phoseedtimeErr_0, &b_phoseedtimeErr_0);
+
+    //fInTree->SetBranchAddress("phoE_1", &phoE_1, &b_phoE_1);
+    //fInTree->SetBranchAddress("phopt_1", &phopt_1, &b_phopt_1);
+    //fInTree->SetBranchAddress("phoeta_1", &phoeta_1, &b_phoeta_1);
+    //fInTree->SetBranchAddress("phophi_1", &phophi_1, &b_phophi_1);
 
     fInTree->SetBranchAddress("phoseedI1_1", &phoseedI1_1, &b_phoseedI1_1);
     fInTree->SetBranchAddress("phoseedI2_1", &phoseedI2_1, &b_phoseedI2_1);
@@ -95,8 +125,8 @@ void plot2dResolution( string califilename, string infilename, string outfilenam
     //fInTree->SetBranchAddress("phoseedkuStctime_1", &phoseedtime_1, &b_phoseedtime_1);
     string tvarname_1(tvarname+"_1");
     fInTree->SetBranchAddress( tvarname_1.c_str(), &phoseedtime_1, &b_phoseedtime_1);
-    string tvarnameErr_1(tvarname+"Err_1");
-    fInTree->SetBranchAddress( tvarnameErr_1.c_str(), &phoseedtimeErr_1, &b_phoseedtimeErr_1);
+    //string tvarnameErr_1(tvarname+"Err_1");
+    //fInTree->SetBranchAddress( tvarnameErr_1.c_str(), &phoseedtimeErr_1, &b_phoseedtimeErr_1);
 
 //     get maps from fCaliFile
     std::cout << "get maps from fCaliFile" << std::endl;
@@ -121,39 +151,54 @@ void plot2dResolution( string califilename, string infilename, string outfilenam
     std::cout << "Setting up 2D plot" << std::endl;
 
     string histname("Data_Hist");
+    string histname_c("Data_Hist_Core");
+    string histname_t("Data_Hist_Tail");
+    string histname_u("Data_Hist_UnScaled");
+    string histname_l("Data_Hist_LargeScale");
     string histname1("td_Hist");
     string histname2("tdc_Hist");
     string histname3("tdf_Hist");
     string histname4("tdfc_Hist");
-    string fTitle("#Delta(Photon Seed Time) [ns] vs. A_{eff}/#sigma_{n} (EBEB)");
+    string fTitle("#Delta(t_{0}-t_{1}) [ns] vs. ETeff [GeV] (EBEB)");
     string fTitle1("Photon Seed Time [ns]");
     string fTitle2("Photon Seed Time Calibrated [ns]");
     string fTitle3("Photon Seed Time Filtered [ns]");
     string fTitle4("Photon Seed Time Filtered Calibrated [ns]");
-    string fXTitle("A_{eff}/#sigma_{n} (EBEB)");
+    string fXTitle("ETeff [GeV] (EBEB)");
     std::vector<Double_t> fXBins;
     Bool_t fXVarBins = false;
-    string xbinstr("VARIABLE 75 100 125 150 175 225 275 325 375 475 600 750 950 1275 1700 2250");
+    //string xbinstr("VARIABLE 0 75 100 125 150 175 225 275 325 375 475 600 750 950 1275 1700 2250");
+    string xbinstr("VARIABLE 0 2 4 6 8 10 12 14 16 20 24 30 38 52 68 100");
+    //string xbinstr("CONSTANT 20 0 100");
     //std::vector<TString> fXLabels;
-    string fYTitle("#Delta(Photon Seed Time) [ns] (EBEB)");
+    string fYTitle("#Delta(t_{0}-t_{1}) [ns] (EBEB)");
     std::vector<Double_t> fYBins;
+    std::vector<Double_t> fYLBins;
     Bool_t fYVarBins = false;
     //string ybinstr("CONSTANT 30 -3 3");
     string ybinstr("CONSTANT 480 -3 3");
+    string ylbinstr("CONSTANT 480 -30 30");
     //std::vector<TString> fYLabels;
     string fZTitle("");
 
     Common::SetupBins(xbinstr,fXBins,fXVarBins);
     Common::SetupBins(ybinstr,fYBins,fYVarBins);
+    Common::SetupBins(ylbinstr,fYLBins,fYVarBins);
 
     const auto xbins = &fXBins[0];
     const auto ybins = &fYBins[0];
+    const auto ylbins = &fYLBins[0];
 
     int tdiv = 960;
     float tstart = -6.0;
     float tend = 6.0;
 
     auto theHist = new TH2F(histname.c_str(),fTitle.c_str(),fXBins.size()-1,xbins,fYBins.size()-1,ybins);
+    auto theHistC = new TH2F(histname_c.c_str(),fTitle.c_str(),fXBins.size()-1,xbins,fYBins.size()-1,ybins);
+    auto theHistT = new TH2F(histname_t.c_str(),fTitle.c_str(),fXBins.size()-1,xbins,fYBins.size()-1,ybins);
+    auto theHistU = new TH2F(histname_u.c_str(),fTitle.c_str(),fXBins.size()-1,xbins,fYBins.size()-1,ybins);
+    auto theHistL = new TH2F(histname_l.c_str(),fTitle.c_str(),fXBins.size()-1,xbins,fYBins.size()-1,ylbins);
+
     auto thetdHist = new TH1F(histname1.c_str(),fTitle1.c_str(),tdiv,tstart,tend);
     auto thetdcHist = new TH1F(histname2.c_str(),fTitle2.c_str(),tdiv,tstart,tend);
     auto thetdfHist = new TH1F(histname3.c_str(),fTitle3.c_str(),tdiv,tstart,tend);
@@ -163,6 +208,22 @@ void plot2dResolution( string califilename, string infilename, string outfilenam
     theHist->GetYaxis()->SetTitle(fYTitle.c_str());
     theHist->GetZaxis()->SetTitle(fZTitle.c_str());
     theHist->Sumw2();
+    theHistC->GetXaxis()->SetTitle(fXTitle.c_str());
+    theHistC->GetYaxis()->SetTitle(fYTitle.c_str());
+    theHistC->GetZaxis()->SetTitle(fZTitle.c_str());
+    theHistC->Sumw2();
+    theHistT->GetXaxis()->SetTitle(fXTitle.c_str());
+    theHistT->GetYaxis()->SetTitle(fYTitle.c_str());
+    theHistT->GetZaxis()->SetTitle(fZTitle.c_str());
+    theHistT->Sumw2();
+    theHistU->GetXaxis()->SetTitle(fXTitle.c_str());
+    theHistU->GetYaxis()->SetTitle(fYTitle.c_str());
+    theHistU->GetZaxis()->SetTitle(fZTitle.c_str());
+    theHistU->Sumw2();
+    theHistL->GetXaxis()->SetTitle(fXTitle.c_str());
+    theHistL->GetYaxis()->SetTitle(fYTitle.c_str());
+    theHistL->GetZaxis()->SetTitle(fZTitle.c_str());
+    theHistL->Sumw2();
     //thetdHist->Sumw2();
     //thetdcHist->Sumw2();
     //thetdfHist->Sumw2();
@@ -177,6 +238,8 @@ void plot2dResolution( string califilename, string infilename, string outfilenam
 	     if( entry%100000 == 0 ) std::cout << "Proccessed " << entry << " of " << nEntries << " entries." << std::endl;        
 
 	     fInFile->cd();
+        //b_phoE_0->GetEntry(entry);
+
         b_phoseedI1_0->GetEntry(entry);
 	     b_phoseedI2_0->GetEntry(entry);	
 	     b_phoseedEcal_0->GetEntry(entry);
@@ -186,7 +249,7 @@ void plot2dResolution( string califilename, string infilename, string outfilenam
         b_phoseedpedrms12_0->GetEntry(entry);
         b_phoseedTOF_0->GetEntry(entry);
         b_phoseedtime_0->GetEntry(entry);
-        b_phoseedtimeErr_0->GetEntry(entry);
+        //b_phoseedtimeErr_0->GetEntry(entry);
 
         b_phoseedI1_1->GetEntry(entry);
         b_phoseedI2_1->GetEntry(entry);
@@ -197,7 +260,7 @@ void plot2dResolution( string califilename, string infilename, string outfilenam
         b_phoseedpedrms12_1->GetEntry(entry);
         b_phoseedTOF_1->GetEntry(entry);
         b_phoseedtime_1->GetEntry(entry);
-        b_phoseedtimeErr_1->GetEntry(entry);
+        //b_phoseedtimeErr_1->GetEntry(entry);
 
 	     int bin_offset = 86;
 	     int adjust = 0.0;
@@ -232,12 +295,12 @@ void plot2dResolution( string califilename, string infilename, string outfilenam
         //if( (abs(phoseedtime_0 + offset - phoseedtimeCaliIc_0 ) > outlier) or (abs(phoseedtime_1 + offset - phoseedtimeCaliIc_1 ) > outlier) ) skip_cali = true;
         //if( (abs(phoseedtime_0 + offset ) > outlier) or (abs(phoseedtime_1 + offset ) > outlier) ) skip = true;
         //if( tvarname == "phoseedkuMfootCCStctime" ) { skip = false; }
-		  if( ( phoseedtimeErr_0 < 0 ) or ( phoseedtimeErr_1 < 0  )  ) { skip = true; }
+		  //if( ( phoseedtimeErr_0 < 0 ) or ( phoseedtimeErr_1 < 0  )  ) { skip = true; }
 
         auto yfill = (phoseedtime_0-phoseedtimeCaliIc_0)-(phoseedtime_1-phoseedtimeCaliIc_1)+(phoseedTOF_0-phoseedTOF_1);
-        auto effa0 = (phoseedE_0/phoseedadcToGeV_0)/phoseedpedrms12_0;
-        auto effa1 = (phoseedE_1/phoseedadcToGeV_1)/phoseedpedrms12_1;
-        auto xfill = (effa0*effa1)/sqrt(pow(effa0,2)+pow(effa1,2));
+        auto effa0 = phoseedE_0;
+        auto effa1 = phoseedE_1;
+        auto xfill = (effa0*effa1)/sqrt((effa0*effa0)+(effa1*effa1));
 
 		  auto e_cut = (phoseedE_0>=10)&&(phoseedE_0<=120)&&(phoseedE_1>=10)&&(phoseedE_1<=120);
 	     auto eta_cut = (phoseedEcal_0 == ECAL::EB)&&(phoseedEcal_1 == ECAL::EB);
@@ -246,7 +309,13 @@ void plot2dResolution( string califilename, string infilename, string outfilenam
         if( isd_type == "Same") isd_cut = (phoseedTT_0==phoseedTT_1); //same
 	     auto event_good = e_cut && eta_cut && isd_cut;
 
-	     if( event_good and not skip ) theHist->Fill(xfill,yfill);
+	     if( event_good and not skip ){ 
+				theHist->Fill(xfill,yfill);
+            if( abs(yfill) <= 0.1 ) theHistC->Fill(xfill,yfill);
+            if( abs(yfill) > 0.1 ) theHistT->Fill(xfill,yfill);
+            theHistU->Fill(xfill,yfill);
+            theHistL->Fill(xfill,yfill);
+		  }
         if( event_good ) { thetdHist->Fill(phoseedtime_0); thetdHist->Fill(phoseedtime_1);}
         if( event_good ) { thetdcHist->Fill(phoseedtime_0-phoseedtimeCaliIc_0); thetdcHist->Fill(phoseedtime_1-phoseedtimeCaliIc_1);}
         if( event_good and not skip ) { thetdfHist->Fill(phoseedtime_0); thetdfHist->Fill(phoseedtime_1);}
@@ -255,14 +324,25 @@ void plot2dResolution( string califilename, string infilename, string outfilenam
     }
 
     Common::Scale(theHist,false,fXVarBins,fYVarBins);
+    Common::Scale(theHistC,false,fXVarBins,fYVarBins);
+    Common::Scale(theHistT,false,fXVarBins,fYVarBins);
+
     fOutFile->cd();
     theHist->Write();
+    theHistC->Write();
+    theHistT->Write();
+    theHistU->Write();
+    theHistL->Write();
     thetdHist->Write();
     thetdcHist->Write();
     thetdfHist->Write();
     thetdfcHist->Write();
 
     delete theHist;
+    delete theHistC;
+    delete theHistT;
+    delete theHistU;
+    delete theHistL;
     delete thetdHist;
     delete thetdcHist;
     delete thetdfHist;

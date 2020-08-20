@@ -120,6 +120,8 @@ private:
   TH1F  * noEleMatchHist;
   TH1F  * eleMatchTrueHist;
   TH1F  * eleMatchFalseHist;
+  TH1F  * eleTrackTrueHist;
+  TH1F  * eleTrackFalseHist;
 
 //  ave and diff hists
   TH1F  * fOutAveXtalRecTimeHist;
@@ -405,6 +407,17 @@ private:
   TH2F  * fOutAveXtalWtOOTStcPhoIcRecTimeMapEP;
   TH2F  * fOutAveXtalWtOOTStcPhoIcRecTimeMapEM;
 
+/// hists for pcalo
+  TH1F  * fOutPcaloWTimeHist;
+  TH1F  * fOutPcaloTimeHist;
+  TH1F  * fOutPcaloEnergyHist;
+  TH2F  * fOutPcaloEvWTHist;
+  TH2F  * fOutPcaloevtHist;
+  TH2F  * fOutPcalogtidvtHist;
+  TH1F  * fOutPcaloSumTimeHist;
+  TH1F  * fOutPcaloSumEnergyHist;
+  TH1I  * fOutPcaloGTIdHist;
+
 //////////////////////////////////////////////////////
 
   GmsbVec fOutGMSBs;
@@ -558,6 +571,9 @@ private:
    Float_t         beam2_RF[3564];   //[num_bunch]
    Float_t         gZmass;
    Float_t         gdR;
+   Float_t         elTrackZ_0;
+   Float_t         elTrackZ_1;
+
 
    Int_t	  nxtal_sep;
    Int_t          nurechits;
@@ -571,6 +587,8 @@ private:
    Int_t          nkuMfootCCStcrechits;
    Int_t          ndigis;
 
+   std::vector<Float_t>  * amplitude;
+   std::vector<Float_t>  * amplitudeError;
    std::vector<Float_t>  * ootA0;
    std::vector<Float_t>  * ootA1;
    std::vector<Float_t>  * ootA2;
@@ -583,7 +601,32 @@ private:
    std::vector<Float_t>  * ootA9;
    std::vector<Float_t>  * ootMax;
    std::vector<Float_t>  * ootVsum;
-   std::vector<Float_t>  * uRhId;
+   std::vector<UInt_t>  * uRhId;
+   std::vector<Float_t>  * ku_amplitude;
+   std::vector<Float_t>  * ku_amplitudeError;
+   std::vector<Float_t>  * ku_ootA0;
+   std::vector<Float_t>  * ku_ootA1;
+   std::vector<Float_t>  * ku_ootA2;
+   std::vector<Float_t>  * ku_ootA3;
+   std::vector<Float_t>  * ku_ootA4;
+   std::vector<Float_t>  * ku_ootA5;
+   std::vector<Float_t>  * ku_ootA6;
+   std::vector<Float_t>  * ku_ootA7;
+   std::vector<Float_t>  * ku_ootA8;
+   std::vector<Float_t>  * ku_ootA9;
+   std::vector<UInt_t>  * ku_uRhId;
+
+   std::vector<unsigned int> * pcalo_id;
+   std::vector<uint16_t> * pcalo_depth;
+   std::vector<double> * pcalo_t;
+   std::vector<double> * pcalo_e;
+   std::vector<double> * pcalo_emf;
+   std::vector<double> * pcalo_hadf;
+   std::vector<int> * pcalo_gtid;
+   std::vector<uint32_t> * pcalo_eventid;
+   std::vector<int> * pcalo_bx;
+   std::vector<int> * pcalo_event;
+
 
    std::vector<Float_t> * kurhE;
    std::vector<Float_t> * kurhtime;
@@ -666,7 +709,10 @@ private:
    TBranch        *b_nkuMfootCCStcrechits;
    TBranch        *b_ndigis;
    TBranch        *b_uRhId;
+   TBranch        *b_ku_uRhId;
 
+   TBranch        *b_amplitude;
+   TBranch        *b_amplitudeError;
    TBranch        *b_ootA0;
    TBranch        *b_ootA1;
    TBranch        *b_ootA2;
@@ -680,6 +726,21 @@ private:
    TBranch        *b_ootMax;
    TBranch        *b_ootVsum;
 
+   TBranch        *b_ku_amplitude;
+   TBranch        *b_ku_amplitudeError;
+   TBranch        *b_ku_ootA0;
+   TBranch        *b_ku_ootA1;
+   TBranch        *b_ku_ootA2;
+   TBranch        *b_ku_ootA3;
+   TBranch        *b_ku_ootA4;
+   TBranch        *b_ku_ootA5;
+   TBranch        *b_ku_ootA6;
+   TBranch        *b_ku_ootA7;
+   TBranch        *b_ku_ootA8;
+   TBranch        *b_ku_ootA9;
+   TBranch        *b_ku_ootMax;
+   TBranch        *b_ku_ootVsum;
+
    TBranch        *b_bunch_crossing;   //!
    TBranch        *b_num_bunch;   //!
    TBranch        *b_subtrain_position;   //!
@@ -691,6 +752,17 @@ private:
    TBranch        *b_beam1_RF;   //!
    TBranch        *b_beam2_RF;   //!
    TBranch        *b_nxtal_sep;   //!
+
+   TBranch    *b_pcalo_id;
+   TBranch    *b_pcalo_depth;
+   TBranch    *b_pcalo_t;
+   TBranch    *b_pcalo_e;
+   TBranch    *b_pcalo_emf;
+   TBranch    *b_pcalo_hadf;
+   TBranch    *b_pcalo_gtid;
+   TBranch    *b_pcalo_eventid;
+   TBranch    *b_pcalo_bx;
+   TBranch    *b_pcalo_event;
 
    TBranch 	  *b_kurhE;
    TBranch 	  *b_kurhtime;

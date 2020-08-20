@@ -122,6 +122,7 @@ private:
   Float_t fRangeLow;
   Float_t fRangeUp;
   TString fTimeText;
+  TString f2DHistName;
 
   // sigma fit config
   Bool_t fDoSigmaFit;

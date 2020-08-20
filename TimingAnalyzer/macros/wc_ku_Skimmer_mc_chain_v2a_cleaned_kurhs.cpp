@@ -40,7 +40,7 @@ Skimmer::Skimmer(const TString & indir, const TString & outdir, const TString & 
   ////////////////////////
   // Get all the inputs //
   ////////////////////////
-  std::cout << "Setting up inputs to run skim" << std::endl;
+  std::cout << "Setting up inputs for skim" << std::endl;
 
   // Set skim config options 
   Skimmer::SetupDefaults();
@@ -124,6 +124,25 @@ Skimmer::Skimmer(const TString & indir, const TString & outdir, const TString & 
   eleTrackFalseHist = new TH1F("eleTrackFalseHist","eleTrackFalse",400,-20,20);
   eleTrackFalseHist->Sumw2();
 
+  fOutPcaloWTimeHist = new TH1F("pcaloWTimeHist","pcaloWTimeHist",4000,0,40);
+  fOutPcaloWTimeHist->Sumw2();
+  fOutPcaloSumTimeHist = new TH1F("pcaloSumETimeHist","pcaloSumETimeHist",8000,0,800);
+  fOutPcaloSumTimeHist->Sumw2();
+  fOutPcaloSumEnergyHist = new TH1F("pcaloSumEnergyHist","pcaloSumEnergyHist",6000,0,600);
+  fOutPcaloSumEnergyHist->Sumw2();
+  fOutPcaloEvWTHist = new TH2F("pcaloSumEvWTHist","pcaloSumEvWTHist",6000,0,600,4000,0,40);
+  fOutPcaloEvWTHist->Sumw2();
+  fOutPcaloTimeHist = new TH1F("pcaloTimeHist","pcaloTimeHist",5000,0,50);
+  fOutPcaloTimeHist->Sumw2();
+  fOutPcaloEnergyHist = new TH1F("pcaloEnergyHist","pcaloEnergyHist",5000,0,50);
+  fOutPcaloEnergyHist->Sumw2();
+  fOutPcaloevtHist = new TH2F("pcaloevtHist","pcaloevtHist",5000,0,5,5000,0,50);
+  fOutPcaloevtHist->Sumw2();
+  fOutPcaloGTIdHist = new TH1I("pcaloGTIdHist","pcaloGTIdHist",5000,0,500000);
+  fOutPcaloGTIdHist->Sumw2();
+  fOutPcalogtidvtHist = new TH2F("pcalogtidvtHist","pcalogtidvtHist",5000,0,500000,5000,0,50);
+  fOutPcalogtidvtHist->Sumw2();
+
 }
 
 Skimmer::~Skimmer()
@@ -139,6 +158,16 @@ Skimmer::~Skimmer()
   delete eleTrackTrueHist;
   delete eleTrackFalseHist;
 
+  delete fOutPcaloWTimeHist;
+  delete fOutPcaloSumTimeHist;
+  delete fOutPcaloSumEnergyHist;
+  delete fOutPcaloEvWTHist;
+  delete fOutPcaloevtHist;
+  delete fOutPcaloTimeHist;
+  delete fOutPcaloEnergyHist;
+  delete fOutPcaloGTIdHist;
+  delete fOutPcalogtidvtHist;
+
   delete fOutTree;
   delete fOutFile;
 }
@@ -153,7 +182,7 @@ void Skimmer::EventLoop()
   float minRecE2 = 2.f;
   float minRecE5 = 5.f;
   float minRecE10 = 10.f;
-  float ele_dz = 1.0;  //  0.1 or 0.005
+  float ele_dz = 0.005;  //  0.1 or 0.005
   bool useTOF = true;
   //bool useTOF = false;
   //const auto nEntries = 100000;
@@ -171,11 +200,6 @@ void Skimmer::EventLoop()
     // get event weight: no scaling by BR, xsec, lumi, etc.
     const auto wgt    = 1.f; //(fIsMC ? fInEvent.genwgt : 1.f);
     const auto evtwgt = 1.f; //fSampleWeight * wgt; // sample weight for data == 1
-  
-    fInEvent.b_run->GetEntry(entry);  
-    if( (fInEvent.run < 320200) || ( fInEvent.run > 326000 ) ) continue;
-    //if( (fInEvent.run < 315000) || ( fInEvent.run > 320200 ) ) continue;  
-
 
     gZmass = 0.f;
     gdR = 0.f;
@@ -435,6 +459,16 @@ void Skimmer::EventLoop()
   eleTrackTrueHist->Write();
   eleTrackFalseHist->Write();
 
+  fOutPcaloWTimeHist->Write();
+  fOutPcaloTimeHist->Write();
+  fOutPcaloSumEnergyHist->Write();
+  fOutPcaloSumTimeHist->Write();
+  fOutPcaloEnergyHist->Write();
+  fOutPcaloEvWTHist->Write();
+  fOutPcaloevtHist->Write();
+  fOutPcaloGTIdHist->Write();
+  fOutPcalogtidvtHist->Write();
+
   std::cout << "write tree output!"<< std::endl;
   //fOutConfigTree->Write();
   fOutTree->Write();
@@ -601,6 +635,7 @@ void Skimmer::FillOutPhos(const UInt_t entry)
       inpho.b_seedtime->GetEntry(entry);
       inpho.b_seedtimeErr->GetEntry(entry);
       inpho.b_seedTOF->GetEntry(entry);
+      inpho.b_seedpcTOF->GetEntry(entry);
       inpho.b_seedID->GetEntry(entry);
       // inpho.b_seedisOOT->GetEntry(entry);
       inpho.b_seedisGS6->GetEntry(entry);
@@ -625,6 +660,7 @@ void Skimmer::FillOutPhos(const UInt_t entry)
     fInRecHits.b_time->GetEntry(entry);
     fInRecHits.b_timeErr->GetEntry(entry);
     fInRecHits.b_TOF->GetEntry(entry);
+    fInRecHits.b_pcTOF->GetEntry(entry);
     fInRecHits.b_ID->GetEntry(entry);
     // fInRecHits.b_isOOT->GetEntry(entry);
     fInRecHits.b_isGS6->GetEntry(entry);
@@ -638,6 +674,17 @@ void Skimmer::FillOutPhos(const UInt_t entry)
     fInRecHits.b_pedrms1->GetEntry(entry);
 
   }
+
+  b_pcalo_id->GetEntry(entry);
+  b_pcalo_t->GetEntry(entry);
+  b_pcalo_e->GetEntry(entry);
+  b_pcalo_emf->GetEntry(entry);
+  b_pcalo_hadf->GetEntry(entry);
+  b_pcalo_gtid->GetEntry(entry);
+  b_pcalo_eventid->GetEntry(entry);
+  b_pcalo_bx->GetEntry(entry);
+  b_pcalo_event->GetEntry(entry);
+  b_pcalo_depth->GetEntry(entry);
 
   b_kurhtime->GetEntry(entry);
   b_kurhtimeErr->GetEntry(entry);
@@ -782,6 +829,7 @@ void Skimmer::FillOutPhos(const UInt_t entry)
 	outpho.seedtime    = (*fInRecHits.time)   [seed];
 	outpho.seedtimeErr = (*fInRecHits.timeErr)[seed];
 	outpho.seedTOF     = (*fInRecHits.TOF)    [seed];
+   outpho.seedpcTOF     = (*fInRecHits.pcTOF)    [seed];
    tofHist->Fill(outpho.seedTOF);
 
    if( ipho < 3 ){
@@ -796,6 +844,57 @@ void Skimmer::FillOutPhos(const UInt_t entry)
 		}
 	   else eleMatchFalseHist->Fill(outpho.seedtime);
    }
+
+   //  pcalo time fill
+   //std::cout << "hit flag for outpho fill pcalo" << std::endl;
+   float pce = 0.0;
+   float pct = 0.0;
+   float pcwt = 0.0;
+   for(UInt_t pcseed = 0; pcseed < (*pcalo_id).size(); pcseed++ ){
+          if( (*pcalo_id)[pcseed] == (*fInRecHits.ID)[seed] ){
+						//auto pcid = (*pcalo_id)[pcseed];
+						//DetId mydetid(pcid);
+						auto depth = (*pcalo_depth)[pcseed];
+						if( depth > 0 ) continue;		
+                  auto time = (*pcalo_t)[pcseed];
+                  //if( time < 0.001 or time > 100 ) continue; 
+                  auto energy = (*pcalo_e)[pcseed];
+                  auto emf = (*pcalo_emf)[pcseed];
+                  auto hadf = (*pcalo_hadf)[pcseed];
+
+						//const unsigned long long mask = 0x7FF0000000000000LL;
+						//union { unsigned long long l; double d;} v;
+ 						//v.d = time;
+						//if( !((v.l&mask)!=mask)) continue; 
+						//if( energy < 0.001 or energy > 100 ) continue;
+						//if( energy == time ) continue;
+						//std::cout << " - energy: " << energy << " time: " << time << " depth: " << depth << " emf: " << emf << " hadf: " << hadf << std::endl;
+                  pce += energy;
+						pct += time;
+						pcwt += (energy*time);
+                  fOutPcaloTimeHist->Fill(time);
+                  fOutPcaloEnergyHist->Fill(energy);
+                  fOutPcaloevtHist->Fill(energy,time);
+                  auto gtid = (*pcalo_gtid)[pcseed];
+                  auto eventid = (*pcalo_eventid)[pcseed];
+                  auto bx = (*pcalo_bx)[pcseed];
+                  auto event = (*pcalo_event)[pcseed];
+                  //std::cout << " - gtid: " << gtid << " eventid: " << eventid << " bx: " << bx << " event: " << event << std::endl;
+                  //if( thegtid < 75001 ){ 
+						fOutPcaloGTIdHist->Fill(gtid);
+						fOutPcalogtidvtHist->Fill(gtid,time); 
+					   //}
+         }
+   }		
+   if( pce > 0.0 ) {
+   	auto wt = pcwt/pce;
+   	outpho.seedpctime = wt;
+   	fOutPcaloWTimeHist->Fill(wt);
+   	fOutPcaloSumTimeHist->Fill(pcwt);
+   	fOutPcaloSumEnergyHist->Fill(pce);
+   	fOutPcaloEvWTHist->Fill(pce,wt);
+      //std::cout << "pct : " << pct << " pce : " << pce << " pcwt(pct*pce) : " << pcwt << " wt(pcwt/pce) : " << wt << std::endl; 
+   } 	
 
    //std::cout << "hit flag for outpho fill" << std::endl;
 	// get trigger tower
@@ -1047,8 +1146,10 @@ void Skimmer::FillOutPhos(const UInt_t entry)
 	outpho.seedE = -9999.f;
 
 	outpho.seedtime    = -9999.f;
+   outpho.seedpctime    = -9999.f;
 	outpho.seedtimeErr = -9999.f;
 	outpho.seedTOF     = -9999.f;	
+   outpho.seedpcTOF     = -9999.f;
 
 	// outpho.seedID    = 0;
 	// outpho.seedisOOT = -1;
@@ -1128,6 +1229,7 @@ void Skimmer::FillOutPhos(const UInt_t entry)
       outpho.seedtime = inpho.seedtime;
       outpho.seedtimeErr = inpho.seedtimeErr;
       outpho.seedTOF = inpho.seedTOF;
+      outpho.seedpcTOF = inpho.seedpcTOF;
       // outpho.seedID = inpho.seedID;
       // outpho.seedisOOT = inpho.seedisOOT;
       outpho.seedTT = Common::GetTriggerTower(inpho.seedID);
@@ -1175,6 +1277,17 @@ void Skimmer::InitInBranchVecs()
   // fInJets.MUF = 0;
   // fInJets.NHM = 0;
   // fInJets.CHM = 0;
+
+  pcalo_id = 0;
+  pcalo_t = 0;
+  pcalo_e = 0;
+  pcalo_emf = 0;
+  pcalo_hadf = 0;
+  pcalo_gtid = 0;
+  pcalo_bx = 0;
+  pcalo_event = 0;
+  pcalo_eventid = 0;
+  pcalo_depth = 0;
 
   kurhE = 0;
   kurhtime = 0;
@@ -1262,6 +1375,7 @@ void Skimmer::InitInBranchVecs()
     fInRecHits.time = 0;
     fInRecHits.timeErr = 0;
     fInRecHits.TOF = 0;
+    fInRecHits.pcTOF = 0;
     fInRecHits.ID = 0;
     // fInRecHits.isOOT = 0;
     fInRecHits.isGS6 = 0;
@@ -1287,6 +1401,17 @@ void Skimmer::InitInBranches()
   fInTree->SetBranchAddress(fInEvent.s_run.c_str(), &fInEvent.run, &fInEvent.b_run);
   fInTree->SetBranchAddress(fInEvent.s_lumi.c_str(), &fInEvent.lumi, &fInEvent.b_lumi);
   fInTree->SetBranchAddress(fInEvent.s_event.c_str(), &fInEvent.event, &fInEvent.b_event);
+
+   fInTree->SetBranchAddress("pcalo_id", &pcalo_id, &b_pcalo_id);
+   fInTree->SetBranchAddress("pcalo_t", &pcalo_t, &b_pcalo_t);
+   fInTree->SetBranchAddress("pcalo_e", &pcalo_e, &b_pcalo_e);
+   fInTree->SetBranchAddress("pcalo_emf", &pcalo_emf, &b_pcalo_emf);
+   fInTree->SetBranchAddress("pcalo_hadf", &pcalo_hadf, &b_pcalo_hadf);
+   fInTree->SetBranchAddress("pcalo_gtid", &pcalo_gtid, &b_pcalo_gtid);
+   fInTree->SetBranchAddress("pcalo_eventid", &pcalo_eventid, &b_pcalo_eventid);
+   fInTree->SetBranchAddress("pcalo_bx", &pcalo_bx, &b_pcalo_bx);
+   fInTree->SetBranchAddress("pcalo_event", &pcalo_event, &b_pcalo_event);
+   fInTree->SetBranchAddress("pcalo_depth", &pcalo_depth, &b_pcalo_depth);
 
    if( isLHCInfo ){
    fInTree->SetBranchAddress("bunch_crossing", &bunch_crossing, &b_bunch_crossing);
@@ -1414,6 +1539,7 @@ void Skimmer::InitInBranches()
     fInTree->SetBranchAddress(fInRecHits.s_time.c_str(), &fInRecHits.time, &fInRecHits.b_time);
     fInTree->SetBranchAddress(fInRecHits.s_timeErr.c_str(), &fInRecHits.timeErr, &fInRecHits.b_timeErr);
     fInTree->SetBranchAddress(fInRecHits.s_TOF.c_str(), &fInRecHits.TOF, &fInRecHits.b_TOF);
+    fInTree->SetBranchAddress(fInRecHits.s_pcTOF.c_str(), &fInRecHits.pcTOF, &fInRecHits.b_pcTOF);
     fInTree->SetBranchAddress(fInRecHits.s_ID.c_str(), &fInRecHits.ID, &fInRecHits.b_ID);
     //fInTree->SetBranchAddress(fInRecHits.s_isOOT.c_str(), &fInRecHits.isOOT, &fInRecHits.b_isOOT);
     fInTree->SetBranchAddress(fInRecHits.s_isGS6.c_str(), &fInRecHits.isGS6, &fInRecHits.b_isGS6);
@@ -1480,6 +1606,7 @@ void Skimmer::InitInBranches()
       fInTree->SetBranchAddress(Form("%s_%i",pho.s_seedtime.c_str(),ipho), &pho.seedtime, &pho.b_seedtime);
       fInTree->SetBranchAddress(Form("%s_%i",pho.s_seedtimeErr.c_str(),ipho), &pho.seedtimeErr, &pho.b_seedtimeErr);
       fInTree->SetBranchAddress(Form("%s_%i",pho.s_seedTOF.c_str(),ipho), &pho.seedTOF, &pho.b_seedTOF);
+      fInTree->SetBranchAddress(Form("%s_%i",pho.s_seedpcTOF.c_str(),ipho), &pho.seedpcTOF, &pho.b_seedpcTOF);
       fInTree->SetBranchAddress(Form("%s_%i",pho.s_seedID.c_str(),ipho), &pho.seedID, &pho.b_seedID);
       // fInTree->SetBranchAddress(Form("%s_%i",pho.s_seedisOOT.c_str(),ipho), &pho.seedisOOT, &pho.b_seedisOOT);
       fInTree->SetBranchAddress(Form("%s_%i",pho.s_seedisGS6.c_str(),ipho), &pho.seedisGS6, &pho.b_seedisGS6);
@@ -1642,8 +1769,10 @@ void Skimmer::InitOutBranches()
     // fOutTree->Branch(Form("%s_%i",pho.s_seedZ.c_str(),ipho), &pho.seedZ);
     fOutTree->Branch(Form("%s_%i",pho.s_seedE.c_str(),ipho), &pho.seedE);
     fOutTree->Branch(Form("%s_%i",pho.s_seedtime.c_str(),ipho), &pho.seedtime);
+    fOutTree->Branch(Form("%s_%i",pho.s_seedpctime.c_str(),ipho), &pho.seedpctime);
     fOutTree->Branch(Form("%s_%i",pho.s_seedtimeErr.c_str(),ipho), &pho.seedtimeErr);
     fOutTree->Branch(Form("%s_%i",pho.s_seedTOF.c_str(),ipho), &pho.seedTOF);
+    fOutTree->Branch(Form("%s_%i",pho.s_seedpcTOF.c_str(),ipho), &pho.seedpcTOF);
     fOutTree->Branch(Form("%s_%i",pho.s_seedID.c_str(),ipho), &pho.seedID);
     fOutTree->Branch(Form("%s_%i",pho.s_seedI1.c_str(),ipho), &pho.seedI1);
     fOutTree->Branch(Form("%s_%i",pho.s_seedI2.c_str(),ipho), &pho.seedI2);
@@ -1829,7 +1958,6 @@ void Skimmer::SetupSkimConfig()
     else if (str.find("hasUrecDigi=") != std::string::npos)
     {
       str = Common::RemoveDelim(str,"hasUrecDigi=");
-      std::cout << " Config has hasUrecDigi to be set to " << str << std::endl;
       if( str == "true" ) hasUrecDigi = true;
       if( str == "false" ) hasUrecDigi = false;
       std::cout << " Config set hasUrecDigi to " << hasUrecDigi << std::endl;

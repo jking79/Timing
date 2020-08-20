@@ -435,6 +435,7 @@ struct RecHits
   std::vector<Float_t> * time;
   std::vector<Float_t> * timeErr;
   std::vector<Float_t> * TOF;
+  std::vector<Float_t> * pcTOF;
   std::vector<UInt_t>  * ID;
   std::vector<Int_t>   * isOOT;
   std::vector<Int_t>   * isGS6;
@@ -454,6 +455,7 @@ struct RecHits
   std::string s_time = "rhtime";
   std::string s_timeErr = "rhtimeErr";
   std::string s_TOF = "rhTOF";
+  std::string s_pcTOF = "rhpcTOF";
   std::string s_ID = "rhID";
   std::string s_isOOT = "rhisOOT";
   std::string s_isGS6 = "rhisGS6";
@@ -473,6 +475,7 @@ struct RecHits
   TBranch * b_time;
   TBranch * b_timeErr;
   TBranch * b_TOF;
+  TBranch * b_pcTOF;
   TBranch * b_ID;
   TBranch * b_isOOT;
   TBranch * b_isGS6;
@@ -537,9 +540,11 @@ struct Pho
   Float_t seedZ;
   Float_t seedE;
   Float_t seedtime;
+  Float_t seedpctime;
   Float_t seedtimeCali;
   Float_t seedtimeErr;
   Float_t seedTOF;
+  Float_t seedpcTOF;
   UInt_t  seedID;
   Int_t   seedI1; // EB: iphi, EE: ix
   Int_t   seedI2; // EB: ieta, EE: iy
@@ -555,6 +560,8 @@ struct Pho
   Float_t seedpedrms6;
   Float_t seedpedrms1;
   //  ucal RecHit Info
+  Float_t seedamplitude;
+  Float_t seedamplitudeError;
   Float_t seedootA0;
   Float_t seedootA1;
   Float_t seedootA2;
@@ -570,6 +577,19 @@ struct Pho
   Float_t seedootMbefore;
   Float_t seedootMafter;
   Int_t   seedootSign;;
+
+  Float_t seedkuamplitude;
+  Float_t seedkuamplitudeError;
+  Float_t seedkuootA0;
+  Float_t seedkuootA1;
+  Float_t seedkuootA2;
+  Float_t seedkuootA3;
+  Float_t seedkuootA4;
+  Float_t seedkuootA5;
+  Float_t seedkuootA6;
+  Float_t seedkuootA7;
+  Float_t seedkuootA8;
+  Float_t seedkuootA9;
 
   // KU RecHit info
 
@@ -741,9 +761,11 @@ struct Pho
   std::string s_seedZ = "phoseedZ";
   std::string s_seedE = "phoseedE";
   std::string s_seedtime = "phoseedtime";
+  std::string s_seedpctime = "phoseedpctime";
   std::string s_seedtimeCali = "phoseedtimeCali";
   std::string s_seedtimeErr = "phoseedtimeErr";
   std::string s_seedTOF = "phoseedTOF";
+  std::string s_seedpcTOF = "phoseedpcTOF";
   std::string s_seedID = "phoseedID";
   std::string s_seedI1 = "phoseedI1"; // EB: iphi, EE: seedI2; // EB: ieta, EE: iy
   std::string s_seedI2 = "phoseedI2"; // EB: ieta, EE: iy
@@ -759,6 +781,8 @@ struct Pho
   std::string s_seedpedrms6 = "phoseedpedrms6";
   std::string s_seedpedrms1 = "phoseedpedrms1";
 
+  std::string s_seedamplitude = "phoseedamplitude";
+  std::string s_seedamplitudeError = "phoseedamplitudeError";
   std::string s_seedootA0 = "phoseedootA0";
   std::string s_seedootA1 = "phoseedootA1";
   std::string s_seedootA2 = "phoseedootA2";
@@ -774,6 +798,19 @@ struct Pho
   std::string s_seedootMafter = "phoseedootMafter";
   std::string s_seedootSign = "phoseedootSign";
   std::string s_seedootVsum = "phoseedootVsum";
+
+  std::string s_seedkuamplitude = "phoseedkuamplitude";
+  std::string s_seedkuamplitudeError = "phoseedkuamplitudeError";
+  std::string s_seedkuootA0 = "phoseedkuootA0";
+  std::string s_seedkuootA1 = "phoseedkuootA1";
+  std::string s_seedkuootA2 = "phoseedkuootA2";
+  std::string s_seedkuootA3 = "phoseedkuootA3";
+  std::string s_seedkuootA4 = "phoseedkuootA4";
+  std::string s_seedkuootA5 = "phoseedkuootA5";
+  std::string s_seedkuootA6 = "phoseedkuootA6";
+  std::string s_seedkuootA7 = "phoseedkuootA7";
+  std::string s_seedkuootA8 = "phoseedkuootA8";
+  std::string s_seedkuootA9 = "phoseedkuootA9";
 
   std::string s_isGen = "phoisGen";
   std::string s_isSignal = "phoisSignal";
@@ -940,6 +977,8 @@ struct Pho
   TBranch * b_seedZ;
   TBranch * b_seedE;
   TBranch * b_seedtime;
+  TBranch * b_seedpctime;
+  TBranch * b_seedpcTOF;
   TBranch * b_seedtimeCali;
   TBranch * b_seedtimeErr;
   TBranch * b_seedTOF;
@@ -957,6 +996,8 @@ struct Pho
   TBranch * b_seedpedrms6;
   TBranch * b_seedpedrms1;
 
+  TBranch * b_seedamplitude;
+  TBranch * b_seedamplitudeError;
   TBranch * b_seedootA0;
   TBranch * b_seedootA1;
   TBranch * b_seedootA2;
@@ -972,6 +1013,19 @@ struct Pho
   TBranch * b_seedootMafter;
   TBranch * b_seedootSign;
   TBranch * b_seedootVsum;
+
+  TBranch * b_seedkuamplitude;
+  TBranch * b_seedkuamplitudeError;
+  TBranch * b_seedkuootA0;
+  TBranch * b_seedkuootA1;
+  TBranch * b_seedkuootA2;
+  TBranch * b_seedkuootA3;
+  TBranch * b_seedkuootA4;
+  TBranch * b_seedkuootA5;
+  TBranch * b_seedkuootA6;
+  TBranch * b_seedkuootA7;
+  TBranch * b_seedkuootA8;
+  TBranch * b_seedkuootA9;
 
   TBranch * b_isGen;
   TBranch * b_isSignal;

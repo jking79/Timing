@@ -38,7 +38,7 @@ ku_reduced_multi_ecalUncalibRecHitSequence = cms.Sequence(ecalMultiFitUncalibRec
                                         #kuEcalMultiFitUncalibRecHit*
                                         kuNotEcalMultiFitUncalibRecHit*
                                         kuWtEcalMultiFitUncalibRecHit*
-                                        #kuWootEcalMultiFitUncalibRecHit*
+                                        kuWootEcalMultiFitUncalibRecHit*
                                         kuMfootEcalMultiFitUncalibRecHit*
                                         kuMfootCCEcalMultiFitUncalibRecHit*
                                         ecalDetIdToBeRecovered)
@@ -154,7 +154,7 @@ ku_reduced_multi_ecalRecHitSequence        = cms.Sequence(#kuEcalRecHit*
                                                   #kuNotEcalRecHit*
                                                   kuNotStcEcalRecHit*
                                                   kuWtStcEcalRecHit*
-                                                  #kuWootStcEcalRecHit*
+                                                  kuWootStcEcalRecHit*
                                                   kuMfootStcEcalRecHit*
                                                   kuMfootCCStcEcalRecHit
                                                )

@@ -14,7 +14,7 @@
 #include "Common.hh"
 
 // Time fit enum
-enum TimeFitType {Gaus1, Gaus1core, Gaus2fm, Gaus2fmcore, Gaus3fm, Gaus3fmcore};
+enum TimeFitType {Gaus1, Gaus1core, Gaus1coretail, Gaus2fm, Gaus2fmcore, Gaus3fm, Gaus3fmcore};
 
 namespace Common
 {
@@ -28,6 +28,7 @@ struct TimeFitResult
   
   Float_t chi2ndf;
   Float_t chi2prob;
+  Float_t occ;
   Float_t mu;
   Float_t emu;
   Float_t sigma;

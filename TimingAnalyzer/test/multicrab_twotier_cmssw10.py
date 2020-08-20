@@ -83,8 +83,8 @@ def subcrab( runs, events, reqmem ):
         #config.JobType.psetName    = 'dispho_raw_twotier.py'
         config.JobType.psetName    = 'dispho_raw_twotier_multi.py'
         #config.JobType.numCores    = 8
-        config.JobType.maxMemoryMB = 2250 #reqmem
-        config.JobType.maxJobRuntimeMin = 2750
+        #config.JobType.maxMemoryMB = 2250 #reqmem
+        #config.JobType.maxJobRuntimeMin = 2750
         config.JobType.pyCfgParams = None
         config.JobType.inputFiles  = [ inputDir+inputPaths , inputDir+inputFilters , inputDir+inputFlags ]
 
@@ -111,10 +111,10 @@ def subcrab( runs, events, reqmem ):
         # Will submit one task for each of these input datasets.
         inputDataAndOpts = [
 
-            ['/EGamma/Run2018A-17Sep2018-v2/MINIAOD'],
-            #['/EGamma/Run2018B-26Sep2018-v1/MINIAOD'],
+            #['/EGamma/Run2018A-17Sep2018-v2/MINIAOD'], # for ABC change to GT 102X_dataRun2_v12
+            #['/EGamma/Run2018B-17Sep2018-v1/MINIAOD'],
             #['/EGamma/Run2018C-17Sep2018-v1/MINIAOD'],
-            #['/EGamma/Run2018D-22Jan2019-v2/MINIAOD'],
+            ['/EGamma/Run2018D-22Jan2019-v2/MINIAOD'],  # for D change to GT 102X_dataRun2_v15 
             ##['/EGamma/Run2018E-PromptReco-v1/MINIAOD'],
 
 	    ]
@@ -148,17 +148,24 @@ def subcrab( runs, events, reqmem ):
             #trial          = "tt_rt_rtnot_wt_woot_ks_kscc_nolhc_v10"  # as v9 w/ units 2000, runtime 2400 
             #trial          = "tt_kurhs_nolhc_v12"  # as v9 w/ units 500, runtime 2800, mem 2250 GT 101X prompt 
             #trial          = "tt_kurhs_nolhc_v14"  # as v9 w/ units 500, runtime 2800, mem 2250 GT 102X prompt  same as 13 w/ NM pull redo
-            trial          = "tt_kurhs_nolhc_v15"  # as v9 w/ units 500, runtime 2800, mem 2250 GT 102X prompt  same as 13 w/ NM pull 12May20
+            #trial          = "tt_kurhs_nolhc_v15"  # as v9 w/ units 500, no runtime, no mem, GT 102X prompt  same as 13 w/ NM pull 12May20
+            #trial          = "tt_kurhs_nolhc_v16"  # as v15 w/ NM pull 17May20
+            #trial          = "tt_kurhs_nolhc_v17"  # as v15 w/ NM pull 17May20   replaced Wt with KansasDummy
+            #trial          = "tt_kurhs_nolhc_v18"  # as v15 w/ NM pull 17May20   replaced Wt with KansasDummy and pulling amplitudes from KS uncali rechit collection
+            #trial          = "tt_kurhs_nolhc_v19"  # as v18 w/ NM pull 22May20   replaced Wt with KansasDummy and pulling amplitudes from KS uncali rechit collection
+            #trial          = "tt_kurhs_nolhc_v20"  # as v19 w/ NM pull 29May20 _+ new GT for D  replaced Wt with KansasDummy and pulling amplitudes from KS uncali rechit collection
+            trial          = "tt_kurhs_nolhc_v21"  # s v20 w/ Wt restored and Woot as KansasDummy
 
             config.General.requestName   = trial+"_"+primaryDataset+"_"+runEra+"_"+runs+"_"+dataset+"_dispho"
             config.Data.outputDatasetTag = trial+"_"+primaryDataset+"_"+dataset+"_"+runEra+"_"+runs+"_dispho"
 
 
-	    # for 2018 EGamma 2tier 102X_dataRun2_Sep2018Rereco_v1 or  globalTag=102X_dataRun2_Prompt_v11
-            config.JobType.pyCfgParams   = ['globalTag=102X_dataRun2_Prompt_v11',#'nThreads='+str(config.JobType.numCores), 
+	    ####  old  ####  for 2018 EGamma 2tier 102X_dataRun2_Sep2018Rereco_v1 or  globalTag=102X_dataRun2_Prompt_v11
+       # ABC 102X_dataRun2_v12   D  102X_dataRun2_Prompt_v15
+            config.JobType.pyCfgParams   = ['globalTag=102X_dataRun2_Prompt_v15',#'nThreads='+str(config.JobType.numCores), 
                                             'inputPaths='+inputPaths,'inputFilters='+inputFilters,'inputFlags='+inputFlags, 
                                             'onlyGED=True', 'outputFileName=output.root', #'rlelist='+events,
-					                             'kuRechitValid=True','lhcInfoValid=False', 'rawCollectionsValid=True' ]
+					                             'mcValid=False','kuRechitValid=True','lhcInfoValid=False', 'rawCollectionsValid=True' ]
 
             config.Data.inputDataset     = inDO[0]
             # Submit.
@@ -196,9 +203,12 @@ def subcrab( runs, events, reqmem ):
 event_list_path = "/home/t3-ku/jaking/trees/ecal/run_lumi_event_lists/sel_eg2018/"
 
 def submit_run2018A():
-        #subcrab( "315257-315488","",2500)
-        subcrab( "315257-315322","",2500)
-        #subcrab( "315721-316240","",2500)
+        ##subcrab( "315257-315488","",2500)
+        ##subcrab( "315257-315322","",2500)
+        ##subcrab( "315721-316240","",2500)
+
+        #subcrab( "315721-316110","",2500)
+        #subcrab( "316111-316995","",2500)
 
         #subcrab( "315257-315322", event_list_path + "sel_315257v315322_EG2018A.txt", 2500 )
         #subcrab( "315339-315366", event_list_path + "sel_315339v315366_EG2018A.txt", 3000 )
@@ -256,8 +266,8 @@ def submit_run2018C():
 
 
 def submit_run2018D():
-		  subcrab( "320673-320824","",2500)
-        #subcrab( "320673-320824","",2500)
+		  #subcrab( "320673-320824","",2500)
+        subcrab( "320807-320824","",2500)
         #subcrab( "320673-320824","",2500)
 
         #subcrab( "320673-320673", event_list_path + "sel_320673v320673_EG2018D.txt", 3000 )
@@ -317,8 +327,8 @@ def submit_run2018D():
         #subcrab( "325057-325170", event_list_path + "sel_325057v325170_EG2018D.txt", 3000 )
 
 
-submit_run2018A()
+#submit_run2018A()
 #submit_run2018B()
 #submit_run2018C()
-#submit_run2018D()
+submit_run2018D()
 

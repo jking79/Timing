@@ -40,7 +40,7 @@ Skimmer::Skimmer(const TString & indir, const TString & outdir, const TString & 
   ////////////////////////
   // Get all the inputs //
   ////////////////////////
-  std::cout << "Setting up inputs to run skim" << std::endl;
+  std::cout << "Setting up inputs for skim" << std::endl;
 
   // Set skim config options 
   Skimmer::SetupDefaults();
@@ -153,7 +153,6 @@ void Skimmer::EventLoop()
   float minRecE2 = 2.f;
   float minRecE5 = 5.f;
   float minRecE10 = 10.f;
-  float ele_dz = 1.0;  //  0.1 or 0.005
   bool useTOF = true;
   //bool useTOF = false;
   //const auto nEntries = 100000;
@@ -171,16 +170,9 @@ void Skimmer::EventLoop()
     // get event weight: no scaling by BR, xsec, lumi, etc.
     const auto wgt    = 1.f; //(fIsMC ? fInEvent.genwgt : 1.f);
     const auto evtwgt = 1.f; //fSampleWeight * wgt; // sample weight for data == 1
-  
-    fInEvent.b_run->GetEntry(entry);  
-    if( (fInEvent.run < 320200) || ( fInEvent.run > 326000 ) ) continue;
-    //if( (fInEvent.run < 315000) || ( fInEvent.run > 320200 ) ) continue;  
-
 
     gZmass = 0.f;
     gdR = 0.f;
-    elTrackZ_0 = 0.f;
-    elTrackZ_1 = 0.f;
 
     if (fSkim == SkimType::Zee)
     {
@@ -211,20 +203,20 @@ void Skimmer::EventLoop()
             //cout << "isOOT " << inpho.isOOT << endl;
          	if (inpho.isOOT) continue;
             //std::cout << "Photon found." << std::endl;  
-				inpho.b_elMatched->GetEntry(entry);
+				//inpho.b_elMatched->GetEntry(entry);
             //if (not inpho.elMatched) continue; //isEleMatched = true;
 				//if (inpho.elMatched) std::cout << "Photon has electron Match" << std::endl;
-				if(inpho.elMatched){
+				//if(inpho.elMatched){
             	//inpho.b_elTrackX->GetEntry(entry);
             	//inpho.b_elTrackY->GetEntry(entry);
-            	inpho.b_elTrackZ->GetEntry(entry);
+            	//inpho.b_elTrackZ->GetEntry(entry);
 					//std::cout << inpho.elTrackZ << " " << fInEvent.vtxZ << " " 
 					//						<< abs( inpho.elTrackZ - fInEvent.vtxZ ) << std::endl;
-					if( abs( inpho.elTrackZ - fInEvent.vtxZ ) > ele_dz ) continue; //isTrackMatched = true;
+					//if( abs( inpho.elTrackZ - fInEvent.vtxZ ) > 0.005 ) continue; //isTrackMatched = true;
 					//std::cout << "Z Vertex match found" << std::endl;
-            	good_phos.emplace_back(ipho);
-				}
-         	//good_phos.emplace_back(ipho);
+            	//good_phos.emplace_back(ipho);
+				//}
+         	good_phos.emplace_back(ipho);
       }
       
       // make sure have at least 1 good photon
@@ -305,9 +297,7 @@ void Skimmer::EventLoop()
       ////cout << "save photon " << endl;
       fPhoList.clear();
       fPhoList.emplace_back((pho1.pt > pho2.pt) ? phopair.ipho1 : phopair.ipho2);
-      elTrackZ_0 = (pho1.pt > pho2.pt) ? pho1.elTrackZ : pho2.elTrackZ;
       fPhoList.emplace_back((pho1.pt > pho2.pt) ? phopair.ipho2 : phopair.ipho1);
-      elTrackZ_1 = (pho1.pt > pho2.pt) ? pho2.elTrackZ : pho1.elTrackZ;
       for (auto ipho = 0; ipho < Common::nPhotons; ipho++)
       {
 			if      (phopair.ipho1 == ipho) continue;
@@ -321,8 +311,6 @@ void Skimmer::EventLoop()
      //std::cout << "Start DiXtal "<< std::endl;
       gZmass = 0.f;     
       gdR = 0.f; 
-      elTrackZ_0 = 0.f;
-      elTrackZ_1 = 0.f;
 
       // get rechits
       fInRecHits.b_E->GetEntry(entry);
@@ -1533,8 +1521,6 @@ void Skimmer::InitOutBranches()
 
   fOutTree->Branch("gZmass",&gZmass);
   fOutTree->Branch("gdR",&gdR);
-  fOutTree->Branch("elTrackZ_0",&elTrackZ_0);
-  fOutTree->Branch("elTrackZ_1",&elTrackZ_1);
   fOutTree->Branch("bunch_crossing",&bunch_crossing);
   fOutTree->Branch("num_bunch",&num_bunch);
   fOutTree->Branch("subtrain_position",&subtrain_position);
@@ -1829,7 +1815,6 @@ void Skimmer::SetupSkimConfig()
     else if (str.find("hasUrecDigi=") != std::string::npos)
     {
       str = Common::RemoveDelim(str,"hasUrecDigi=");
-      std::cout << " Config has hasUrecDigi to be set to " << str << std::endl;
       if( str == "true" ) hasUrecDigi = true;
       if( str == "false" ) hasUrecDigi = false;
       std::cout << " Config set hasUrecDigi to " << hasUrecDigi << std::endl;

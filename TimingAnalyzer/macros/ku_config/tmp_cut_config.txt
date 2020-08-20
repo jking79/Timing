@@ -1,4 +1,4 @@
 common_cut=(phoisEB_0&&phoisEB_1)&&(1)
-data_cut=1&&(phoseedE_0>=10)&&(phoseedE_0<=120)&&(phoseedE_1>=10)&&(phoseedE_1<=120)&&1&&1
+data_cut=1&&(phoseedE_0>=15)&&(phoseedE_0<=120)&&(phoseedE_1>=15)&&(phoseedE_1<=120)&&1&&1
 bkgd_cut=
 sign_cut=

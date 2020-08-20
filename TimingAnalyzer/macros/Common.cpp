@@ -1237,39 +1237,34 @@ namespace Common
   {
     std::cout << "Scaling " << (isUp?"up":"down") << " hist: " << hist->GetName() << std::endl;
 
-    for (auto ibinX = 1; ibinX <= hist->GetXaxis()->GetNbins(); ibinX++)
-    {
-      const auto binwidthX = hist->GetXaxis()->GetBinWidth(ibinX);
-      for (auto ibinY = 1; ibinY <= hist->GetYaxis()->GetNbins(); ibinY++)
-      {
-	const auto binwidthY = hist->GetYaxis()->GetBinWidth(ibinY);
+    for (auto ibinX = 1; ibinX <= hist->GetXaxis()->GetNbins(); ibinX++){
+          const auto binwidthX = hist->GetXaxis()->GetBinWidth(ibinX);
+          for (auto ibinY = 1; ibinY <= hist->GetYaxis()->GetNbins(); ibinY++){
+					const auto binwidthY = hist->GetYaxis()->GetBinWidth(ibinY);
 	
-	// get multiplier/divisor
-	auto multiplier = 1.f;      
-	if (varBinsX) multiplier *= binwidthX;
-	if (varBinsY) multiplier *= binwidthY;
+					// get multiplier/divisor
+					auto multiplier = 1.f;      
+					if (varBinsX) multiplier *= binwidthX;
+					if (varBinsY) multiplier *= binwidthY;
 	
-	// get content/error
-	auto content = hist->GetBinContent(ibinX,ibinY);
-	auto error   = hist->GetBinError  (ibinX,ibinY);
+					// get content/error
+					auto content = hist->GetBinContent(ibinX,ibinY);
+					auto error   = hist->GetBinError  (ibinX,ibinY);
 	
-	// scale it
-	if (isUp)
-	{
-	  content *= multiplier;
-	  error   *= multiplier;
-	}
-	else
-        {
-	  content /= multiplier;
-	  error   /= multiplier;
-	}
+					// scale it
+					if (isUp){
+	  					content *= multiplier;
+	  					error   *= multiplier;
+					} else {
+	  					content /= multiplier;
+	  					error   /= multiplier;
+					}
 	
-	// set new contents
-	hist->SetBinContent(ibinX,ibinY,content);
-	hist->SetBinError  (ibinX,ibinY,error);
-      }
-    }
+					// set new contents
+					hist->SetBinContent(ibinX,ibinY,content);
+					hist->SetBinError  (ibinX,ibinY,error);
+      		}
+    	}
   }
 
   void Scale(TGraphAsymmErrors *& graph, const std::vector<Double_t> & bins, const Bool_t isUp)

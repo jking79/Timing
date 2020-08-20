@@ -8,3 +8,4 @@ sigma_var_text=A_{eff}/#sigma_{n}
 sigma_var_unit=NONE
 sigma_init_N_params=0 50 100
 sigma_init_C_params=0 .5 1
+2d_hist_name=Data_Hist

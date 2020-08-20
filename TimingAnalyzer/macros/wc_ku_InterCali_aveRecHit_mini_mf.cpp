@@ -150,6 +150,7 @@ void wc_ku_InterCali_aveRecHit_mini( string indir, string infilelist, string out
     //std::map<UInt_t,Float_t> sumXtalWtOOTStcRecTime;
     std::map<UInt_t,Float_t> numXtalIcRecTime;
 
+         UInt_t run;
          bool isOOT_0;
          bool isOOT_1;
          bool isOOT_2;
@@ -179,6 +180,7 @@ void wc_ku_InterCali_aveRecHit_mini( string indir, string infilelist, string out
          TBranch * b_kuNotrhtime;
          TBranch * b_kuNotStcrhtime;
          TBranch * b_kuWootStcrhtime;
+         TBranch * b_run;
          TBranch * b_isOOT_0;
          TBranch * b_isOOT_1;
          TBranch * b_isOOT_2;
@@ -207,7 +209,8 @@ void wc_ku_InterCali_aveRecHit_mini( string indir, string infilelist, string out
          auto fInTree = new TChain(treename.c_str());
          std::cout << "Adding files to TChain." << std::endl;
          while (std::getline(infile,str)){
-         auto tfilename = indir + "/" + str;
+         //auto tfilename = indir + "/" + str;
+         auto tfilename = indir + str;
          std::cout << "--  adding file: " << tfilename << std::endl;
          fInTree->Add(tfilename.c_str());
          }
@@ -233,7 +236,8 @@ void wc_ku_InterCali_aveRecHit_mini( string indir, string infilelist, string out
          //fInTree->SetBranchAddress("kuNotrhtime",&kuNotrhtime,&b_kuNotrhtime);
          //fInTree->SetBranchAddress("kuNotStcrhtime",&kuNotStcrhtime,&b_kuNotStcrhtime);
          //fInTree->SetBranchAddress("kuWootStcrhtime",&kuWootStcrhtime,&b_kuWootStcrhtime);
-     
+         fInTree->SetBranchAddress("run",&run,&b_run);     
+
          // >> calcs  <<
      
          std::cout << "Starting entry loops "<< std::endl;
@@ -247,6 +251,10 @@ void wc_ku_InterCali_aveRecHit_mini( string indir, string infilelist, string out
     		  
     		  auto entry = fInTree->LoadTree(centry);
     		  
+           b_run->GetEntry(entry);
+           if( (run < 320200) || ( run > 326000 ) ) continue;
+           //if( (run < 315000) || ( run > 320200 ) ) continue; 
+
              //b_npho_recHits_0->GetEntry(entry);
              //b_npho_recHits_1->GetEntry(entry);
              //std::cout << "GetEntries rh for photons 0,1 Finished "<< std::endl;

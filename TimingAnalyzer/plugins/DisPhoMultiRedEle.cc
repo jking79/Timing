@@ -6,6 +6,7 @@ DisPhoMulti::DisPhoMulti(const edm::ParameterSet & iConfig) :
   // Collection flags
   rawCollectionsValid (iConfig.existsAs<bool>("rawCollectionsValid")  ? iConfig.getParameter<bool>("rawCollectionsValid")  : false),
   kuRechitValid (iConfig.existsAs<bool>("kuRechitValid")  ? iConfig.getParameter<bool>("kuRechitValid")  : false),
+  mcValid (iConfig.existsAs<bool>("mcValid")  ? iConfig.getParameter<bool>("mcValid")  : false),
 
   // LHC Info 
   lhcInfoValid (iConfig.existsAs<bool>("lhcInfoValid")  ? iConfig.getParameter<bool>("lhcInfoValid")  : false),
@@ -116,8 +117,8 @@ DisPhoMulti::DisPhoMulti(const edm::ParameterSet & iConfig) :
   kuWtStcRecHitsEBTag(iConfig.getParameter<edm::InputTag>("kuWtStcRecHitsEB")),
   kuWtStcRecHitsEETag(iConfig.getParameter<edm::InputTag>("kuWtStcRecHitsEE")),
 
-  //kuWootStcRecHitsEBTag(iConfig.getParameter<edm::InputTag>("kuWootStcRecHitsEB")),
-  //kuWootStcRecHitsEETag(iConfig.getParameter<edm::InputTag>("kuWootStcRecHitsEE")),
+  kuWootStcRecHitsEBTag(iConfig.getParameter<edm::InputTag>("kuWootStcRecHitsEB")),
+  kuWootStcRecHitsEETag(iConfig.getParameter<edm::InputTag>("kuWootStcRecHitsEE")),
 
   kuMfootStcRecHitsEBTag(iConfig.getParameter<edm::InputTag>("kuMfootStcRecHitsEB")),
   kuMfootStcRecHitsEETag(iConfig.getParameter<edm::InputTag>("kuMfootStcRecHitsEE")),
@@ -129,8 +130,8 @@ DisPhoMulti::DisPhoMulti(const edm::ParameterSet & iConfig) :
   uncalibratedRecHitsEBTag(iConfig.getParameter<edm::InputTag>("uncalibratedRecHitsEB")),
   uncalibratedRecHitsEETag(iConfig.getParameter<edm::InputTag>("uncalibratedRecHitsEE")),
 
-  //ku_uncalibratedRecHitsEBTag(iConfig.getParameter<edm::InputTag>("ku_uncalibratedRecHitsEB")),
-  //ku_uncalibratedRecHitsEETag(iConfig.getParameter<edm::InputTag>("ku_uncalibratedRecHitsEE")),
+  ku_uncalibratedRecHitsEBTag(iConfig.getParameter<edm::InputTag>("ku_uncalibratedRecHitsEB")),
+  ku_uncalibratedRecHitsEETag(iConfig.getParameter<edm::InputTag>("ku_uncalibratedRecHitsEE")),
 
   //kuNot_uncalibratedRecHitsEBTag(iConfig.getParameter<edm::InputTag>("kuNot_uncalibratedRecHitsEB")),
   //kuNot_uncalibratedRecHitsEETag(iConfig.getParameter<edm::InputTag>("kuNot_uncalibratedRecHitsEE")),
@@ -138,6 +139,9 @@ DisPhoMulti::DisPhoMulti(const edm::ParameterSet & iConfig) :
   // digis
   ecalDigisEBTag(iConfig.getParameter<edm::InputTag>("EBdigiCollection")),
   ecalDigisEETag(iConfig.getParameter<edm::InputTag>("EEdigiCollection")),
+
+  // pCaloHit
+  //pcaloEBTag(iConfig.getParameter<edm::InputTag>("pcalohitEB")),
 
   // gedphotons
   gedPhotonsTag(iConfig.getParameter<edm::InputTag>("gedPhotons")),
@@ -240,8 +244,8 @@ void DisPhoMulti::ConsumeTokens()
         kuWtStcRecHitsEBToken = consumes<edm::SortedCollection<EcalRecHit,edm::StrictWeakOrdering<EcalRecHit> > > (kuWtStcRecHitsEBTag);
         kuWtStcRecHitsEEToken = consumes<edm::SortedCollection<EcalRecHit,edm::StrictWeakOrdering<EcalRecHit> > > (kuWtStcRecHitsEETag);
 
-        //kuWootStcRecHitsEBToken = consumes<edm::SortedCollection<EcalRecHit,edm::StrictWeakOrdering<EcalRecHit> > > (kuWootStcRecHitsEBTag);
-        //kuWootStcRecHitsEEToken = consumes<edm::SortedCollection<EcalRecHit,edm::StrictWeakOrdering<EcalRecHit> > > (kuWootStcRecHitsEETag);
+        kuWootStcRecHitsEBToken = consumes<edm::SortedCollection<EcalRecHit,edm::StrictWeakOrdering<EcalRecHit> > > (kuWootStcRecHitsEBTag);
+        kuWootStcRecHitsEEToken = consumes<edm::SortedCollection<EcalRecHit,edm::StrictWeakOrdering<EcalRecHit> > > (kuWootStcRecHitsEETag);
 
         kuMfootStcRecHitsEBToken = consumes<edm::SortedCollection<EcalRecHit,edm::StrictWeakOrdering<EcalRecHit> > > (kuMfootStcRecHitsEBTag);
         kuMfootStcRecHitsEEToken = consumes<edm::SortedCollection<EcalRecHit,edm::StrictWeakOrdering<EcalRecHit> > > (kuMfootStcRecHitsEETag);
@@ -258,17 +262,17 @@ void DisPhoMulti::ConsumeTokens()
   	uncalibratedRecHitsEEToken = 
 	 consumes<edm::SortedCollection<EcalUncalibratedRecHit,edm::StrictWeakOrdering<EcalUncalibratedRecHit>>>(uncalibratedRecHitsEETag);
 
-//	 if( kuRechitValid ){
-//	        ku_uncalibratedRecHitsEBToken =
-//	         consumes< edm::SortedCollection<EcalUncalibratedRecHit,edm::StrictWeakOrdering<EcalUncalibratedRecHit>>>(ku_uncalibratedRecHitsEBTag);
-//	        ku_uncalibratedRecHitsEEToken =
-//	         consumes<edm::SortedCollection<EcalUncalibratedRecHit,edm::StrictWeakOrdering<EcalUncalibratedRecHit>>>(ku_uncalibratedRecHitsEETag);
+	 if( kuRechitValid ){
+	        ku_uncalibratedRecHitsEBToken =
+	         consumes< edm::SortedCollection<EcalUncalibratedRecHit,edm::StrictWeakOrdering<EcalUncalibratedRecHit>>>(ku_uncalibratedRecHitsEBTag);
+	        ku_uncalibratedRecHitsEEToken =
+	         consumes<edm::SortedCollection<EcalUncalibratedRecHit,edm::StrictWeakOrdering<EcalUncalibratedRecHit>>>(ku_uncalibratedRecHitsEETag);
 //	
 //	        kuNot_uncalibratedRecHitsEBToken =
 //	         consumes< edm::SortedCollection<EcalUncalibratedRecHit,edm::StrictWeakOrdering<EcalUncalibratedRecHit>>>(kuNot_uncalibratedRecHitsEBTag);
 //	        kuNot_uncalibratedRecHitsEEToken =
 //	         consumes<edm::SortedCollection<EcalUncalibratedRecHit,edm::StrictWeakOrdering<EcalUncalibratedRecHit>>>(kuNot_uncalibratedRecHitsEETag);
-//	}
+	}
 	
   	// digis
   	//ecalDigisEBToken = consumes<edm::SortedCollection<EcalTimeDigi,edm::StrictWeakOrdering<EcalTimeDigi> > > (ecalDigisEBTag);
@@ -280,6 +284,15 @@ void DisPhoMulti::ConsumeTokens()
   // photons
   gedPhotonsToken = consumes<std::vector<pat::Photon> > (gedPhotonsTag);
   ootPhotonsToken = consumes<std::vector<pat::Photon> > (ootPhotonsTag);
+
+  if( mcValid ){
+    //std::cout << " getting pcalo token" << std::endl;
+    std::string g4Label = "g4SimHits"; // iConfig.getUntrackedParameter<std::string>("ModuleLabel","g4SimHits");
+    std::string mixLabel = "mix";
+    std::string hitLabEB = "EcalHitsEB"; // iConfig.getUntrackedParameter<std::string>("EBCollection","EcalHitsEB");
+    ebCaloHitToken_  = consumes<edm::PCaloHitContainer>(edm::InputTag(g4Label,hitLabEB));
+    //cfToken_ = consumes<CrossingFrame<PCaloHit>>(edm::InputTag(mixLabel,hitLabEB));
+  }
 
   // only for simulated samples
   if (isMC)
@@ -607,11 +620,11 @@ bool DisPhoMulti::GetStandardObjects(const edm::Event & iEvent)
         iEvent.getByToken(kuWtStcRecHitsEEToken,kuWtStcRecHitsEEH);
         if (oot::BadHandle(kuWtStcRecHitsEEH,"kuWtStcRecHitsEE")) return false;
 
-        //iEvent.getByToken(kuWootStcRecHitsEBToken,kuWootStcRecHitsEBH);
-        //if (oot::BadHandle(kuWootStcRecHitsEBH,"kuWootStcRecHitsEB")) return false;
+        iEvent.getByToken(kuWootStcRecHitsEBToken,kuWootStcRecHitsEBH);
+        if (oot::BadHandle(kuWootStcRecHitsEBH,"kuWootStcRecHitsEB")) return false;
 
-        //iEvent.getByToken(kuWootStcRecHitsEEToken,kuWootStcRecHitsEEH);
-        //if (oot::BadHandle(kuWootStcRecHitsEEH,"kuWootStcRecHitsEE")) return false;
+        iEvent.getByToken(kuWootStcRecHitsEEToken,kuWootStcRecHitsEEH);
+        if (oot::BadHandle(kuWootStcRecHitsEEH,"kuWootStcRecHitsEE")) return false;
 
         iEvent.getByToken(kuMfootStcRecHitsEBToken,kuMfootStcRecHitsEBH);
         if (oot::BadHandle(kuMfootStcRecHitsEBH,"kuMfootStcRecHitsEB")) return false;
@@ -635,13 +648,13 @@ bool DisPhoMulti::GetStandardObjects(const edm::Event & iEvent)
   	iEvent.getByToken(uncalibratedRecHitsEEToken,uncalibratedRecHitsEEH);
   	if (oot::BadHandle(uncalibratedRecHitsEEH,"uncalibratedRecHitsEE")) return false;
 
-//	if( kuRechitValid ){
+	if( kuRechitValid ){
 //
-//	        iEvent.getByToken(ku_uncalibratedRecHitsEBToken,ku_uncalibratedRecHitsEBH);
-//	        if (oot::BadHandle(ku_uncalibratedRecHitsEBH,"ku_uncalibratedRecHitsEB")) return false;
+	        iEvent.getByToken(ku_uncalibratedRecHitsEBToken,ku_uncalibratedRecHitsEBH);
+	        if (oot::BadHandle(ku_uncalibratedRecHitsEBH,"ku_uncalibratedRecHitsEB")) return false;
 //	
-//	        iEvent.getByToken(ku_uncalibratedRecHitsEEToken,ku_uncalibratedRecHitsEEH);
-//	        if (oot::BadHandle(ku_uncalibratedRecHitsEEH,"ku_uncalibratedRecHitsEE")) return false;
+	        iEvent.getByToken(ku_uncalibratedRecHitsEEToken,ku_uncalibratedRecHitsEEH);
+	        if (oot::BadHandle(ku_uncalibratedRecHitsEEH,"ku_uncalibratedRecHitsEE")) return false;
 //	
 //	        iEvent.getByToken(kuNot_uncalibratedRecHitsEBToken,kuNot_uncalibratedRecHitsEBH);
 //	        if (oot::BadHandle(kuNot_uncalibratedRecHitsEBH,"kuNot_uncalibratedRecHitsEB")) return false;
@@ -649,7 +662,7 @@ bool DisPhoMulti::GetStandardObjects(const edm::Event & iEvent)
 //	        iEvent.getByToken(kuNot_uncalibratedRecHitsEEToken,kuNot_uncalibratedRecHitsEEH);
 //	        if (oot::BadHandle(kuNot_uncalibratedRecHitsEEH,"kuNot_uncalibratedRecHitsEE")) return false;
 //
-//        }
+        }
 
   	// DIGIS
   	iEvent.getByToken(ebDigiCollectionToken_,pEBDigis);
@@ -657,7 +670,15 @@ bool DisPhoMulti::GetStandardObjects(const edm::Event & iEvent)
 
   	iEvent.getByToken(eeDigiCollectionToken_,pEEDigis);
   	if (oot::BadHandle(pEEDigis,"EEdigiCollection")) return false;
-
+ 
+   if( mcValid ){
+       //std::cout << " getting pcalo handle" << std::endl;
+       iEvent.getByToken(ebCaloHitToken_,caloHitEBH); 
+       if (oot::BadHandle(caloHitEBH,"pCaloHitEB")) return false;
+       //iEvent.getByToken(cfToken_,crossingFrame);
+       //if (oot::BadHandle(crossingFrame,"pCaloHitEB")) return false; 
+   }
+    
   }
 
   // PHOTONS
@@ -782,8 +803,8 @@ void DisPhoMulti::InitializeObjects(const edm::Event & iEvent)
         kuWtStcRecHitsEB = kuWtStcRecHitsEBH.product();
         kuWtStcRecHitsEE = kuWtStcRecHitsEEH.product();
 
-        //kuWootStcRecHitsEB = kuWootStcRecHitsEBH.product();
-        //kuWootStcRecHitsEE = kuWootStcRecHitsEEH.product();
+        kuWootStcRecHitsEB = kuWootStcRecHitsEBH.product();
+        kuWootStcRecHitsEE = kuWootStcRecHitsEEH.product();
 
         kuMfootStcRecHitsEB = kuMfootStcRecHitsEBH.product();
         kuMfootStcRecHitsEE = kuMfootStcRecHitsEEH.product();
@@ -799,7 +820,7 @@ void DisPhoMulti::InitializeObjects(const edm::Event & iEvent)
   //kuNotRecHitMap.clear();
   kuNotStcRecHitMap.clear();
   kuWtStcRecHitMap.clear();
-  //kuWootStcRecHitMap.clear();
+  kuWootStcRecHitMap.clear();
   kuMfootStcRecHitMap.clear();
   kuMfootCCStcRecHitMap.clear();
 
@@ -808,24 +829,32 @@ void DisPhoMulti::InitializeObjects(const edm::Event & iEvent)
   	uncalibratedRecHitsEB = uncalibratedRecHitsEBH.product();
   	uncalibratedRecHitsEE = uncalibratedRecHitsEEH.product();
 
-//	if( kuRechitValid ){
-//
-//        	ku_uncalibratedRecHitsEB = ku_uncalibratedRecHitsEBH.product();
-//        	ku_uncalibratedRecHitsEE = ku_uncalibratedRecHitsEEH.product();
+	if( kuRechitValid ){
+
+        	ku_uncalibratedRecHitsEB = ku_uncalibratedRecHitsEBH.product();
+        	ku_uncalibratedRecHitsEE = ku_uncalibratedRecHitsEEH.product();
 //	
 //        	kuNot_uncalibratedRecHitsEB = kuNot_uncalibratedRecHitsEBH.product();
 //        	kuNot_uncalibratedRecHitsEE = kuNot_uncalibratedRecHitsEEH.product();
 //		
-//	}
+	}
 
   	// INPUT ECAL DIGIS
   	EBdigiCollection = pEBDigis.product();
   	EEdigiCollection = pEEDigis.product();
   }
 
+  if( mcValid ){
+     //std::cout << " getting pcalo product" << std::endl;
+     caloHitEB = caloHitEBH.product();
+     //  done in set pcalo code section
+
+  }
+
+
   // OUTPUT UNCALIBRATED RECHIT MAP
   uncalibratedRecHitMap.clear();
-  //ku_uncalibratedRecHitMap.clear();
+  ku_uncalibratedRecHitMap.clear();
   //kuNot_uncalibratedRecHitMap.clear();
 
   // OUTPUT ECAL DIGIS
@@ -951,16 +980,16 @@ void DisPhoMulti::PrepObjects(const edm::Event & iEvent)
         //oot::PrepRecHits(kuNotRecHitsEB,kuNotRecHitsEE,kuNotRecHitMap,rhEmin); 
         oot::PrepRecHits(kuNotStcRecHitsEB,kuNotStcRecHitsEE,kuNotStcRecHitMap,rhEmin); 
         oot::PrepRecHits(kuWtStcRecHitsEB,kuWtStcRecHitsEE,kuWtStcRecHitMap,rhEmin);
-        //oot::PrepRecHits(kuWootStcRecHitsEB,kuWootStcRecHitsEE,kuWootStcRecHitMap,rhEmin);
+        oot::PrepRecHits(kuWootStcRecHitsEB,kuWootStcRecHitsEE,kuWootStcRecHitMap,rhEmin);
         oot::PrepRecHits(kuMfootStcRecHitsEB,kuMfootStcRecHitsEE,kuMfootStcRecHitMap,rhEmin);
         oot::PrepRecHits(kuMfootCCStcRecHitsEB,kuMfootCCStcRecHitsEE,kuMfootCCStcRecHitMap,rhEmin);
   } 
   if( rawCollectionsValid ){
   	oot::PrepURecHits(uncalibratedRecHitsEB,uncalibratedRecHitsEE,uncalibratedRecHitMap);
-//	if( kuRechitValid ){
-//		oot::PrepURecHits(ku_uncalibratedRecHitsEB,ku_uncalibratedRecHitsEE,ku_uncalibratedRecHitMap);
+	if( kuRechitValid ){
+		oot::PrepURecHits(ku_uncalibratedRecHitsEB,ku_uncalibratedRecHitsEE,ku_uncalibratedRecHitMap);
 //                oot::PrepURecHits(kuNot_uncalibratedRecHitsEB,kuNot_uncalibratedRecHitsEE,kuNot_uncalibratedRecHitMap);
-//	}
+	}
   	oot::PrepDigis(EBdigiCollection,EEdigiCollection,digiMap);
   }
 
@@ -997,11 +1026,11 @@ void DisPhoMulti::PrepObjects(const edm::Event & iEvent)
   nKuNotRecHits = 0;//kuNotRecHitMap.size();
   nKuNotStcRecHits = kuNotStcRecHitMap.size();
   nKuWtStcRecHits = kuWtStcRecHitMap.size();
-  nKuWootStcRecHits = 0;//kuWootStcRecHitMap.size();
+  nKuWootStcRecHits = kuWootStcRecHitMap.size();
   nKuMfootStcRecHits = kuMfootStcRecHitMap.size();
   nKuMfootCCStcRecHits = kuMfootCCStcRecHitMap.size();
   nURecHits = uncalibratedRecHitMap.size();
-  nKuURecHits = 0;//ku_uncalibratedRecHitMap.size();
+  nKuURecHits = ku_uncalibratedRecHitMap.size();
   nKuNotURecHits = 0;//kuNot_uncalibratedRecHitMap.size();
   nDigis = digiMap.size();
   nPhotons = std::min(int(photons.size()),Config::nPhotons);
@@ -1182,6 +1211,9 @@ void DisPhoMulti::FillTreeFromObjects(const edm::Event & iEvent)
   //////////////
   // Rec Hits //
   //////////////
+
+  if( mcValid ){ DisPhoMulti::SetPCalo(); }
+
   //std::cout << ">>> Rec Hits" << std::endl;
   DisPhoMulti::InitializeRecHitBranches();
   DisPhoMulti::SetRecHitBranches();
@@ -1911,6 +1943,7 @@ void DisPhoMulti::InitializeRecHitBranches()
   rhtime.clear();
   rhtimeErr.clear();
   rhTOF.clear();
+  rhpcTOF.clear();
   rhID.clear();
   rhisOOT.clear();
   rhisGS6.clear();
@@ -1986,6 +2019,7 @@ void DisPhoMulti::InitializeRecHitBranches()
   kuNotStcrhE.clear();
   kuNotStcrhtime.clear();
   kuNotStcrhtimeErr.clear();
+  pCalotime.clear();
   kuNotStcrhTOF.clear();
   kuNotStcrhID.clear();
   kuNotStcrhisOOT.clear();
@@ -2098,13 +2132,38 @@ void DisPhoMulti::InitializeRecHitBranches()
   isJitterValid.clear();
   isJitterErrorValid.clear();
 
+  ku_uRhId.clear();
+  ku_amplitude.clear();
+  ku_amplitudeError.clear();
+  ku_pedestal.clear();
+  ku_jitter.clear();
+  ku_chi2.clear();
+  //outOfTimeAmplitude.clear();
+  //for (unsigned int i; i<SAMPLES; i++) outOfTimeAmplitude[i].clear();
+  ku_ootA0.clear();
+  ku_ootA1.clear();
+  ku_ootA2.clear();
+  ku_ootA3.clear();
+  ku_ootA4.clear();
+  ku_ootA5.clear();
+  ku_ootA6.clear();
+  ku_ootA7.clear();
+  ku_ootA8.clear();
+  ku_ootA9.clear();
+  ku_jitterError.clear();
+  ku_isSaturated.clear();
+  ku_isJitterValid.clear();
+  ku_isJitterErrorValid.clear();
+
   rhX.resize(nRecHits);
   rhY.resize(nRecHits);
   rhZ.resize(nRecHits);
   rhE.resize(nRecHits);
   rhtime.resize(nRecHits);
   rhtimeErr.resize(nRecHits);
+  pCalotime.resize(nRecHits);
   rhTOF.resize(nRecHits);
+  rhpcTOF.resize(nRecHits);
   rhID.resize(nRecHits);
   rhisOOT.resize(nRecHits);
   rhisGS6.resize(nRecHits);
@@ -2292,6 +2351,29 @@ void DisPhoMulti::InitializeRecHitBranches()
   isJitterValid.resize(nURecHits);
   isJitterErrorValid.resize(nURecHits);
 
+  ku_uRhId.resize(nURecHits);
+  ku_amplitude.resize(nURecHits);
+  ku_amplitudeError.resize(nURecHits);
+  ku_pedestal.resize(nURecHits);
+  ku_jitter.resize(nURecHits);
+  ku_chi2.resize(nURecHits);
+  //outOfTimeAmplitude.resize(nURecHits);
+  ku_ootA0.resize(nURecHits);
+  ku_ootA1.resize(nURecHits);
+  ku_ootA2.resize(nURecHits);
+  ku_ootA3.resize(nURecHits);
+  ku_ootA4.resize(nURecHits);
+  ku_ootA5.resize(nURecHits);
+  ku_ootA6.resize(nURecHits);
+  ku_ootA7.resize(nURecHits);
+  ku_ootA8.resize(nURecHits);
+  ku_ootA9.resize(nURecHits);
+  //for (auto i = 0; i<nURecHits; i++) outOfTimeAmplitude[i].resize(SAMPLES);
+  ku_jitterError.resize(nURecHits);
+  ku_isSaturated.resize(nURecHits);
+  ku_isJitterValid.resize(nURecHits);
+  ku_isJitterErrorValid.resize(nURecHits);
+
   for (auto i = 0; i < nRecHits; i++)
   {
     rhX[i] = -9999.f;
@@ -2302,6 +2384,8 @@ void DisPhoMulti::InitializeRecHitBranches()
     rhtime   [i] = -9999.f;
     rhtimeErr[i] = -9999.f;
     rhTOF    [i] = -9999.f;
+    rhpcTOF    [i] = -9999.f;
+    pCalotime[i] = -9999.f;
     
     rhID[i] = 0; // non-ideal
 
@@ -2567,6 +2651,29 @@ void DisPhoMulti::InitializeRecHitBranches()
       isSaturated[i] = false;
       isJitterValid[i] = false;
       isJitterErrorValid[i] = false;
+
+      ku_uRhId[i] = 0;
+      ku_amplitude[i] = -9999.f;
+      ku_amplitudeError[i] = -9999.f;
+      ku_pedestal[i] = -9999.f;
+      ku_jitter[i] = -9999.f;
+      ku_chi2[i] = -9999.f;
+      //for (unsigned int j; j<SAMPLES; j++) outOfTimeAmplitude[i][j] = -9999.f;
+      ku_ootA0[i] = -9999.f;
+      ku_ootA1[i] = -9999.f;
+      ku_ootA2[i] = -9999.f;
+      ku_ootA3[i] = -9999.f;
+      ku_ootA4[i] = -9999.f;
+      ku_ootA5[i] = -9999.f;
+      ku_ootA6[i] = -9999.f;
+      ku_ootA7[i] = -9999.f;
+      ku_ootA8[i] = -9999.f;
+      ku_ootA9[i] = -9999.f;
+      ku_jitterError[i] = -9999.f;
+      ku_isSaturated[i] = false;
+      ku_isJitterValid[i] = false;
+      ku_isJitterErrorValid[i] = false;
+
     }
 
   }  
@@ -2615,8 +2722,8 @@ void DisPhoMulti::SetRecHitBranches()
         DisPhoMulti::SetKuWtStcRecHitBranches(kuWtStcRecHitsEB,barrelGeometry,adcToGeVEB);
         DisPhoMulti::SetKuWtStcRecHitBranches(kuWtStcRecHitsEE,endcapGeometry,adcToGeVEE);
 
-        //DisPhoMulti::SetKuWootStcRecHitBranches(kuWootStcRecHitsEB,barrelGeometry,adcToGeVEB);
-        //DisPhoMulti::SetKuWootStcRecHitBranches(kuWootStcRecHitsEE,endcapGeometry,adcToGeVEE);
+        DisPhoMulti::SetKuWootStcRecHitBranches(kuWootStcRecHitsEB,barrelGeometry,adcToGeVEB);
+        DisPhoMulti::SetKuWootStcRecHitBranches(kuWootStcRecHitsEE,endcapGeometry,adcToGeVEE);
 
         DisPhoMulti::SetKuMfootStcRecHitBranches(kuMfootStcRecHitsEB,barrelGeometry,adcToGeVEB);
         DisPhoMulti::SetKuMfootStcRecHitBranches(kuMfootStcRecHitsEE,endcapGeometry,adcToGeVEE);
@@ -2630,6 +2737,13 @@ void DisPhoMulti::SetRecHitBranches()
 	nurechits = uncalibratedRecHitMap.size();
   	DisPhoMulti::SetURecHitBranches(uncalibratedRecHitsEB,barrelGeometry);
   	DisPhoMulti::SetURecHitBranches(uncalibratedRecHitsEE,endcapGeometry);
+   
+   
+   if( kuRechitValid ){ 	
+	   ku_nurechits = ku_uncalibratedRecHitMap.size();
+   	DisPhoMulti::SetUKURecHitBranches(ku_uncalibratedRecHitsEB,barrelGeometry);
+   	DisPhoMulti::SetUKURecHitBranches(ku_uncalibratedRecHitsEE,endcapGeometry);
+	}	
   }
 
 }
@@ -2638,6 +2752,88 @@ void DisPhoMulti::SetDigiBranches()
 {
   ndigis = digiMap.size();
   DisPhoMulti::SetDigiBranches(EBdigiCollection,EEdigiCollection,barrelGeometry);
+}
+
+void DisPhoMulti::SetPCalo()
+{ 
+
+   //auto barrelHits = std::make_unique<MixCollection<PCaloHit>>(crossingFrame.product()) ;
+
+   pcalo_id.clear();
+   pcalo_gtid.clear();
+   pcalo_t.clear();
+   pcalo_e.clear();
+   pcalo_hw = 0;
+   pcalo_lw = 0;
+   pcalo_ew = 0;
+   pcalo_emf.clear();
+   pcalo_hadf.clear();
+   pcalo_depth.clear();
+   pcalo_bx.clear();
+   pcalo_event.clear();
+   pcalo_eventid.clear();
+
+   auto nPCalo = caloHitEB->size();
+   //auto nPCalo = barrelHits->size();
+
+   pcalo_id.resize(nPCalo);
+   pcalo_gtid.resize(nPCalo);
+   pcalo_t.resize(nPCalo);
+   pcalo_e.resize(nPCalo);
+   pcalo_emf.resize(nPCalo);
+   pcalo_hadf.resize(nPCalo);
+   pcalo_depth.resize(nPCalo);
+   pcalo_bx.resize(nPCalo);
+   pcalo_event.resize(nPCalo);
+   pcalo_eventid.resize(nPCalo);
+
+   edm::PCaloHitContainer::const_iterator ihit;
+   //MixCollection<PCaloHit>::MixItr hitItr;
+   int index = 0;
+//   for (ihit=caloHitEB->begin(); ihit!=caloHitEB->end(); ihit++) {
+//      pcalo_id[index] = 1; //pcrawid;
+//      pcalo_gtid[index] = 2000000; //ihit->geantTrackId();
+//      pcalo_e[index] = -10.0; //ihit->energy();
+//      pcalo_t[index] = -10.0; //ihit->time();
+//      pcalo_depth[index] = 10; //ihit->depth();
+//      pcalo_eventid[index] = 1; //eventID.rawId();
+//      pcalo_bx[index] = 1; //eventID.bunchCrossing();
+//      pcalo_event[index] = 1; //eventID.event();
+//      index++;
+//   }
+
+   index = 0;
+ 	for (ihit=caloHitEB->begin(); ihit!=caloHitEB->end(); ihit++) {
+   //for (hitItr=barrelHits->begin(); hitItr!=barrelHits->end(); hitItr++) {
+      //const PCaloHit& ihit ( *hitItr );
+      //pcalo_bx[index] =  hitItr.bunch(); 
+      EBDetId pcdetid = ihit->id();//->
+	   auto pcrawid = pcdetid.rawId();
+      //std::cout << "Index " << index << " of " << nPCalo << " Id: " << pcrawid << " E : " << ihit->energy() << " T : " << ihit->time() << std::endl;
+		pcalo_id[index] = pcrawid;
+      pcalo_gtid[index] = ihit->geantTrackId();//->
+      pcalo_e[index] = ihit->energy();//->
+	   //auto ech = abs(ihit->energy());
+      //auto tch = abs(ihit->time());
+      pcalo_emf[index] = ihit->energyEM();//->
+      pcalo_hadf[index] = ihit->energyHad();//->
+      pcalo_t[index] = ihit->time();//->
+      pcalo_depth[index] = ihit->depth();//->
+      auto eventID = ihit->eventId();//->
+      pcalo_eventid[index] = eventID.rawId();
+      pcalo_bx[index] = eventID.bunchCrossing(); 
+      pcalo_event[index] = eventID.event(); 
+      //if( ech < 0.0000001 ) ++pcalo_lw;
+      //if( tch < 0.0000001 ) ++pcalo_lw;
+      //if( ech > 1000000 ) ++pcalo_hw;
+      //if( tch > 1000000 ) ++pcalo_hw;
+      //if( ech == tch ) ++pcalo_ew;
+	   //std::cout << "Index " << index << " of " << nPCalo << " Id: " << pcrawid << " E : " << ihit->energy() << " T : " << ihit->time() << std::endl;
+      //std::cout << "Index " << index << " of " << nPCalo << " Id: " << pcrawid << " E : " << pcalo_e[index] << " T : " << pcalo_t[index] << std::endl;
+      //std::cout << "---------------------" << std::endl;
+      //if( pcalo_e[index] > 100.f ) std::cout << "Index " << index << " of " << nPCalo << " Id: " << pcrawid << " E : " << ihit.energy() << " T : " << ihit.time() << std::endl;
+      index++;
+	}
 }
 
 void DisPhoMulti::SetRecHitBranches(const EcalRecHitCollection * recHits, const CaloSubdetectorGeometry * geometry, const float adcToGeV)
@@ -2663,7 +2859,8 @@ void DisPhoMulti::SetRecHitBranches(const EcalRecHitCollection * recHits, const 
       rhtime   [pos] = recHit.time();
       rhtimeErr[pos] = recHit.timeError();
       rhTOF    [pos] = (d_orig-d_pv) / Config::sol;
-      
+      rhpcTOF  [pos] = d_pv / Config::sol;     
+ 
       // detid
       rhID[pos] = rawId;
 
@@ -2683,6 +2880,31 @@ void DisPhoMulti::SetRecHitBranches(const EcalRecHitCollection * recHits, const 
       const auto interCalib = ((interCalibIter != interCalibMap->end()) ? (*interCalibIter) : - 1.f);
       if ((laser > 0.f) && (interCalib > 0.f) && (adcToGeV > 0.f)) rhadcToGeV[pos] = (laser*interCalib*adcToGeV);
 
+      //pcalo wtime
+      //if( mcValid ){
+      if( false ){
+          float pce = 0.0;
+          //float pct = 0.0;
+          float pcwt = 0.0;
+          for(UInt_t pcseed = 0; pcseed < pcalo_id.size(); pcseed++ ){
+				  //std::cout << "Pcalo id match : " << pcalo_id[pcseed] << " : " << rhID[pos] << std::endl;
+              if( pcalo_id[pcseed] == rhID[pos] ){    //(*fInRecHits.ID)[seed] ){
+							 //std::cout << "     match found  " << std::endl;
+                      auto time = pcalo_t[pcseed];
+                      //std::cout << "     time : " << time << std::endl;
+                      //if( (time <= 0.f) or (time==2.f) ) continue;
+                      auto depth = pcalo_depth[pcseed];
+                      if( depth > 0 ) continue;
+                      auto energy = pcalo_e[pcseed];
+                      //std::cout << "     energy : " << energy << std::endl;
+                      //if( (energy <= 0.f) or (energy==2.f) ) continue;
+                      pce += energy;
+                      //pct += time;
+                      pcwt += (energy*time);
+             }
+          }
+          if( pce > 0.0 ) { pCalotime[pos] = pcwt/pce; }
+      }
       // pedestal info
       const auto & pediter = pedestalsH->find(recHitId);
       if (pediter != pedestalsH->end())
@@ -3206,6 +3428,49 @@ void DisPhoMulti::SetURecHitBranches(const EcalUncalibratedRecHitCollection * re
 	}
     }
 }
+void DisPhoMulti::SetUKURecHitBranches(const EcalUncalibratedRecHitCollection * recHits, const CaloSubdetectorGeometry * geometry)
+{
+  for (const auto recHit : *recHits)
+    {
+      const auto recHitId(recHit.id());
+      //const auto rawId = recHitId.rawId();
+      if (uncalibratedRecHitMap.count(recHitId))
+   {
+     const auto pos = uncalibratedRecHitMap.at(recHitId);
+
+     // Assign values
+     ku_uRhId[pos] = recHitId;
+     ku_amplitude[pos] = recHit.amplitude();
+     ku_amplitudeError[pos] = recHit.amplitudeError();
+     ku_pedestal[pos] = recHit.pedestal();
+     ku_jitter[pos] = recHit.jitter();
+     ku_chi2[pos] = recHit.chi2();
+     //for (int i=0; i<SAMPLES; i++) {
+     //  outOfTimeAmplitude[pos][i] = recHit.outOfTimeAmplitude(i);
+     //}
+
+          ku_ootA0[pos] = recHit.outOfTimeAmplitude(0);
+          ku_ootA1[pos] = recHit.outOfTimeAmplitude(1);
+          ku_ootA2[pos] = recHit.outOfTimeAmplitude(2);
+          ku_ootA3[pos] = recHit.outOfTimeAmplitude(3);
+          ku_ootA4[pos] = recHit.outOfTimeAmplitude(4);
+          ku_ootA5[pos] = recHit.outOfTimeAmplitude(5);
+          ku_ootA6[pos] = recHit.outOfTimeAmplitude(6);
+          ku_ootA7[pos] = recHit.outOfTimeAmplitude(7);
+          ku_ootA8[pos] = recHit.outOfTimeAmplitude(8);
+          ku_ootA9[pos] = recHit.outOfTimeAmplitude(9);
+
+     ku_jitterError[pos] = recHit.jitterError();
+     ku_isSaturated[pos] = recHit.isSaturated();
+     ku_isJitterValid[pos] = recHit.isJitterValid();
+     ku_isJitterErrorValid[pos] = recHit.isJitterErrorValid();
+
+     // Print elements of OOTamp vectors
+     //for (auto k = outOfTimeAmplitude[pos].begin(); k!=outOfTimeAmplitude[pos].end(); k++) cout << "Element: " << *k << endl;
+
+   }
+    }
+}
 
 void DisPhoMulti::SetDigiBranches(const EBDigiCollection * ebDigis, const EEDigiCollection * eeDigis,  const CaloSubdetectorGeometry * geometry)
 {
@@ -3318,6 +3583,7 @@ void DisPhoMulti::InitializePhoBranches()
       phoBranch.seedtime_     = -9999.f;
       phoBranch.seedtimeErr_  = -9999.f;
       phoBranch.seedTOF_      = -9999.f;
+      phoBranch.seedpcTOF_      = -9999.f;
       phoBranch.seedID_       = 0; // non-ideal
       phoBranch.seedisOOT_    = -1;
       phoBranch.seedisGS6_    = -1;
@@ -3493,6 +3759,7 @@ void DisPhoMulti::SetPhoBranches()
 	phoBranch.seedtime_ = rhtime[seedpos];
 	phoBranch.seedtimeErr_ = rhtimeErr[seedpos];
 	phoBranch.seedTOF_ = rhTOF[seedpos];
+   phoBranch.seedpcTOF_ = rhpcTOF[seedpos];
 	phoBranch.seedID_ = rhID[seedpos];
 	phoBranch.seedisOOT_ = rhisOOT[seedpos];
 	phoBranch.seedisGS6_ = rhisGS6[seedpos];
@@ -3534,7 +3801,7 @@ void DisPhoMulti::SetPhoBranches()
     // other track vetoes
     phoBranch.passEleVeto_ = photon.passElectronVeto();
     phoBranch.hasPixSeed_  = photon.hasPixelSeed();
- 
+
     for (const auto & ele : *electronsH){
           if (reco::deltaR(ele,photon) < 0.1 ){
               phoBranch.elMatched_ = true;
@@ -4056,6 +4323,23 @@ void DisPhoMulti::MakeEventTree()
   disphotree->Branch("nmuHighM", &nmuHighM);
   disphotree->Branch("nmuHighT", &nmuHighT);
 
+  // PCalo Info
+  if( mcValid ){
+		disphotree->Branch("pcalo_t", &pcalo_t); 
+      disphotree->Branch("pcalo_e", &pcalo_e); 
+      disphotree->Branch("pcalo_hw", &pcalo_hw);
+      disphotree->Branch("pcalo_lw", &pcalo_lw);
+      disphotree->Branch("pcalo_ew", &pcalo_ew);
+      disphotree->Branch("pcalo_emf", &pcalo_emf);
+      disphotree->Branch("pcalo_hadf", &pcalo_hadf);
+      disphotree->Branch("pcalo_id", &pcalo_id); 
+      disphotree->Branch("pcalo_gtid", &pcalo_gtid);
+      disphotree->Branch("pcalo_depth", &pcalo_depth);
+      disphotree->Branch("pcalo_bx", &pcalo_bx);
+      disphotree->Branch("pcalo_event", &pcalo_event); 
+      disphotree->Branch("pcalo_eventid", &pcalo_eventid);
+ }
+
   // RecHit Info
   disphotree->Branch("nrechits", &nrechits);
   disphotree->Branch("nurechits", &nurechits);
@@ -4068,7 +4352,9 @@ void DisPhoMulti::MakeEventTree()
     disphotree->Branch("rhE", &rhE);
     disphotree->Branch("rhtime", &rhtime);
     disphotree->Branch("rhtimeErr", &rhtimeErr);
+    disphotree->Branch("pCalotime", &pCalotime);
     disphotree->Branch("rhTOF", &rhTOF);
+    disphotree->Branch("rhpcTOF", &rhpcTOF);
     disphotree->Branch("rhID", &rhID);
     disphotree->Branch("rhisOOT", &rhisOOT);
     disphotree->Branch("rhisGS6", &rhisGS6);
@@ -4215,6 +4501,29 @@ void DisPhoMulti::MakeEventTree()
 //    disphotree->Branch("isJitterValid", &isJitterValid);
 //    disphotree->Branch("isJitterErrorValid", &isJitterErrorValid);
 
+    disphotree->Branch("ku_uRhId", &ku_uRhId);
+    disphotree->Branch("ku_amplitude", &ku_amplitude);
+    disphotree->Branch("ku_amplitudeError", &ku_amplitudeError);
+//    disphotree->Branch("pedestal", &pedestal);
+//    disphotree->Branch("jitter", &jitter);
+//    disphotree->Branch("chi2", &chi2);
+//    disphotree->Branch("outOfTimeAmplitude", &outOfTimeAmplitude);
+    disphotree->Branch("ku_ootA0", &ku_ootA0);
+    disphotree->Branch("ku_ootA1", &ku_ootA1);
+    disphotree->Branch("ku_ootA2", &ku_ootA2);
+    disphotree->Branch("ku_ootA3", &ku_ootA3);
+    disphotree->Branch("ku_ootA4", &ku_ootA4);
+    disphotree->Branch("ku_ootA5", &ku_ootA5);
+    disphotree->Branch("ku_ootA6", &ku_ootA6);
+    disphotree->Branch("ku_ootA7", &ku_ootA7);
+    disphotree->Branch("ku_ootA8", &ku_ootA8);
+    disphotree->Branch("ku_ootA9", &ku_ootA9);
+////    disphotree->Branch("outOfTimeAmplitude", &outOfTimeAmplitude, "outOfTimeAmplitude/F");
+//    disphotree->Branch("jitterError", &jitterError);
+//    disphotree->Branch("isSaturated", &isSaturated);
+//    disphotree->Branch("isJitterValid", &isJitterValid);
+//    disphotree->Branch("isJitterErrorValid", &isJitterErrorValid);
+
   }
   
   // Digi Info
@@ -4224,7 +4533,6 @@ void DisPhoMulti::MakeEventTree()
       disphotree->Branch("digiID", &digiID);
       disphotree->Branch("digiData", &digiData, "digiData/F");
     }
-
   // Photon Info
   disphotree->Branch("nphotons", &nphotons);
 
@@ -4290,6 +4598,7 @@ void DisPhoMulti::MakeEventTree()
       disphotree->Branch(Form("phoseedtime_%i",iphoton), &phoBranch.seedtime_);
       disphotree->Branch(Form("phoseedtimeErr_%i",iphoton), &phoBranch.seedtimeErr_);
       disphotree->Branch(Form("phoseedTOF_%i",iphoton), &phoBranch.seedTOF_);
+      disphotree->Branch(Form("phoseedpcTOF_%i",iphoton), &phoBranch.seedpcTOF_);
       disphotree->Branch(Form("phoseedID_%i",iphoton), &phoBranch.seedID_);
       disphotree->Branch(Form("phoseedisOOT_%i",iphoton), &phoBranch.seedisOOT_);
       disphotree->Branch(Form("phoseedisGS6_%i",iphoton), &phoBranch.seedisGS6_);

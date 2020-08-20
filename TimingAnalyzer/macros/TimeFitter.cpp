@@ -25,6 +25,7 @@ TimeFitter::TimeFitter(const TString & infilename, const TString & plotconfig, c
   // output root file for quick inspection
   fOutFile = TFile::Open(Form("%s.root",fOutFileText.Data()),"UPDATE");
 
+  f2DHistName="Data_Hist_test";
   // setup config
   TimeFitter::SetupDefaults();
   TimeFitter::SetupCommon();
@@ -67,7 +68,7 @@ void TimeFitter::MakeTimeFits()
   }
 
   // Make Plots
-  TimeFitter::MakePlots(DataInfo,MCInfo);
+  //TimeFitter::MakePlots(DataInfo,MCInfo);
 
   // MakeConfigPave
 //  TimeFitter::MakeConfigPave();
@@ -149,7 +150,7 @@ void TimeFitter::GetInputHist(FitStruct & FitInfo)
   auto & Hist2D = FitInfo.Hist2D;
 
   // get the hist
-  Hist2D = (TH2F*)fInFile->Get(inHistName.Data());
+  Hist2D = (TH2F*)fInFile->Get(f2DHistName.Data());
 
   // save to output
   fOutFile->cd();
@@ -232,6 +233,7 @@ void TimeFitter::ExtractFitResults(FitStruct & FitInfo)
   ResultsMap["chi2prob"] = TimeFitter::SetupHist("#chi^{2} Prob.","chi2prob",label);
   ResultsMap["mu"]       = TimeFitter::SetupHist(Form("#mu(%s) [ns]",fTimeText.Data()),"mu",label);
   ResultsMap["sigma"]    = TimeFitter::SetupHist(Form("#sigma(%s) [ns]",fTimeText.Data()),"sigma",label);
+  ResultsMap["occ"]       = TimeFitter::SetupHist(Form("#occ(%s)",fTimeText.Data()),"occ",label);
 
   // set bin content!
   for (auto ibinX = 1; ibinX <= fNBinsX; ibinX++)
@@ -253,6 +255,8 @@ void TimeFitter::ExtractFitResults(FitStruct & FitInfo)
     ResultsMap["mu"]      ->SetBinError  (ibinX,result.emu);
     ResultsMap["sigma"]   ->SetBinContent(ibinX,result.sigma);
     ResultsMap["sigma"]   ->SetBinError  (ibinX,result.esigma);
+    ResultsMap["occ"]   ->SetBinContent(ibinX,result.occ);
+    ResultsMap["occ"]   ->SetBinError  (ibinX,sqrt(result.occ));
   }
 
   // save output
@@ -508,7 +512,7 @@ void TimeFitter::DumpFitInfo(FitStruct & DataInfo, FitStruct & MCInfo)
   std::cout << "Dumping fit info into text file..." << std::endl;
 
   // get histograms!
-//  const auto & data_mu_hist = DataInfo.ResultsMap["mu"];
+  const auto & data_mu_hist = DataInfo.ResultsMap["mu"];
 //  const auto & mc_mu_hist   = MCInfo  .ResultsMap["mu"];
 
   const auto & data_sigma_hist = DataInfo.ResultsMap["sigma"];
@@ -517,32 +521,44 @@ void TimeFitter::DumpFitInfo(FitStruct & DataInfo, FitStruct & MCInfo)
   // make dumpfile object
   const TString filename = fOutFileText+Common::outFitText+"."+Common::outTextExt; 
   std::ofstream dumpfile(Form("%s",filename.Data()),std::ios_base::out);
+  auto & TimeFitStructMap = DataInfo.TimeFitStructMap;
 
   dumpfile << std::setw(5)  << "Bin |"
 	   << std::setw(18) << "     pT range    |"
-	   << std::setw(19) << "      Data mu     |"
-	   << std::setw(19) << "       MC mu      |"
-	   << std::setw(19) << "    Data sigma    |"
-	   << std::setw(19) << "     MC sigma     |"
-  	   << std::setw(17) << "    Diff sigma   "
+	   << std::setw(19) << "      Data mu         |"
+//	   << std::setw(19) << "       MC mu          |"
+	   << std::setw(19) << "    Data sigma        |"
+//	   << std::setw(19) << "     MC sigma         |"
+//  	   << std::setw(17) << "    Diff sigma      "
+      << std::setw(19) << "    Data n            |"
+//      << std::setw(19) << "    Param mu          |"
+//      << std::setw(19) << "    Param sigma       |"
+      << std::setw(19) << "    Data n2           |"
+      << std::setw(19) << "    Data sigma2       |"
+      << std::setw(19) << "    Data chisqr/ndf   |"
 	   << std::endl;
   
   std::string space = "";
-  const auto nw = 5+18+19+19+19+19+17;
+  const auto nw = 5+18+19+19+19+19+17+38+38;
   for (auto i = 0; i < nw; i++) space += "-";
 
   dumpfile << space.c_str() << std::endl;
 
   for (auto ibinX = 1; ibinX <= fNBinsX; ibinX++)
   {
+
+    std::cout << "Dumping Info for " << ibinX << " of " << fNBinsX << " bins. " << std::endl;
+
+    auto & TimeFit = TimeFitStructMap[ibinX];
+
     const auto pt_low = fXBins[ibinX-1];
     const auto pt_up  = fXBins[ibinX];
 
-/*    const auto data_mu   = data_mu_hist->GetBinContent(ibinX);
+    const auto data_mu   = data_mu_hist->GetBinContent(ibinX);
     const auto data_mu_e = data_mu_hist->GetBinError  (ibinX);
-    const auto mc_mu     = mc_mu_hist  ->GetBinContent(ibinX);
-    const auto mc_mu_e   = mc_mu_hist  ->GetBinError  (ibinX);
-*/
+//    const auto mc_mu     = mc_mu_hist  ->GetBinContent(ibinX);
+//    const auto mc_mu_e   = mc_mu_hist  ->GetBinError  (ibinX);
+
     const auto data_sigma   = data_sigma_hist->GetBinContent(ibinX);
     const auto data_sigma_e = data_sigma_hist->GetBinError  (ibinX);
 //    const auto mc_sigma     = mc_sigma_hist  ->GetBinContent(ibinX);
@@ -550,13 +566,54 @@ void TimeFitter::DumpFitInfo(FitStruct & DataInfo, FitStruct & MCInfo)
 //    const auto diff_sigma   = std::sqrt(std::pow(data_sigma,2.f)-std::pow(mc_sigma,2.f));
 //    const auto diff_sigma_e = std::sqrt(std::pow(data_sigma*data_sigma_e/diff_sigma,2.f)+std::pow(mc_sigma*mc_sigma_e/diff_sigma,2.f));
 
+    auto param0 = 0.f; 
+    auto paramErr0 = 0.f;
+    auto param1 = 0.f;
+    auto paramErr1 = 0.f;
+    auto param2 = 0.f;
+    auto paramErr2 = 0.f;
+    auto param3 = 0.f;
+    auto paramErr3 = 0.f;
+    auto param4 = 0.f;
+    auto paramErr4 = 0.f;
+    auto chisqr = 0.f;
+    auto ndf = 0;
+
+    if (not TimeFit->isEmpty()){
+    std::cout << "Number of Parameters " << TimeFit->fit->GetNpar() << std::endl;
+         if( (TimeFit->fit)->GetNpar() > 0 ) {
+              param0 = TimeFit->fit->GetParameter(0);
+              paramErr0 = TimeFit->fit->GetParError (0);
+              param1 = TimeFit->fit->GetParameter(1);
+              paramErr1 = TimeFit->fit->GetParError (1);
+              param2 = TimeFit->fit->GetParameter(2);
+              paramErr2 = TimeFit->fit->GetParError (2);
+              chisqr = TimeFit->fit->GetChisquare();
+              ndf = TimeFit->fit->GetNDF();
+         }
+         if( (TimeFit->fit)->GetNpar() > 3 ) {
+              param3 = TimeFit->fit->GetParameter(3);
+              paramErr3 = TimeFit->fit->GetParError (3);
+              param4 = TimeFit->fit->GetParameter(4);
+              paramErr4 = TimeFit->fit->GetParError (4);
+         }
+    } else { 
+	     std::cout << "Time Fit Empty " << std::endl;
+    }
+
     dumpfile << std::setw(5)  << Form("%i |",ibinX) 
 	     << std::setw(17) << Form(" %6.1f - %6.1f |",pt_low,pt_up)
-//	     << std::setw(19) << Form(" %6.3f +/- %5.3f |",data_mu,data_mu_e)
-//	     << std::setw(19) << Form(" %6.3f +/- %5.3f |",mc_mu  ,mc_mu_e)
-	     << std::setw(19) << Form(" %6.3f +/- %5.3f |",data_sigma,data_sigma_e)
-//	     << std::setw(19) << Form(" %6.3f +/- %5.3f |",mc_sigma  ,mc_sigma_e)
-//	     << std::setw(17) << Form(" %6.3f +/- %5.3f"  ,diff_sigma,diff_sigma_e)
+	     << std::setw(23) << Form(" %6.4f +/- %5.4f |",data_mu,data_mu_e)
+//	     << std::setw(23) << Form(" %6.4f +/- %5.4f |",mc_mu  ,mc_mu_e)
+	     << std::setw(23) << Form(" %6.4f +/- %5.4f |",data_sigma,data_sigma_e)
+//	     << std::setw(23) << Form(" %6.4f +/- %5.4f |",mc_sigma  ,mc_sigma_e)
+//	     << std::setw(17) << Form(" %6.4f +/- %5.4f"  ,diff_sigma,diff_sigma_e)
+        << std::setw(23) << Form(" %6.4f +/- %5.4f |",param0,paramErr0)
+//        << std::setw(23) << Form(" %6.4f +/- %5.4f |",param1,paramErr1)
+//        << std::setw(23) << Form(" %6.4f +/- %5.4f |",param2,paramErr2)
+        << std::setw(23) << Form(" %6.4f +/- %5.4f |",param3,paramErr3)
+        << std::setw(23) << Form(" %6.4f +/- %5.4f |",param4,paramErr4)
+        << std::setw(23) << Form(" %6.4f / %5i |",chisqr,ndf)
 	     << std::endl;
 
     if (ibinX % 20 == 0) dumpfile << space.c_str() << std::endl;
@@ -565,6 +622,7 @@ void TimeFitter::DumpFitInfo(FitStruct & DataInfo, FitStruct & MCInfo)
   if (fDoSigmaFit)
   {
     // get fits!
+    std::cout << "Do Sigma Fit Info Dump"<< std::endl;
     const auto & data_sigma_fit = DataInfo.SigmaFit;
 //    const auto & mc_sigma_fit   = MCInfo  .SigmaFit;
 
@@ -585,10 +643,13 @@ void TimeFitter::DumpFitInfo(FitStruct & DataInfo, FitStruct & MCInfo)
 //      const auto mc_sigma_fit_par_e   = mc_sigma_fit  ->GetParError (ipar);
       
       dumpfile << std::setw(5)  << Form("%s |",data_sigma_fit->GetParName(ipar)) 
-	       << std::setw(23) << Form(" %8.3f +/- %7.3f |",data_sigma_fit_par,data_sigma_fit_par_e)
-//	       << std::setw(23) << Form(" %8.3f +/- %7.3f |",mc_sigma_fit_par  ,mc_sigma_fit_par_e)
+	       << std::setw(23) << Form(" %8.4f +/- %7.4f |",data_sigma_fit_par,data_sigma_fit_par_e)
+//	       << std::setw(23) << Form(" %8.4f +/- %7.4f |",mc_sigma_fit_par  ,mc_sigma_fit_par_e)
 	       << std::endl;
     }
+    const auto data_sigma_fit_chi   = data_sigma_fit->GetChisquare();
+    const auto data_sigma_fit_ndf   = data_sigma_fit->GetNDF();
+    dumpfile << std::setw(5)  << "ChiSqr/NDF |"  << std::setw(23)  << Form(" %8.4f / %7i |", data_sigma_fit_chi, data_sigma_fit_ndf ) << std::endl;
   }
 }
 
@@ -630,7 +691,9 @@ void TimeFitter::SetupPlotConfig()
     else if (str.find("x_bins=") != std::string::npos)
     {
       str = Common::RemoveDelim(str,"x_bins=");
+      //auto xbinstr  = "VARIABLE 0 75 100 125 150 175 225 275 325 375 475 600 750 950 1275 1700 2250"
       Common::SetupBins(str,fXBins,fXVarBins);
+      //Common::SetupBins(xbinstr,fXBins,fXVarBins);
       fNBinsX = fXBins.size()-1;
     }
   }
@@ -717,6 +780,11 @@ void TimeFitter::SetupTimeFitConfig()
     {
       str = Common::RemoveDelim(str,"sigma_init_C_params=");
       TimeFitter::ReadInitParams(str,fSigmaInitC);
+    }
+    else if (str.find("2d_hist_name=") != std::string::npos)
+    {
+      str = Common::RemoveDelim(str,"2d_hist_name=");
+      f2DHistName=str;
     }
     else
     {

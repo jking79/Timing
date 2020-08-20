@@ -9,7 +9,7 @@ options = VarParsing('python')
 options.register('lhcInfoValid',False,VarParsing.multiplicity.singleton,VarParsing.varType.bool,'flag to get lhc info');
 options.register('rawCollectionsValid',True,VarParsing.multiplicity.singleton,VarParsing.varType.bool,'flag to get digi/uncalRechit');
 options.register('kuRechitValid',True,VarParsing.multiplicity.singleton,VarParsing.varType.bool,'flag to get kuRechit');
-options.register('mcValid',False,VarParsing.multiplicity.singleton,VarParsing.varType.bool,'flag to get pcalo in mc');
+options.register('mcValid',True,VarParsing.multiplicity.singleton,VarParsing.varType.bool,'flag to get pcalo in mc');
 
 #options.register('rlelist','events2018.txt',VarParsing.multiplicity.singleton,VarParsing.varType.string,'Events to Process');
 ## blinding
@@ -85,8 +85,8 @@ options.register('filterEff',1.0,VarParsing.multiplicity.singleton,VarParsing.va
 options.register('BR',1.0,VarParsing.multiplicity.singleton,VarParsing.varType.float,'branching ratio of MC');
 
 ## GT to be used
-options.register('globalTag','101X_dataRun2_Prompt_v11',VarParsing.multiplicity.singleton,VarParsing.varType.string,'gloabl tag to be used');
-#options.register('globalTag','102X_dataRun2_Prompt_v11',VarParsing.multiplicity.singleton,VarParsing.varType.string,'gloabl tag to be used');
+options.register('globalTag','102X_upgrade2018_realistic_v20',VarParsing.multiplicity.singleton,VarParsing.varType.string,'gloabl tag to be used');
+
 ## do a demo run over only 1k events
 options.register('demoMode',False,VarParsing.multiplicity.singleton,VarParsing.varType.bool,'flag to run over only 1k events');
 
@@ -94,7 +94,7 @@ options.register('demoMode',False,VarParsing.multiplicity.singleton,VarParsing.v
 options.register('processName','TREE',VarParsing.multiplicity.singleton,VarParsing.varType.string,'process name to be considered');
 
 ## outputFile Name
-options.register('outputFileName','ku_ksMulti_algo_test_tt_dispho_v2.root',VarParsing.multiplicity.singleton,VarParsing.varType.string,'output file name created by cmsRun');
+options.register('outputFileName','ku_mc_test_tt_dispho_v2.root',VarParsing.multiplicity.singleton,VarParsing.varType.string,'output file name created by cmsRun');
 
 ## etra bits
 options.register('nThreads',8,VarParsing.multiplicity.singleton,VarParsing.varType.int,'number of threads per job');
@@ -182,6 +182,7 @@ print " "
 print "LHC Info       : ",options.lhcInfoValid
 print "rawCollections : ",options.rawCollectionsValid
 print "kuRechit       : ",options.kuRechitValid
+print "mcValid        : ",options.mcValid
 print "     #####################"
 
 ## Define the CMSSW process
@@ -236,54 +237,14 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 100
 #eventList = open(options.rlelist,'r')
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(#'file:jwk_reco_data_DIGI2RAW.root'),
-		  #'root://eoscms//eos/user/n/nminafra/EcalFiles/MINIAOD/323/414/AF2238B6-5EE6-064E-8192-0DFC2DF3933B.root'
-        '/store/data/Run2018D/ZeroBias/RAW/v1/000/325/240/00000/FFA4CC2A-A63C-8440-ADC4-D7E2FF53BB4F.root'
-        #'file:2E81C787-2D53-E811-BAFC-FA163E2CD5B1.root'
-        #'file:30F3675D-F89D-E811-8D66-FA163E884269.root'#run2018D raw
-        #'file:EF735B7A-54AA-3749-84B6-ADBBCE9B4329.root'#run2018D mini
-        #'/store/data/Run2018A/EGamma/RAW/v1/000/315/973/00000/2E81C787-2D53-E811-BAFC-FA163E2CD5B1.root'
-		  #'/store/data/Run2018D/EGamma/MINIAOD/PromptReco-v2/000/320/712/00000/4A95EB13-2698-E811-BBC4-FA163EC6DE18.root',
-		  ##'/store/data/Run2018D/EGamma/MINIAOD/PromptReco-v2/000/323/414/00000/AF2238B6-5EE6-064E-8192-0DFC2DF3933B.root'
-		  #'file:/home/t3-ku/jaking/trees/ecal/datasets/AF2238B6-5EE6-064E-8192-0DFC2DF3933B.root'
-	     #'/store/data/Run2018D/EGamma/MINIAOD/PromptReco-v2/000/325/175/00000/9D0F9360-DD60-314A-BB24-33D62A3CD6BD.root'
-        #'/store/data/Run2018D/EGamma/MINIAOD/22Jan2019-v2/70001/FFBC2AE4-28D9-B947-A927-84804A19B8CD.root'
+       '/store/mc/RunIIAutumn18MiniAOD/DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/FlatPU28to62NZS_102X_upgrade2018_realistic_v15-v1/80000/A6B73E60-65C7-3D4E-86C4-8DA0AB4FD93A.root',
         ),
     secondaryFileNames = cms.untracked.vstring(
-		  #'root://eoscms//eos/user/n/nminafra/EcalFiles/RAW/323/414/E9A6A66F-0E63-AD45-8137-66B9631818AC.root'
-	     #325175
-	     '/store/data/Run2018D/EGamma/RAW/v1/000/325/175/00000/07EF361B-06DA-6048-AAF6-DDBCD3D7B4A0.root'
-	     #70001/FFBC2AE4-28D9-B947-A927-84804A19B8CD.root
-	     #'/store/data/Run2018D/EGamma/RAW/v1/000/324/878/00000/349768D5-290F-224D-AA01-F53FE4A457B0.root',
-	     #'/store/data/Run2018D/EGamma/RAW/v1/000/324/785/00000/B204A5A8-2179-134E-AC60-03B17A0687E7.root',
-	     #'/store/data/Run2018D/EGamma/RAW/v1/000/324/785/00000/5143A648-7FB3-E643-B9FE-506753199D10.root',
-	     #'/store/data/Run2018D/EGamma/RAW/v1/000/324/878/00000/FD2328F1-DA30-294E-BE01-9947ADE9BE19.root',
-	     #'/store/data/Run2018D/EGamma/RAW/v1/000/324/878/00000/A79C498A-5774-6545-8981-965F83C79A90.root',
-	     #'/store/data/Run2018D/EGamma/RAW/v1/000/324/785/00000/DACB28CB-34E3-8A42-8EF9-D3EC9D550028.root',
-	     #'/store/data/Run2018D/EGamma/RAW/v1/000/320/995/00000/DCD6855A-839A-E811-A0D8-FA163EC187F5.root',
-	     #'/store/data/Run2018D/EGamma/RAW/v1/000/320/995/00000/886FF758-839A-E811-B4BF-FA163EE50654.root',
-	     #'/store/data/Run2018D/EGamma/RAW/v1/000/320/995/00000/665A7BA2-839A-E811-9B82-FA163E4637E0.root',
-	     #'/store/data/Run2018D/EGamma/RAW/v1/000/320/995/00000/32D3FB78-839A-E811-98BB-FA163EAFBB72.root'
-	     #320712
-	     #'/store/data/Run2018D/EGamma/RAW/v1/000/320/712/00000/E6AC3679-0096-E811-8627-FA163EBC06F8.root',
-	     #'/store/data/Run2018D/EGamma/RAW/v1/000/320/712/00000/EE079695-FE95-E811-BD8F-FA163EC2BC89.root',
-	     #'/store/data/Run2018D/EGamma/RAW/v1/000/320/712/00000/92114094-0296-E811-9275-FA163E4D2241.root',
-	     #'/store/data/Run2018D/EGamma/RAW/v1/000/320/712/00000/C83EAA50-0096-E811-A956-02163E01A074.root',
-	     #'/store/data/Run2018D/EGamma/RAW/v1/000/320/712/00000/48CA1194-FE95-E811-9481-02163E019F62.root',
-	     #'/store/data/Run2018D/EGamma/RAW/v1/000/320/712/00000/8055A1FE-FF95-E811-B658-FA163E6788A6.root',
-	     #'/store/data/Run2018D/EGamma/RAW/v1/000/320/712/00000/30B84492-D396-E811-A5C1-FA163ED918AD.root',
-	     #'/store/data/Run2018D/EGamma/RAW/v1/000/320/712/00000/3C235E7F-D396-E811-8F79-FA163E300262.root',
-	     #'/store/data/Run2018D/EGamma/RAW/v1/000/320/712/00000/0C090600-0096-E811-9224-FA163E010862.root'
-	     #323414
-	     #E9A6A66F-0E63-AD45-8137-66B9631818AC
-	     #'/store/data/Run2018D/EGamma/RAW/v1/000/323/414/00000/042D6023-E0A2-8649-8D86-445F752A8F6B.root',
-	     #'/store/data/Run2018D/EGamma/RAW/v1/000/323/414/00000/78266801-FA3A-0A4E-86E6-1147C0A1FD27.root',
-	     #'/store/data/Run2018D/EGamma/RAW/v1/000/323/414/00000/C9875CA5-D499-2043-BDE2-F766389D2D26.root',
-	     #'/store/data/Run2018D/EGamma/RAW/v1/000/323/414/00000/DF56FF9E-1DE4-DA4C-B02F-0CEA64882D80.root',
-	     ##'/store/data/Run2018D/EGamma/RAW/v1/000/323/414/00000/E9A6A66F-0E63-AD45-8137-66B9631818AC.root',
-		  #'file:/home/t3-ku/jaking/trees/ecal/datasets/E9A6A66F-0E63-AD45-8137-66B9631818AC.root',
-	     #'/store/data/Run2018D/EGamma/RAW/v1/000/323/414/00000/F1430E66-D4F8-3D46-BAFE-F2EA8B065FE5.root',
-	     #'/store/data/Run2018D/EGamma/RAW/v1/000/323/414/00000/60148CAA-381A-D045-9851-3D84D968BB05.root',
-	     #'/store/data/Run2018D/EGamma/RAW/v1/000/323/414/00000/618E1C14-A17B-3B4D-8337-94A987B372D5.root'
+       '/store/mc/RunIIAutumn18DR/DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/GEN-SIM-RAW/FlatPU28to62NZS_102X_upgrade2018_realistic_v15-v1/80001/34717EB2-1778-8645-8EE6-7725783DD606.root',
+       #'/store/mc/RunIIAutumn18DR/DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/GEN-SIM-RAW/FlatPU28to62NZS_102X_upgrade2018_realistic_v15-v1/80000/E7F9BAA0-3D86-C647-AAF8-3C30D5735E07.root',
+       #'/store/mc/RunIIAutumn18DR/DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/GEN-SIM-RAW/FlatPU28to62NZS_102X_upgrade2018_realistic_v15-v1/80000/BDE610F9-C5A8-0149-8BC4-0A405EFFA91B.root',
+       #'/store/mc/RunIIAutumn18DR/DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/GEN-SIM-RAW/FlatPU28to62NZS_102X_upgrade2018_realistic_v15-v1/80000/6B276C42-DD03-1E4E-840B-E014709B98C5.root',
+       #'/store/mc/RunIIAutumn18DR/DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/GEN-SIM-RAW/FlatPU28to62NZS_102X_upgrade2018_realistic_v15-v1/80001/CC1918D4-D7BA-6849-8195-AE0C00CB10BE.root',
 	),
     #eventsToProcess = cms.untracked.VEventRange(eventList)
 )
@@ -292,8 +253,10 @@ process.source = cms.Source("PoolSource",
 ## How many events to process
 #if   options.demoMode : process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(1000))
 #else                  : process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(options.maxEvents))
-process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(10))
-#process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(100))
+#process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(10))
+process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(100))
+#process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(1000))
+#process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(10000))
 #process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(100000))
 #process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(-1))
 
@@ -529,7 +492,7 @@ process.jwk_highlevelreco = cms.Sequence(
 
 process.jwk_reconstruction = cms.Sequence(
 				#process.localreco*
-                                process.jwk_localreco*
+            process.jwk_localreco*
 				#process.globalreco*
 				#process.jwk_highlevelreco*
 				process.logErrorHarvester

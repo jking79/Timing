@@ -5,42 +5,6 @@
 #include <iostream>
 #include <sstream> 
 
-void NormX(TH2F *& hist) //, const Bool_t isUp, const Bool_t varBinsX, const Bool_t varBinsY)
-  { 
-    std::cout << "Normilizing " << " hist: " << hist->GetName() << std::endl;
-    
-    for (auto ibinX = 1; ibinX <= hist->GetXaxis()->GetNbins(); ibinX++){
-          //const auto binwidthX = hist->GetXaxis()->GetBinWidth(ibinX);
-          const auto norm = hist->Integral(ibinX,ibinX,1,hist->GetYaxis()->GetNbins());
-			 if( norm == 0.0 ) continue;
-          for (auto ibinY = 1; ibinY <= hist->GetYaxis()->GetNbins(); ibinY++){
-               //const auto binwidthY = hist->GetYaxis()->GetBinWidth(ibinY);
-               
-               // get multiplier/divisor
-               //auto multiplier = 1.f;      
-               //if (varBinsX) multiplier *= binwidthX;
-               //if (varBinsY) multiplier *= binwidthY;
-               
-               // get content/error
-               auto content = hist->GetBinContent(ibinX,ibinY);
-               auto error   = hist->GetBinError  (ibinX,ibinY);
-               
-               // scale it
-               //if (isUp){ 
-               //   content *= multiplier;
-               //   error   *= multiplier;
-               //} else {
-               content /= norm;
-               error   /= norm;
-               //}
-               
-               // set new contents
-               hist->SetBinContent(ibinX,ibinY,content);
-               hist->SetBinError  (ibinX,ibinY,error);
-            }
-      }
-}
-
 void plot2dResolution( string indir, string infilelistname, string outfilename, string tvarname, string calimapname, string isd_type, int brun, int erun, int leta, int heta  ){
 
 
@@ -105,20 +69,17 @@ void plot2dResolution( string indir, string infilelistname, string outfilename, 
     string histname3("tdf_Hist");
     string histname4("tdfc_Hist");
     string histname5("td_eta_Hist");
-    string histname6("td_phi_Hist");
     string fTitle("#Delta(Photon Seed Time) [ns] vs. A_{eff}/#sigma_{n} (EBEB)");
     string fTitle1("Photon Seed Time [ns]");
     string fTitle2("Photon Seed Time Calibrated [ns]");
     string fTitle3("Photon Seed Time Filtered [ns]");
     string fTitle4("Photon Seed Time Filtered Calibrated [ns]");
-    string fTitle5("#Delta(Photon Seed Time) [ns] vs iEta");
-    string fTitle6("#Delta(Photon Seed Time) [ns] vs iPhi");
+    string fTitle5("#Delta(Photon Seed Time) [ns] vs Eta");
     string fXTitle("A_{eff}/#sigma_{n} (EBEB)");
     std::vector<Double_t> fXBins;
     Bool_t fXVarBins = false;
     string xbinstr("VARIABLE 0 75 100 125 150 175 225 275 325 375 475 600 750 950 1275 1700 2250");
-    //string xbinstr("VARIABLE 0 75 100 125 150 175 225 275 325 375 475 600 750 1275 2250");
-    int nMyBins = 14;
+    int nMyBins = 16;
     //std::vector<TString> fXLabels;
     string fYTitle("#Delta(Photon Seed Time) [ns] (EBEB)");
     std::vector<Double_t> fYBins;
@@ -126,17 +87,9 @@ void plot2dResolution( string indir, string infilelistname, string outfilename, 
     string ybinstr("CONSTANT 1920 -3 3");
     //std::vector<TString> fYLabels;
     string fZTitle("");
-    //string yetabinstr("CONSTANT 800 -4 4");
-    //string xetabinstr("CONSTANT 181 -90.5 90.5");
-    //string xphibinstr("CONSTANT 362 -0.5 361.5");
-    std::vector<Double_t> fXetaBins;
-    std::vector<Double_t> fYetaBins;
-
 
     Common::SetupBins(xbinstr,fXBins,fXVarBins);
     Common::SetupBins(ybinstr,fYBins,fYVarBins);
-    //Common::SetupBins(xetabinstr,fXetaBins,fXVarBins);
-    //Common::SetupBins(yetabinstr,fYetaBins,fYVarBins);
 
     const auto xbins = &fXBins[0];
     const auto ybins = &fYBins[0];
@@ -157,8 +110,7 @@ void plot2dResolution( string indir, string infilelistname, string outfilename, 
     auto thetdcHist = new TH1F(histname2.c_str(),fTitle2.c_str(),tdiv,tstart,tend);
     auto thetdfHist = new TH1F(histname3.c_str(),fTitle3.c_str(),tdiv,tstart,tend);
     auto thetdfcHist = new TH1F(histname4.c_str(),fTitle4.c_str(),tdiv,tstart,tend);
-    auto theetaHist = new TH2F(histname5.c_str(),fTitle5.c_str(),182,-90.5,90.5,tdiv,tstart,tend);
-    auto thephiHist = new TH2F(histname6.c_str(),fTitle6.c_str(),363,-1.5,361.5,tdiv,tstart,tend);
+    auto theetaHist = new TH2F(histname5.c_str(),fTitle5.c_str(),171,-85,85,tdiv,tstart,tend);
     //auto theetaHist = new TH2F(histname5.c_str(),fTitle5.c_str(),86,0,85,tdiv,tstart,tend);
 
     theHist->GetXaxis()->SetTitle(fXTitle.c_str());
@@ -265,14 +217,11 @@ void plot2dResolution( string indir, string infilelistname, string outfilename, 
             b_phoseedTOF_1->GetEntry(entry);
             b_phoseedtime_1->GetEntry(entry);
 
-				if( brun < 200000 ) run = 200000;
-            if((run <= brun) or (run >= erun)) continue;
-            auto i10 = phoseedI1_0;
-            auto i11 = phoseedI1_1;
-            auto i20 = phoseedI2_0;     
-            //auto i20 = abs(phoseedI2_0);
-            auto i21 = phoseedI2_1;
-            //auto i21 = abs(phoseedI2_1);
+            if( (run <= brun) or (run >= erun) ) continue;
+            //auto i20 = phoseedI2_0;     
+            auto i20 = abs(phoseedI2_0);
+            //auto i21 = phoseedI2_1;
+            auto i21 = abs(phoseedI2_1);
             //std::cout << "I2_0 : " << i20 << " I2_1 : " << i21  << " " << leta << " " << heta << std::endl;
             if( (i20 < leta ) or ( i20 > heta ) ) continue;
             if( (i21 < leta ) or ( i21 > heta ) ) continue;
@@ -301,11 +250,11 @@ void plot2dResolution( string indir, string infilelistname, string outfilename, 
 
             //std::cout << "Fill 2D Hist" << std::endl;
 		      auto skip = false;
-            //auto kscc_offset = 3101.f;
+            auto kscc_offset = 3101.f;
 		      auto outlier = 1000.f;
 		      auto offset = 0.f;
             auto outlier_offset = 0.f;
-	         //if( tvarname == "phoseedkuMfootCCStctime" ) { outlier_offset = kscc_offset; } //std::cout << "KsCC ";} 
+	         if( tvarname == "phoseedkuMfootCCStctime" ) { outlier_offset = kscc_offset; } //std::cout << "KsCC ";} 
             if( (abs(phoseedtime_0 + outlier_offset ) > outlier) and (abs(phoseedtime_1 + outlier_offset ) > outlier) ) skip = true;
             //if( tvarname == "phoseedkuMfootCCStctime" ) { skip = false; }
 
@@ -357,10 +306,8 @@ void plot2dResolution( string indir, string infilelistname, string outfilename, 
 						thetdfcHist->Fill(phoseedtime_1+offset-phoseedtimeCaliIc_1);
 				}       
             if( event_good and not skip ) {
-						theetaHist->Fill(i20,yfill); 
-						theetaHist->Fill(i21,yfill);
-                  thephiHist->Fill(i10,yfill);
-                  thephiHist->Fill(i11,yfill);
+						theetaHist->Fill(phoseedI2_0,yfill); 
+						theetaHist->Fill(phoseedI2_1,yfill);
 				}
         } // end of for loop
 	 	  delete fInFile;
@@ -368,9 +315,6 @@ void plot2dResolution( string indir, string infilelistname, string outfilename, 
     } // end of while loop
 
     Common::Scale(theHist,false,fXVarBins,fYVarBins);
-    NormX(theetaHist);
-    NormX(thephiHist);
-
     fOutFile->cd();
     theHist->Write();
     thetdHist->Write();
@@ -378,7 +322,6 @@ void plot2dResolution( string indir, string infilelistname, string outfilename, 
     thetdfHist->Write();
     thetdfcHist->Write();
     theetaHist->Write();
-    thephiHist->Write();
     for( auto ibin = 0; ibin < nMyBins; ibin++ ){
          effBinHists[ibin]->Write();
     }
@@ -389,7 +332,6 @@ void plot2dResolution( string indir, string infilelistname, string outfilename, 
     delete thetdfHist;
     delete thetdfcHist;
     delete theetaHist;
-    delete thephiHist;
     for( auto ibin = 0; ibin < nMyBins; ibin++ ){
          delete effBinHists[ibin];
     }

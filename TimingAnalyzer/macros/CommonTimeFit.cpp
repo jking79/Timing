@@ -5,7 +5,8 @@ namespace Common
   void SetupTimeFitType(const std::string & str, TimeFitType & type)
   {
     if      (str.find("Gaus1")       != std::string::npos) type = TimeFitType::Gaus1;
-    if      (str.find("Gaus1core")   != std::string::npos) type = TimeFitType::Gaus1core;
+    else if (str.find("Gaus1coretail")   != std::string::npos) type = TimeFitType::Gaus1coretail;
+    else if (str.find("Gaus1core")   != std::string::npos) type = TimeFitType::Gaus1core;
     else if (str.find("Gaus2fm")     != std::string::npos) type = TimeFitType::Gaus2fm;
     else if (str.find("Gaus2fmcore") != std::string::npos) type = TimeFitType::Gaus2fmcore;
     else if (str.find("Gaus3fm")     != std::string::npos) type = TimeFitType::Gaus3fm;
@@ -26,6 +27,7 @@ void TimeFitStruct::PrepFit()
   // "core" == mid point of range of fit is mean of the histogram, range is n times the std. dev of hist
 
   // set tmp init vals
+  result.occ   = hist->Integral(varBinsX?"width":"");
   Float_t norm  = hist->Integral(varBinsX?"width":"") / Common::SqrtPI;
   Float_t mu    = hist->GetMean();
   Float_t sigma = hist->GetStdDev(); 
@@ -77,6 +79,16 @@ void TimeFitStruct::PrepFit()
 
     fit->SetParName(0,"N");      fit->SetParameter(0,norm);
     fit->SetParName(1,"#mu");    fit->SetParameter(1,mu);
+    fit->SetParName(2,"#sigma"); fit->SetParameter(2,sigma); fit->SetParLimits(2,0,10);
+  }
+  else if (type == TimeFitType::Gaus1coretail)
+  {
+    form = new TFormula(formname.Data(),"[0]*exp(-0.5*((x-[1])/[2])**2)");
+    fit  = new TF1(fitname.Data(),form->GetName(),rangelow,rangeup);
+
+    mu = 0.0;
+    fit->SetParName(0,"N");      fit->SetParameter(0,norm);
+    fit->SetParName(1,"#mu");    fit->FixParameter(1,mu);
     fit->SetParName(2,"#sigma"); fit->SetParameter(2,sigma); fit->SetParLimits(2,0,10);
   }
   else if (type == TimeFitType::Gaus2fm || type == TimeFitType::Gaus2fmcore)

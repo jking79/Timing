@@ -3,8 +3,25 @@
 #include "Common.cpp"
 #include <iostream>
 
-void plot2dResolution( string califilename, string infilename, string outfilename, string tvarname, string calimapname, string isd_type ){
+//    string xbinstr("VARIABLE 75 100 125 150 175 225 275 325 375 475 600 750 950 1275 1700 2250");
+int getBinNumber( float value, std::vector<Double_t> bins ){
 
+	 for( int bin = 0; bin < bins.size(); bin++ ){
+         //std::cout << "Matching " << value << " and " << bins[bin] << " for " << bin << std::endl;
+			if( bin == 0 ){ 
+				if( value < bins[0] ) return 0;
+			}
+	      else{ 
+				if( (value > bins[bin-1]) and (value <= bins[bin]) ) return bin; 
+			}
+	 }
+    return bins.size();
+
+}	 
+
+void plot3dResolution( const string califilename, const string infilename, const string outfilename, const string tvarname, const string calimapname, const string isd_type ){
+
+    std::cout << " plot3dResolution with " << califilename <<  " " << infilename <<  " " << outfilename <<  " " << tvarname <<  " " << calimapname <<  " " << isd_type <<  " " << std::endl;
     std::cout << "open input files" << std::endl;
     string disphotreename("disphotree");
 
@@ -103,7 +120,8 @@ void plot2dResolution( string califilename, string infilename, string outfilenam
     fCaliFile->cd();
     //string cmbs("AveXtalRtOOTStcPhoIcRecTime");
     //string cmbs("AveXtalRtStcRecTimeE5");
-    string cmbs(calimapname);
+    string cmbs = calimapname;
+    //string cmbs(calimapname);
     //string itcnt("_i95");
     string itcnt("");
     string ebmapstring(cmbs+"EBMap"+itcnt);
@@ -118,30 +136,36 @@ void plot2dResolution( string califilename, string infilename, string outfilenam
     std::cout << "  " << emmapstring << " : " << emmapic << std::endl;
 
     // >> calcs  <<
-    std::cout << "Setting up 2D plot" << std::endl;
+    std::cout << "Setting up 2D plot for " << cmbs << std::endl;
 
-    string histname("Data_Hist");
+    string histname_mean("Data_Hist_mean");
+    string histname_rms("Data_Hist_rms");
+    string histname_occ("Data_Hist_occ");
     string histname1("td_Hist");
-    string histname2("tdc_Hist");
-    string histname3("tdf_Hist");
-    string histname4("tdfc_Hist");
-    string fTitle("#Delta(Photon Seed Time) [ns] vs. A_{eff}/#sigma_{n} (EBEB)");
+    //string histname2("tdc_Hist");
+    //string histname3("tdf_Hist");
+    //string histname4("tdfc_Hist");
+    string fTitle("A_{0}/#sigma_{0}  vs. A_{1}/#sigma_{1} (EBEB)");
     string fTitle1("Photon Seed Time [ns]");
-    string fTitle2("Photon Seed Time Calibrated [ns]");
-    string fTitle3("Photon Seed Time Filtered [ns]");
-    string fTitle4("Photon Seed Time Filtered Calibrated [ns]");
+    //string fTitle2("Photon Seed Time Calibrated [ns]");
+    //string fTitle3("Photon Seed Time Filtered [ns]");
+    //string fTitle4("Photon Seed Time Filtered Calibrated [ns]");
     string fXTitle("A_{eff}/#sigma_{n} (EBEB)");
+    string fXxTitle("A_{0}/#sigma_{0} (EBEB)");
+    string fXyTitle("A_{1}/#sigma_{1} (EBEB)");
     std::vector<Double_t> fXBins;
     Bool_t fXVarBins = false;
     string xbinstr("VARIABLE 75 100 125 150 175 225 275 325 375 475 600 750 950 1275 1700 2250");
     //std::vector<TString> fXLabels;
-    string fYTitle("#Delta(Photon Seed Time) [ns] (EBEB)");
+    string fYTitle("#Delta(t) [ns] (EBEB)");
     std::vector<Double_t> fYBins;
     Bool_t fYVarBins = false;
     //string ybinstr("CONSTANT 30 -3 3");
     string ybinstr("CONSTANT 480 -3 3");
     //std::vector<TString> fYLabels;
-    string fZTitle("");
+    string fZmTitle("Mean #Delta(t)");
+    string fZrTitle("RMS #Delta(t)");
+    string fZoTitle("Occ #Delta(t)");
 
     Common::SetupBins(xbinstr,fXBins,fXVarBins);
     Common::SetupBins(ybinstr,fYBins,fYVarBins);
@@ -153,28 +177,43 @@ void plot2dResolution( string califilename, string infilename, string outfilenam
     float tstart = -6.0;
     float tend = 6.0;
 
-    auto theHist = new TH2F(histname.c_str(),fTitle.c_str(),fXBins.size()-1,xbins,fYBins.size()-1,ybins);
-    auto thetdHist = new TH1F(histname1.c_str(),fTitle1.c_str(),tdiv,tstart,tend);
-    auto thetdcHist = new TH1F(histname2.c_str(),fTitle2.c_str(),tdiv,tstart,tend);
-    auto thetdfHist = new TH1F(histname3.c_str(),fTitle3.c_str(),tdiv,tstart,tend);
-    auto thetdfcHist = new TH1F(histname4.c_str(),fTitle4.c_str(),tdiv,tstart,tend);
+    auto theHist_mean = new TH2F(histname_mean.c_str(),fTitle.c_str(),fXBins.size()-1,xbins,fXBins.size()-1,xbins);
+    theHist_mean->GetXaxis()->SetTitle(fXxTitle.c_str());
+    theHist_mean->GetYaxis()->SetTitle(fXyTitle.c_str());
+    theHist_mean->GetZaxis()->SetTitle(fZmTitle.c_str());
+    theHist_mean->Sumw2();
+    auto theHist_rms = new TH2F(histname_rms.c_str(),fTitle.c_str(),fXBins.size()-1,xbins,fXBins.size()-1,xbins);
+    theHist_rms->GetXaxis()->SetTitle(fXxTitle.c_str());
+    theHist_rms->GetYaxis()->SetTitle(fXyTitle.c_str());
+    theHist_rms->GetZaxis()->SetTitle(fZrTitle.c_str());
+    theHist_rms->Sumw2();
+    auto theHist_occ = new TH2F(histname_occ.c_str(),fTitle.c_str(),fXBins.size()-1,xbins,fXBins.size()-1,xbins);
+    theHist_occ->GetXaxis()->SetTitle(fXxTitle.c_str());
+    theHist_occ->GetYaxis()->SetTitle(fXyTitle.c_str());
+    theHist_occ->GetZaxis()->SetTitle(fZoTitle.c_str());
+    theHist_occ->Sumw2();
 
-    theHist->GetXaxis()->SetTitle(fXTitle.c_str());
-    theHist->GetYaxis()->SetTitle(fYTitle.c_str());
-    theHist->GetZaxis()->SetTitle(fZTitle.c_str());
-    theHist->Sumw2();
-    //thetdHist->Sumw2();
-    //thetdcHist->Sumw2();
-    //thetdfHist->Sumw2();
-    //thetdfcHist->Sumw2();
+    TH1F *thetdHist[fXBins.size()][fXBins.size()];
+    for( int ix = 0; ix <= fXBins.size(); ix++ ){
+	 	  for( int iy = 0; iy <= fXBins.size(); iy++ ){
+			   auto histnametmp = histname1 + "_" + std::to_string(ix) + "_" + std::to_string(iy);
+            auto histtitletmp = fTitle1 + " xBin " + std::to_string(ix) + " yBin " + std::to_string(iy);
+            thetdHist[ix][iy] = new TH1F(histnametmp.c_str(),histtitletmp.c_str(),tdiv,tstart,tend);
+            (thetdHist[ix][iy])->GetXaxis()->SetTitle(fYTitle.c_str());
+            //(thetdHist[ix][iy])->GetYaxis()->SetTitle(fYTitle.c_str());
+            //(thetdHist[ix][iy])->GetZaxis()->SetTitle(fZTitle.c_str());
+            (thetdHist[ix][iy])->Sumw2();
+		  }
+	 }
 
-    std::cout << "Getting calibration values and plotting" << std::endl;
+    std::cout << "Getting calibration values and plotting for " << cmbs << std::endl;
 
     fInFile->cd();
     const auto nEntries = fInTree->GetEntries();
     for (auto entry = 0U; entry < nEntries; entry++){
         // if( entry%int(nEntries*0.1) == 0 ) std::cout << "Proccessed " << entry/nEntries << "\% of " << nEntries << " entries." << std::endl;
 	     if( entry%100000 == 0 ) std::cout << "Proccessed " << entry << " of " << nEntries << " entries." << std::endl;        
+        //std::cout << "Getting Entries" << std::endl;
 
 	     fInFile->cd();
         b_phoseedI1_0->GetEntry(entry);
@@ -202,7 +241,8 @@ void plot2dResolution( string califilename, string infilename, string outfilenam
 	     int bin_offset = 86;
 	     int adjust = 0.0;
 
-	     if( calimapname != "none" ){
+		  //std::cout << "Pulling Calimaps for " << cmbs << std::endl;
+	     if( cmbs != "none" ){
             	if ( phoseedEcal_0 == ECAL::EB ){
                         phoseedtimeCaliIc_0 = ebmapic->GetBinContent( phoseedI2_0 + bin_offset, phoseedI1_0 ) - adjust;
            	   }else if ( phoseedEcal_0 == ECAL::EP ){
@@ -236,7 +276,9 @@ void plot2dResolution( string califilename, string infilename, string outfilenam
 
         auto yfill = (phoseedtime_0-phoseedtimeCaliIc_0)-(phoseedtime_1-phoseedtimeCaliIc_1)+(phoseedTOF_0-phoseedTOF_1);
         auto effa0 = (phoseedE_0/phoseedadcToGeV_0)/phoseedpedrms12_0;
+        auto effa0bin = getBinNumber( effa0, fXBins );
         auto effa1 = (phoseedE_1/phoseedadcToGeV_1)/phoseedpedrms12_1;
+        auto effa1bin = getBinNumber( effa1, fXBins );
         auto xfill = (effa0*effa1)/sqrt(pow(effa0,2)+pow(effa1,2));
 
 		  auto e_cut = (phoseedE_0>=10)&&(phoseedE_0<=120)&&(phoseedE_1>=10)&&(phoseedE_1<=120);
@@ -246,27 +288,45 @@ void plot2dResolution( string califilename, string infilename, string outfilenam
         if( isd_type == "Same") isd_cut = (phoseedTT_0==phoseedTT_1); //same
 	     auto event_good = e_cut && eta_cut && isd_cut;
 
-	     if( event_good and not skip ) theHist->Fill(xfill,yfill);
-        if( event_good ) { thetdHist->Fill(phoseedtime_0); thetdHist->Fill(phoseedtime_1);}
-        if( event_good ) { thetdcHist->Fill(phoseedtime_0-phoseedtimeCaliIc_0); thetdcHist->Fill(phoseedtime_1-phoseedtimeCaliIc_1);}
-        if( event_good and not skip ) { thetdfHist->Fill(phoseedtime_0); thetdfHist->Fill(phoseedtime_1);}
-        if( event_good and not skip ) { thetdfcHist->Fill(phoseedtime_0-phoseedtimeCaliIc_0); thetdfcHist->Fill(phoseedtime_1-phoseedtimeCaliIc_1);}       
+	     if( event_good and not skip ){
+ 				//std::cout << "Filling " << effa0bin << " " << effa1bin << " with " << yfill << std::endl;
+				(thetdHist[effa0bin][effa1bin])->Fill(yfill);
+		  }
 
     }
 
-    Common::Scale(theHist,false,fXVarBins,fYVarBins);
-    fOutFile->cd();
-    theHist->Write();
-    thetdHist->Write();
-    thetdcHist->Write();
-    thetdfHist->Write();
-    thetdfcHist->Write();
+    for( int ix = 0; ix < fXBins.size(); ix++ ){
+        for( int iy = 0; iy < fXBins.size(); iy++ ){
+            auto mean = (thetdHist[ix][iy])->GetMean(1);
+				auto rms = (thetdHist[ix][iy])->GetRMS(1); 
+            auto occ = (thetdHist[ix][iy])->Integral();
+				theHist_mean->SetBinContent( ix, iy, mean );
+            theHist_rms->SetBinContent( ix, iy, rms );
+            theHist_occ->SetBinContent( ix, iy, occ );
+        }
+    }
 
-    delete theHist;
-    delete thetdHist;
-    delete thetdcHist;
-    delete thetdfHist;
-    delete thetdfcHist;
+    //Common::Scale(theHist,false,fXVarBins,fYVarBins);
+    fOutFile->cd();
+    theHist_mean->Write();
+    theHist_rms->Write();
+    theHist_occ->Write();
+    //thetdHist->Write();
+    for( int ix = 0; ix < fXBins.size(); ix++ ){
+        for( int iy = 0; iy < fXBins.size(); iy++ ){ 
+            (thetdHist[ix][iy])->Write(); 
+        }
+    }
+
+    delete theHist_mean;
+    delete theHist_rms;
+    delete theHist_occ;
+    //delete thetdHist;
+    for( int ix = 0; ix < fXBins.size(); ix++ ){
+        for( int iy = 0; iy < fXBins.size(); iy++ ){
+            delete (thetdHist[ix][iy]);           
+        }
+    }
     delete fInFile;
     delete fOutFile;
     delete fCaliFile;
@@ -285,7 +345,8 @@ int main ( int argc, char *argv[] ){
                 auto tvarname = argv[4];
 					 auto calimapname = argv[5];
                 auto isd_type = argv[6];
-      			 plot2dResolution( califilename, infilename, outfilename, tvarname, calimapname, isd_type );
+                std::cout << " Running with " << califilename <<  " " << infilename <<  " " << outfilename <<  " " << tvarname <<  " " << calimapname <<  " " << isd_type <<  " " << std::endl;
+      			 plot3dResolution( califilename, infilename, outfilename, tvarname, calimapname, isd_type );
         }
         return 1;
 }

@@ -121,6 +121,10 @@ void plot2dResolution( string califilename, string infilename, string outfilenam
     std::cout << "Setting up 2D plot" << std::endl;
 
     string histname("Data_Hist");
+    string histname_c("Data_Hist_Core");
+    string histname_t("Data_Hist_Tail");
+    string histname_u("Data_Hist_UnScaled");
+    string histname_l("Data_Hist_LargeScale");
     string histname1("td_Hist");
     string histname2("tdc_Hist");
     string histname3("tdf_Hist");
@@ -137,23 +141,32 @@ void plot2dResolution( string califilename, string infilename, string outfilenam
     //std::vector<TString> fXLabels;
     string fYTitle("#Delta(Photon Seed Time) [ns] (EBEB)");
     std::vector<Double_t> fYBins;
+    std::vector<Double_t> fYLBins;
     Bool_t fYVarBins = false;
     //string ybinstr("CONSTANT 30 -3 3");
-    string ybinstr("CONSTANT 480 -3 3");
+    string ybinstr("CONSTANT 1920 -3 3");
+    string ylbinstr("CONSTANT 480 -30 30");
     //std::vector<TString> fYLabels;
     string fZTitle("");
 
     Common::SetupBins(xbinstr,fXBins,fXVarBins);
     Common::SetupBins(ybinstr,fYBins,fYVarBins);
+    Common::SetupBins(ylbinstr,fYLBins,fYVarBins);
 
     const auto xbins = &fXBins[0];
     const auto ybins = &fYBins[0];
+    const auto ylbins = &fYLBins[0];
 
     int tdiv = 960;
     float tstart = -6.0;
     float tend = 6.0;
 
     auto theHist = new TH2F(histname.c_str(),fTitle.c_str(),fXBins.size()-1,xbins,fYBins.size()-1,ybins);
+    auto theHistC = new TH2F(histname_c.c_str(),fTitle.c_str(),fXBins.size()-1,xbins,fYBins.size()-1,ybins);
+    auto theHistT = new TH2F(histname_t.c_str(),fTitle.c_str(),fXBins.size()-1,xbins,fYBins.size()-1,ybins);
+    auto theHistU = new TH2F(histname_u.c_str(),fTitle.c_str(),fXBins.size()-1,xbins,fYBins.size()-1,ybins);
+    auto theHistL = new TH2F(histname_l.c_str(),fTitle.c_str(),fXBins.size()-1,xbins,fYBins.size()-1,ylbins);
+
     auto thetdHist = new TH1F(histname1.c_str(),fTitle1.c_str(),tdiv,tstart,tend);
     auto thetdcHist = new TH1F(histname2.c_str(),fTitle2.c_str(),tdiv,tstart,tend);
     auto thetdfHist = new TH1F(histname3.c_str(),fTitle3.c_str(),tdiv,tstart,tend);
@@ -163,6 +176,22 @@ void plot2dResolution( string califilename, string infilename, string outfilenam
     theHist->GetYaxis()->SetTitle(fYTitle.c_str());
     theHist->GetZaxis()->SetTitle(fZTitle.c_str());
     theHist->Sumw2();
+    theHistC->GetXaxis()->SetTitle(fXTitle.c_str());
+    theHistC->GetYaxis()->SetTitle(fYTitle.c_str());
+    theHistC->GetZaxis()->SetTitle(fZTitle.c_str());
+    theHistC->Sumw2();
+    theHistT->GetXaxis()->SetTitle(fXTitle.c_str());
+    theHistT->GetYaxis()->SetTitle(fYTitle.c_str());
+    theHistT->GetZaxis()->SetTitle(fZTitle.c_str());
+    theHistT->Sumw2();
+    theHistU->GetXaxis()->SetTitle(fXTitle.c_str());
+    theHistU->GetYaxis()->SetTitle(fYTitle.c_str());
+    theHistU->GetZaxis()->SetTitle(fZTitle.c_str());
+    theHistU->Sumw2();
+    theHistL->GetXaxis()->SetTitle(fXTitle.c_str());
+    theHistL->GetYaxis()->SetTitle(fYTitle.c_str());
+    theHistL->GetZaxis()->SetTitle(fZTitle.c_str());
+    theHistL->Sumw2();
     //thetdHist->Sumw2();
     //thetdcHist->Sumw2();
     //thetdfHist->Sumw2();
@@ -234,7 +263,9 @@ void plot2dResolution( string califilename, string infilename, string outfilenam
         //if( tvarname == "phoseedkuMfootCCStctime" ) { skip = false; }
 		  if( ( phoseedtimeErr_0 < 0 ) or ( phoseedtimeErr_1 < 0  )  ) { skip = true; }
 
-        auto yfill = (phoseedtime_0-phoseedtimeCaliIc_0)-(phoseedtime_1-phoseedtimeCaliIc_1)+(phoseedTOF_0-phoseedTOF_1);
+        //auto yfill = (phoseedtime_0-phoseedtimeCaliIc_0)-(phoseedtime_1-phoseedtimeCaliIc_1)+(phoseedTOF_0-phoseedTOF_1);
+        auto yfill = (phoseedtime_0-phoseedtimeCaliIc_0)-(phoseedtime_1-phoseedtimeCaliIc_1)+(1.f-1.f);
+        //auto yfill = (phoseedtime_0-phoseedtimeCaliIc_0)-(phoseedtime_1-phoseedtimeCaliIc_1);
         auto effa0 = (phoseedE_0/phoseedadcToGeV_0)/phoseedpedrms12_0;
         auto effa1 = (phoseedE_1/phoseedadcToGeV_1)/phoseedpedrms12_1;
         auto xfill = (effa0*effa1)/sqrt(pow(effa0,2)+pow(effa1,2));
@@ -246,7 +277,13 @@ void plot2dResolution( string califilename, string infilename, string outfilenam
         if( isd_type == "Same") isd_cut = (phoseedTT_0==phoseedTT_1); //same
 	     auto event_good = e_cut && eta_cut && isd_cut;
 
-	     if( event_good and not skip ) theHist->Fill(xfill,yfill);
+	     if( event_good and not skip ){ 
+				theHist->Fill(xfill,yfill);
+            if( abs(yfill) <= 0.1 ) theHistC->Fill(xfill,yfill);
+            if( abs(yfill) > 0.1 ) theHistT->Fill(xfill,yfill);
+            theHistU->Fill(xfill,yfill);
+            theHistL->Fill(xfill,yfill);
+		  }
         if( event_good ) { thetdHist->Fill(phoseedtime_0); thetdHist->Fill(phoseedtime_1);}
         if( event_good ) { thetdcHist->Fill(phoseedtime_0-phoseedtimeCaliIc_0); thetdcHist->Fill(phoseedtime_1-phoseedtimeCaliIc_1);}
         if( event_good and not skip ) { thetdfHist->Fill(phoseedtime_0); thetdfHist->Fill(phoseedtime_1);}
@@ -255,14 +292,25 @@ void plot2dResolution( string califilename, string infilename, string outfilenam
     }
 
     Common::Scale(theHist,false,fXVarBins,fYVarBins);
+    Common::Scale(theHistC,false,fXVarBins,fYVarBins);
+    Common::Scale(theHistT,false,fXVarBins,fYVarBins);
+
     fOutFile->cd();
     theHist->Write();
+    theHistC->Write();
+    theHistT->Write();
+    theHistU->Write();
+    theHistL->Write();
     thetdHist->Write();
     thetdcHist->Write();
     thetdfHist->Write();
     thetdfcHist->Write();
 
     delete theHist;
+    delete theHistC;
+    delete theHistT;
+    delete theHistU;
+    delete theHistL;
     delete thetdHist;
     delete thetdcHist;
     delete thetdfHist;

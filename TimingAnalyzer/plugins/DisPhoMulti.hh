@@ -51,6 +51,12 @@
 #include "DataFormats/EcalDigi/interface/EBSrFlag.h"
 #include "DataFormats/EcalDigi/interface/EESrFlag.h"
 
+// PCaloHits 
+#include "SimDataFormats/CaloHit/interface/PCaloHit.h"
+#include "SimDataFormats/CaloHit/interface/PCaloHitContainer.h"
+#include "SimDataFormats/CrossingFrame/interface/MixCollection.h"
+#include "SimDataFormats/CrossingFrame/interface/CrossingFrame.h"
+
 // Supercluster info
 #include "DataFormats/EgammaReco/interface/SuperCluster.h"
 #include "DataFormats/CaloRecHit/interface/CaloCluster.h"
@@ -241,10 +247,13 @@ public:
   void SetKuMfootStcRecHitBranches(const EcalRecHitCollection * recHits, const CaloSubdetectorGeometry * geometry, const float adcToGeV);
   void SetKuMfootCCStcRecHitBranches(const EcalRecHitCollection * recHits, const CaloSubdetectorGeometry * geometry, const float adcToGeV);
   void SetURecHitBranches(const EcalUncalibratedRecHitCollection * recHits, const CaloSubdetectorGeometry * geometry);
+  void SetUKURecHitBranches(const EcalUncalibratedRecHitCollection * recHits, const CaloSubdetectorGeometry * geometry);
 
   void InitializeDigiBranches();
   void SetDigiBranches();
   void SetDigiBranches(const EBDigiCollection * ebDigis, const EEDigiCollection * eeDigis, const CaloSubdetectorGeometry * geometry);
+
+  void SetPCalo();
 
   void InitializePhoBranches();
   void SetPhoBranches();
@@ -272,6 +281,7 @@ private:
   // Collection Flags
   const bool rawCollectionsValid;
   const bool kuRechitValid;
+  const bool mcValid;
 
   // LHC info  
   std::vector<unsigned int> train_zero, train_notzero, long_train_notzero, subtrain_num, train_num;
@@ -532,16 +542,16 @@ private:
   const edm::SortedCollection<EcalUncalibratedRecHit,edm::StrictWeakOrdering<EcalUncalibratedRecHit> > * uncalibratedRecHitsEE;
 
   // EB Uncalibrated ku RecHits
-  //const edm::InputTag ku_uncalibratedRecHitsEBTag;
-  //edm::EDGetTokenT<edm::SortedCollection<EcalUncalibratedRecHit,edm::StrictWeakOrdering<EcalUncalibratedRecHit> > > ku_uncalibratedRecHitsEBToken;
-  //edm::Handle<edm::SortedCollection<EcalUncalibratedRecHit,edm::StrictWeakOrdering<EcalUncalibratedRecHit> > > ku_uncalibratedRecHitsEBH;
-  //const edm::SortedCollection<EcalUncalibratedRecHit,edm::StrictWeakOrdering<EcalUncalibratedRecHit> > * ku_uncalibratedRecHitsEB;
+  const edm::InputTag ku_uncalibratedRecHitsEBTag;
+  edm::EDGetTokenT<edm::SortedCollection<EcalUncalibratedRecHit,edm::StrictWeakOrdering<EcalUncalibratedRecHit> > > ku_uncalibratedRecHitsEBToken;
+  edm::Handle<edm::SortedCollection<EcalUncalibratedRecHit,edm::StrictWeakOrdering<EcalUncalibratedRecHit> > > ku_uncalibratedRecHitsEBH;
+  const edm::SortedCollection<EcalUncalibratedRecHit,edm::StrictWeakOrdering<EcalUncalibratedRecHit> > * ku_uncalibratedRecHitsEB;
 
   // EE Uncalibrated ku RecHits
-  //const edm::InputTag ku_uncalibratedRecHitsEETag;
-  //edm::EDGetTokenT<edm::SortedCollection<EcalUncalibratedRecHit,edm::StrictWeakOrdering<EcalUncalibratedRecHit> > > ku_uncalibratedRecHitsEEToken;
-  //edm::Handle<edm::SortedCollection<EcalUncalibratedRecHit,edm::StrictWeakOrdering<EcalUncalibratedRecHit> > > ku_uncalibratedRecHitsEEH;
-  //const edm::SortedCollection<EcalUncalibratedRecHit,edm::StrictWeakOrdering<EcalUncalibratedRecHit> > * ku_uncalibratedRecHitsEE;
+  const edm::InputTag ku_uncalibratedRecHitsEETag;
+  edm::EDGetTokenT<edm::SortedCollection<EcalUncalibratedRecHit,edm::StrictWeakOrdering<EcalUncalibratedRecHit> > > ku_uncalibratedRecHitsEEToken;
+  edm::Handle<edm::SortedCollection<EcalUncalibratedRecHit,edm::StrictWeakOrdering<EcalUncalibratedRecHit> > > ku_uncalibratedRecHitsEEH;
+  const edm::SortedCollection<EcalUncalibratedRecHit,edm::StrictWeakOrdering<EcalUncalibratedRecHit> > * ku_uncalibratedRecHitsEE;
 
 
   // EB Uncalibrated kuNot RecHits
@@ -567,6 +577,14 @@ private:
   edm::EDGetTokenT<EEDigiCollection> eeDigiCollectionToken_;
   edm::Handle<EEDigiCollection> pEEDigis;
   const EEDigiCollection * EEdigiCollection;
+  
+  // EB PCaloHit
+  const edm::InputTag pcaloEBTag;
+  edm::EDGetTokenT<edm::PCaloHitContainer>  ebCaloHitToken_;
+  edm::EDGetTokenT<CrossingFrame<PCaloHit>> cfToken_;
+  edm::Handle<edm::PCaloHitContainer> caloHitEBH;
+  edm::Handle<CrossingFrame<PCaloHit>> crossingFrame;
+  const edm::PCaloHitContainer * caloHitEB;
 
   // Output rechit map
   uiiumap recHitMap;
@@ -581,7 +599,7 @@ private:
   uiiumap kuMfootCCStcRecHitMap;
 
   uiiumap uncalibratedRecHitMap;
-  //uiiumap ku_uncalibratedRecHitMap;
+  uiiumap ku_uncalibratedRecHitMap;
   //uiiumap kuNot_uncalibratedRecHitMap;
 
   // Output digi map
@@ -776,7 +794,7 @@ private:
 
   // RecHits
   int nrechits;
-  std::vector<float> rhX, rhY, rhZ, rhE, rhtime, rhtimeErr, rhTOF;
+  std::vector<float> rhX, rhY, rhZ, rhE, rhtime, rhtimeErr, rhTOF, rhpcTOF;
   std::vector<unsigned int> rhID;
   std::vector<bool> rhisOOT, rhisGS6, rhisGS1;
   std::vector<float> rhadcToGeV;
@@ -863,11 +881,11 @@ private:
   std::vector<float> ootA0, ootA1, ootA2, ootA3, ootA4, ootA5, ootA6, ootA7, ootA8, ootA9;
 
   // Uncalibrated ku RecHits
-  //int nkuUrechits;
-  //std::vector<unsigned int> ku_uRhId;
-  //std::vector<float> ku_amplitude, ku_amplitudeError, ku_pedestal, ku_jitter, ku_chi2, ku_jitterError;
-  ////std::vector<std::vector<float> > outOfTimeAmplitude;
-  //std::vector<float> ku_ootA0, ku_ootA1, ku_ootA2, ku_ootA3, ku_ootA4, ku_ootA5, ku_ootA6, ku_ootA7, ku_ootA8, ku_ootA9;
+  int ku_nurechits;
+  std::vector<unsigned int> ku_uRhId;
+  std::vector<float> ku_amplitude, ku_amplitudeError, ku_pedestal, ku_jitter, ku_chi2, ku_jitterError;
+  //std::vector<std::vector<float> > outOfTimeAmplitude;
+  std::vector<float> ku_ootA0, ku_ootA1, ku_ootA2, ku_ootA3, ku_ootA4, ku_ootA5, ku_ootA6, ku_ootA7, ku_ootA8, ku_ootA9;
 
   // Uncalibrated kuWieNot RecHits
   //int nkuNotUrechits;
@@ -878,15 +896,29 @@ private:
   //std::vector<float> kuNot_ootA5, kuNot_ootA6, kuNot_ootA7, kuNot_ootA8, kuNot_ootA9;
 
   std::vector<bool> isSaturated, isJitterValid, isJitterErrorValid;
+  std::vector<bool> ku_isSaturated, ku_isJitterValid, ku_isJitterErrorValid;
 
   // Digis
   int ndigis;
   std::vector<unsigned int> digiID;
   std::vector<std::vector<float> > digiData;
 
+  // PCalo 
+  int npcalo;
+  std::vector<unsigned int> pcalo_id; 
+  std::vector<uint16_t> pcalo_depth;
+  std::vector<uint32_t> pcalo_eventid;
+  std::vector<int> pcalo_bx, pcalo_event, pcalo_gtid;
+  int pcalo_hw, pcalo_lw, pcalo_ew;
+  std::vector<double> pcalo_t, pcalo_e, pcalo_emf, pcalo_hadf;
+  //std::vector<unsigned int> pcrhId;
+  std::vector<double> pCalotime;
+
   // photon info
   int nphotons;
   std::vector<phoStruct> phoBranches;
+
+
 };
 
 #endif

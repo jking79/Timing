@@ -113,10 +113,10 @@ def subcrab( runs, events, reqmem ):
         inputDataAndOpts = [
 
             #['/EGamma/Run2018A-17Sep2018-v2/MINIAOD'],
-            #['/EGamma/Run2018B-26Sep2018-v1/MINIAOD'],
+            #['/EGamma/Run2018B-17Sep2018-v1/MINIAOD'],
             #['/EGamma/Run2018C-17Sep2018-v1/MINIAOD'],
             ['/EGamma/Run2018D-22Jan2019-v2/MINIAOD'],
-            #['/EGamma/Run2018E-PromptReco-v1/MINIAOD'],
+            ##['/EGamma/Run2018E-PromptReco-v1/MINIAOD'],
 
 	    ]
  
@@ -147,7 +147,7 @@ def subcrab( runs, events, reqmem ):
             #trial          = "twotier_allRT_noSTC_test"  # no lhc mini+raw for kurechits/uncal: true,true,false, jwkpupv3, unitsPerJob=3750, reduced size
             #trial          = "onetier_mini_nolhc_v9"  # no lhc mini+noraw for kurechits/uncal: false,flase,false, jwkpupv3, unitsPerJob=37500, reduced size
             #trial          = "onetier_mini_nolhc_v9_GT102X"  # no lhc mini+noraw for kurechits/uncal: false,flase,false, jwkpupv3, unitsPerJob=37500, reduced size
-            trial          = "onetier_mini_nolhc_v9_eMatch"  # no lhc mini+noraw for kurechits/uncal: false,flase,false, jwkpupv3, unitsPerJob=37500, reduced size
+            trial          = "onetier_mini_nolhc_v10_eMatch"  # no lhc mini+noraw for kurechits/uncal: false,flase,false, jwkpupv3, unitsPerJob=37500, reduced size
 
 
             config.General.requestName   = trial+"_"+primaryDataset+"_"+runEra+"_"+dataset+"_dispho"
@@ -155,7 +155,8 @@ def subcrab( runs, events, reqmem ):
 
 
 	         # for 2018 EGamma 2tier   // globalTag=101X_dataRun2_Prompt_v11 have been using
-            config.JobType.pyCfgParams   = ['globalTag=102X_dataRun2_Prompt_v11',#'nThreads='+str(config.JobType.numCores), 
+				# ABC 102X_dataRun2_v12   D  102X_dataRun2_v15
+            config.JobType.pyCfgParams   = ['globalTag=102X_dataRun2_v15',#'nThreads='+str(config.JobType.numCores), 
                                             'inputPaths='+inputPaths,'inputFilters='+inputFilters,'inputFlags='+inputFlags, 
                                             'onlyGED=True', 'outputFileName=output.root', #'rlelist='+events,
 					    								  'kuRechitValid=False','lhcInfoValid=False', 'rawCollectionsValid=False' ]
@@ -275,13 +276,13 @@ def submit_run2018D():
         #subcrab( "321067-321124", event_list_path + "sel_321067v321124_EG2018D.txt", 3000 )
         #subcrab( "321126-321149", event_list_path + "sel_321126v321149_EG2018D.txt", 3000 )
 
-        subcrab( "321165-321219", event_list_path + "sel_321165v321219_EG2018D.txt", 3000 )
-        subcrab( "321221-321305", event_list_path + "sel_321221v321305_EG2018D.txt", 3000 )
-        subcrab( "321311-321396", event_list_path + "sel_321311v321396_EG2018D.txt", 3000 )
+        #subcrab( "321165-321219", event_list_path + "sel_321165v321219_EG2018D.txt", 3000 )
+        #subcrab( "321221-321305", event_list_path + "sel_321221v321305_EG2018D.txt", 3000 )
+        #subcrab( "321311-321396", event_list_path + "sel_321311v321396_EG2018D.txt", 3000 )
 
-        subcrab( "321397-321431", event_list_path + "sel_321397v321431_EG2018D.txt", 3000 )
-        subcrab( "321432-321457", event_list_path + "sel_321432v321457_EG2018D.txt", 3000 )
-        subcrab( "321461-321730", event_list_path + "sel_321461v321730_EG2018D.txt", 3000 )
+        #subcrab( "321397-321431", event_list_path + "sel_321397v321431_EG2018D.txt", 3000 )
+        #subcrab( "321432-321457", event_list_path + "sel_321432v321457_EG2018D.txt", 3000 )
+        #subcrab( "321461-321730", event_list_path + "sel_321461v321730_EG2018D.txt", 3000 )
 
         #subcrab( "321732-321760", event_list_path + "sel_321732v321760_EG2018D.txt", 3000 )
         #subcrab( "321773-321818", event_list_path + "sel_321773v321818_EG2018D.txt", 3000 )
