@@ -380,7 +380,7 @@ kuMfootCCStc = [ plot_kuMfootCCStc_e5_2D, outfile_kuMfootCCStc_2D, kuMfootCCStc_
 #plot_list = [ kuNotStcIc ]
 #plot_list = [ kuNotStcE5, kuNotStc, kuStcE5, kuStc, ku, base ]
 #plot_list = [ kuNotStc, kuStc, ku, base ]
-#plot_list = [ base ]
+plot_list = [ base ]
 #plot_list = [ base_v2 ]  #  Effective ENERGY based, change 2d plot to E based version
 #plot_list = [ baseE5 ]
 #plot_list = [ base, baseE5 ]
@@ -389,7 +389,7 @@ kuMfootCCStc = [ plot_kuMfootCCStc_e5_2D, outfile_kuMfootCCStc_2D, kuMfootCCStc_
 #plot_list = [ base, kuStcE5, kuNotStcE5, kuWtStcE5, kuWootStcE5]
 #plot_list = [ base, baseE5, kuWtStc, kuWtStcE5, kuMfootStc, kuMfootStcE5, kuMfootCCStc, kuMfootCCStcE5 ]
 #plot_list = [ baseE5, kuNotStcE5, kuWtStcE5, kuWootStcE5, kuMfootStcE5, kuMfootCCStcE5 ]
-plot_list = [ base, baseE5, kuNotStcE5, kuWtStcE5, kuMfootStcE5, kuMfootCCStcE5 ]
+#plot_list = [ base, baseE5, kuNotStcE5, kuWtStcE5, kuMfootStcE5, kuMfootCCStcE5 ]
 
 #skiminlist='skimFileListNone.txt'
 #skiminlist='dispho_tt_rm_w_ks_kscc_Run2018A_315257-315488.txt'
@@ -462,6 +462,7 @@ plot_list = [ base, baseE5, kuNotStcE5, kuWtStcE5, kuMfootStcE5, kuMfootCCStcE5 
 #skiminlist='dispho_mc_v29p2_DYJetsToLL.txt'
 #skiminlist='dispho_mc_v30_DYJetsToLL.txt'
 #skiminlist='dispho_mc_v31_DYJetsToLL.txt'
+skiminlist='dispho_mc_v32_DYJetsToLL.txt'
 
 #skiminlist='dispho_ot_mini_Run2018C_319337_319579_ele.txt'
 #skiminlist='dispho_ot_mini_Run2018A_ele.txt'
@@ -501,7 +502,9 @@ plot_list = [ base, baseE5, kuNotStcE5, kuWtStcE5, kuMfootStcE5, kuMfootCCStcE5 
 #skiminlist='dispho_ot_mini_Run2016G.txt'
 
 #skiminlist='dispho_ot_mini_ul_deg_Run2018.txt'
-skiminlist='dispho_ot_mini_ul_deg_Run2018D.txt'
+#skiminlist='dispho_ot_mini_ul_deg_Run2018D.txt'
+#skiminlist='dispho_ot_mini_ul_gt28_deg_Run2018D.txt'
+#skiminlist='dispho_ot_mini_ul_gt28_deg_Run2018C.txt'
 #skiminlist='dispho_ot_mini_ul_deg_Run2018ABC.txt'
 #skiminlist='dispho_ot_mini_ul_deg_Run2017.txt'
 #skiminlist='dispho_ot_mini_ul_deg_Run2016.txt'
@@ -523,6 +526,8 @@ skimoutfile106='dispho_ot_mini_GT102X_Run2018A_ch.root'
 skimoutfile2018ul='dispho_ot_mini_ul_deg_Run2018.root'
 skimoutfile2018ABCul='dispho_ot_mini_ul_deg_Run2018ABC.root'
 skimoutfile2018Dul='dispho_ot_mini_ul_deg_Run2018D.root'
+skimoutfile2018Dulgt28='dispho_ot_mini_ul_gt28_deg_Run2018D.root'
+skimoutfile2018Culgt28='dispho_ot_mini_ul_gt28_deg_Run2018C.root'
 
 skimoutfile201='dispho_ot_mini_Run2016B.root'
 skimoutfile202='dispho_ot_mini_Run2016C.root'
@@ -578,6 +583,7 @@ skimoutfile_mc_dytoll_v29='dispho_mc_v29_DYJetsToLL_pce0p0.root'
 skimoutfile_mc_dytoll_v29v2='dispho_mc_v29p2_DYJetsToLL.root'
 skimoutfile_mc_dytoll_v30='dispho_mc_v30_DYJetsToLL.root'
 skimoutfile_mc_dytoll_v31='dispho_mc_v31_DYJetsToLL.root'
+skimoutfile_mc_dytoll_v32='dispho_mc_v32_DYJetsToLL.root'
 
 skimoutfile501='dispho_tt_kurh_Run2017D.root'
 skimoutfile502a='dispho_ot_mini_Run2018C_319337_319579_noele.root'
@@ -683,6 +689,7 @@ caliinfile_tt7f_v16='dispho_tt_kurhs_v16_Run2017F_ave_e5_cali.root'
 #caliinfile_ul18='dispho_ot_mini_ul_deg_Run2018_ave_e5_cali.root'
 caliinfile_ul18ABC='dispho_ot_mini_ul_deg_Run2018ABC_ave_e5_cali.root'
 caliinfile_ul18D='dispho_ot_mini_ul_deg_Run2018D_ave_e5_cali.root'
+caliinfile_ul18Dgt28='dispho_ot_mini_ul_gt28_deg_Run2018D_ave_e5_cali.root'
 caliinfile_ul17='dispho_ot_mini_ul_deg_Run2017_ave_e5_cali.root'
 caliinfile_ul16='dispho_ot_mini_ul_deg_Run2016_ave_e5_cali.root'
 
@@ -703,7 +710,7 @@ caliinfile_mcv31_dytoll='dispho_mc_v31_DYJetsToLL_ave_e5_cali.root'
 caliinfile=caliinfile_mcv31_dytoll
 #caliinfile=caliinfile_tt8d_v21
 #caliinfile=caliinfile_ul18ABC
-#caliinfile=caliinfile_ul18D
+#caliinfile=caliinfile_ul18Dgt28
 #caliinfile=caliinfile_ul17
 #caliinfile=caliinfile_ul16
 #caliinfile='nocali'
@@ -720,10 +727,12 @@ caliinfile=caliinfile_mcv31_dytoll
 #infile=skimoutfile0146# run2017F V16
 #infile=skimoutfile01320# run2018D V20
 #infile=skimoutfile01321# run2018D V21
-infile=skimoutfile_mc_dytoll_v31
+infile=skimoutfile_mc_dytoll_v32
 #infile=skimoutfile2016ul
 #infile=skimoutfile2017ul
 #infile=skimoutfile2018ul
+#infile=skimoutfile2018Dulgt28
+#infile=skimoutfile2018Culgt28
 #infile='none'
 
 cut_cf='ku_config/tmp_cut_config.txt'  # INCLUSIVE PLOTS
@@ -743,9 +752,9 @@ skim_glo_mini_cf='skim_config/Zee_nokurecs_Skim.txt'  #  GLOBAL  SKIMS nokurhs
 misc_fit_cf='ku_config/tmp_misc_fit.txt'
 
 #indir="/home/t3-ku/jaking/trees/ecal/datasets/"
-#indir="/home/t3-ku/jaking/datasets/ecalTiming/"
+indir="/home/t3-ku/jaking/datasets/ecalTiming/"
 #indir="/home/t3-ku/jaking/datasets/ecalTiming/SingleElectron/"
-indir="/home/t3-ku/jaking/datasets/ecalTiming/EGamma/"
+#indir="/home/t3-ku/jaking/datasets/ecalTiming/EGamma/"
 #indir="/home/t3-ku/jaking/datasets/ecalTiming/DoubleEG/"
 #indir="/scratch/jaking/"
 #indir="../test/"
@@ -872,6 +881,7 @@ dorhcolplot='./wc_ku_rhCollectionPlots.obj '
 #docalirhcolplot='./wc_ku_cali_rhCollectionPlots.obj '
 docalirhcolplot='./wc_ku_cali_ksrhCollectionPlots.obj '
 domcplot='./wc_ku_plot_kurh_vs_mc.obj '
+domcanaplot='./wc_ku_ana_plot_kurh_vs_mc.obj '
 end_skim='\\"\)'
 
 plot1dcali='./wc_ku_plot1dcali.obj '
@@ -941,8 +951,8 @@ def do_plots( plot_list ):
         write_file_3d=entry[1]+'_'+isd_type+'_AvsA'
         plot_file=entry[2]+'_'+isd_type
         ##cmd2d=dotimeres2d+caliindir+caliinfile+sp+pskimindir+infile+sp+'./'+entry[1]+sp+entry[3]+sp+entry[4]+sp+isd_type
-        #cmd2d=dotimeres2d_ctu+caliindir+caliinfile+sp+pskimindir+infile+sp+'./'+write_file+sp+entry[3]+sp+entry[4]+sp+isd_type
-        cmd2d=domcplot+caliindir+caliinfile+sp+pskimindir+infile+sp+'./'+write_file #+sp+entry[3]+sp+entry[4]+sp+isd_type
+        cmd2d=dotimeres2d_ctu+caliindir+caliinfile+sp+pskimindir+infile+sp+'./'+write_file+sp+entry[3]+sp+entry[4]+sp+isd_type
+        #cmd2d=domcplot+caliindir+caliinfile+sp+pskimindir+infile+sp+'./'+write_file #+sp+entry[3]+sp+entry[4]+sp+isd_type
         #cmd2d=dotimeres2d_ctu_mini+caliindir+caliinfile+sp+pskimindir+infile+sp+'./'+write_file+sp+entry[3]+sp+entry[4]+sp+isd_type
         #cmd2d=dotimeres2dE_ctu+caliindir+caliinfile+sp+pskimindir+infile+sp+'./'+write_file+sp+entry[3]+sp+entry[4]+sp+isd_type
         #cmd3d=dotimeres3d+caliindir+caliinfile+sp+pskimindir+infile+sp+'./'+write_file_3d+sp+entry[3]+sp+entry[4]+sp+isd_type
@@ -1285,6 +1295,13 @@ def do_wc_ku_mcplots():
         print(cmdmcplots)
         os.system(cmdmcplots)
 
+def do_wc_ku_mcanaplots():
+
+        anainfile='ku_mc_test_tt_dispho_6k_v2.root'
+        cmdmcplots=domcanaplot+caliindir+caliinfile+sp+anainfile+sp+anainfile[:-5]+'_mc_plots'
+        print(cmdmcplots)
+        os.system(cmdmcplots)
+
 def do_wc_ku_plot_ootamp():
 
         #makeplots( califilename, infilename, outfilename, tvarname, calimapname, isd_type )
@@ -1316,7 +1333,7 @@ def do_wc_ku_plot_ootamp():
 ##do_avecaliminipho()
 ##do_intercaliXX()
 #do_3dplots( plot_list )
-do_plots( plot_list )    #######  <<<<<<<<<<<<<<<<<     change the local/global type!!!!!!!!!!!!
+#do_plots( plot_list )    #######  <<<<<<<<<<<<<<<<<     change the local/global type!!!!!!!!!!!!
 #do_plots_runs( plot_list, '1', '400000' ) 
 runlist = [[100000,400000]]
 #runlist = [[297000,30600]] # full 2017
@@ -1345,4 +1362,8 @@ etalist = [[0,25],[26,45],[46,65],[66,90],[-25,0],[-45,-26],[-65,-46],[-90,-66]]
 #do_wc_ku_plot1dcali()
 #do_wc_ku_plot_eleZ()
 #do_wc_ku_plot_ootamp()
+do_wc_ku_mcanaplots()
 #do_wc_ku_mcplots()
+
+
+

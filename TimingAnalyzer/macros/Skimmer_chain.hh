@@ -255,6 +255,11 @@ private:
   TH1F  * fOutDifXtalRtOOTStcPhoRecTimeHistEM;
 
 // maps   ave and diff
+
+  TH2F * IcMapEB;  //  for dpCalotime
+  std::map<UInt_t,Float_t> sumXtalpCaloTimeMapEB;
+  std::map<UInt_t,UInt_t>  numXtalpCaloTimeMapEB;
+
   TH2F  * fOutAveXtalRecTimeMapEB;
   TH2F  * fOutAveXtalRecTimeMapEP;
   TH2F  * fOutAveXtalRecTimeMapEM;

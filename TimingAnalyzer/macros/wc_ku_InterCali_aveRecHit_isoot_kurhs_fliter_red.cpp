@@ -182,6 +182,7 @@ void wc_ku_InterCali_aveRecHit_mini( string indir, string infilelist, string out
          TBranch * b_fInRecHits_E;
          TBranch * b_fInRecHits_ID;
          TBranch * b_fInRecHits_time;
+         TBranch * b_fInRecHits_timeErr;
          TBranch * b_fInRecHits_TOF;
          //TBranch * b_kurhtime;
          TBranch * b_kurhID;
@@ -441,6 +442,9 @@ void wc_ku_InterCali_aveRecHit_mini( string indir, string infilelist, string out
 		   IcMapEB[i]->Write();
         	IcMapEP[i]->Write();
         	IcMapEM[i]->Write();
+         delete IcMapEB[i];
+         delete IcMapEP[i];
+         delete IcMapEM[i];
     }
 
     //delete fInTree;

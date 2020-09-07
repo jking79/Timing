@@ -2881,29 +2881,44 @@ void DisPhoMulti::SetRecHitBranches(const EcalRecHitCollection * recHits, const 
       if ((laser > 0.f) && (interCalib > 0.f) && (adcToGeV > 0.f)) rhadcToGeV[pos] = (laser*interCalib*adcToGeV);
 
       //pcalo wtime
-      //if( mcValid ){
-      if( false ){
+      if( mcValid ){
+      //if( false ){
+          //std::cout <<"------------------------------------------" << std::endl;
           float pce = 0.0;
           //float pct = 0.0;
           float pcwt = 0.0;
+          if( rawId > 840000000 ) {
+				  //std::cout << "Not EB : " << rawId << std::endl; 
+              pCalotime[pos] = -25.0;
+          } else {
           for(UInt_t pcseed = 0; pcseed < pcalo_id.size(); pcseed++ ){
-				  //std::cout << "Pcalo id match : " << pcalo_id[pcseed] << " : " << rhID[pos] << std::endl;
-              if( pcalo_id[pcseed] == rhID[pos] ){    //(*fInRecHits.ID)[seed] ){
-							 //std::cout << "     match found  " << std::endl;
+				  //std::cout << "Pcalo id match : " << pcalo_id[pcseed] << " : " << rawId << std::endl;
+              if( pcalo_id[pcseed] == rawId ){    //(*fInRecHits.ID)[seed] ){
+                      //std::cout << "Pcalo id match : " << pcalo_id[pcseed] << " : " << rawId;
+							 //std::cout << " match found -> ";
                       auto time = pcalo_t[pcseed];
-                      //std::cout << "     time : " << time << std::endl;
+                      //std::cout << "time : " << time;
                       //if( (time <= 0.f) or (time==2.f) ) continue;
                       auto depth = pcalo_depth[pcseed];
                       if( depth > 0 ) continue;
                       auto energy = pcalo_e[pcseed];
-                      //std::cout << "     energy : " << energy << std::endl;
+                      //std::cout << " energy : " << energy << std::endl;
                       //if( (energy <= 0.f) or (energy==2.f) ) continue;
                       pce += energy;
                       //pct += time;
                       pcwt += (energy*time);
              }
           }
-          if( pce > 0.0 ) { pCalotime[pos] = pcwt/pce; }
+          if( pce > 0.0f ) { pCalotime[pos] = (pcwt/pce); } //  - rhpcTOF[pos]); }
+          else if( pcwt == 0.0f ) { pCalotime[pos] = -5.0f; }
+          else if( pce == 0.0f ) { pCalotime[pos] = -50.0f; }
+			 else { pCalotime[pos] = -100.0f; }
+          //std::cout <<"------------------------------------------" << std::endl;
+          //if( (pCalotime[pos] < -10) or (pCalotime[pos] > 7) ){
+					//std::cout << "Pcalo id match : " << rawId << std::endl;
+					//std::cout <<"	Found:  pce: "<< pce <<" pcwt(pct*pce): "<< pcwt <<" pcTOF: "<< rhpcTOF[pos] <<" pCalo(pcwt/pce - pcTOF): "<< pCalotime[pos] << std::endl; 
+          	//}
+          }
       }
       // pedestal info
       const auto & pediter = pedestalsH->find(recHitId);

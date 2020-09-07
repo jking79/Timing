@@ -23,7 +23,7 @@ int getBinNumber( float value, std::vector<Double_t> bins ){
 
 void makeplots( const string califilename, const string infilename, const string outfilename ){
 
-    //std::cout << "Make plots with " << califilename <<  " " << infilename <<  " " << outfilename << std::endl;
+    std::cout << "Make plots with " << califilename <<  " " << infilename <<  " " << outfilename << std::endl;
     std::cout << "open input files" << std::endl;
     string disphotreename("disphotree");
 
@@ -165,8 +165,7 @@ void makeplots( const string califilename, const string infilename, const string
     fInTree->SetBranchAddress("phoseedTOF_0", &phoseedTOF_0, &b_phoseedTOF_0);
     fInTree->SetBranchAddress("phoseedpcTOF_0", &phoseedpcTOF_0, &b_phoseedpcTOF_0);
     fInTree->SetBranchAddress("phoseedtime_0", &phoseedtime_0, &b_phoseedtime_0);
-    //fInTree->SetBranchAddress("phoseedpctime_0", &phoseedpctime_0, &b_phoseedpctime_0);
-    fInTree->SetBranchAddress("phoseedPcalotime_0", &phoseedpctime_0, &b_phoseedpctime_0);
+    fInTree->SetBranchAddress("phoseedpctime_0", &phoseedpctime_0, &b_phoseedpctime_0);
     fInTree->SetBranchAddress("phoseedkuNotStctime_0", &phoseedkuNotStctime_0, &b_phoseedkuNotStctime_0);
     fInTree->SetBranchAddress("phoseedkuWtStctime_0", &phoseedkuWtStctime_0, &b_phoseedkuWtStctime_0);
     fInTree->SetBranchAddress("phoseedkuWootStctime_0", &phoseedkuWootStctime_0, &b_phoseedkuWootStctime_0);
@@ -188,8 +187,7 @@ void makeplots( const string califilename, const string infilename, const string
     fInTree->SetBranchAddress("phoseedpcTOF_1", &phoseedpcTOF_1, &b_phoseedpcTOF_1);
     fInTree->SetBranchAddress("phoseedkuNotStctime_1", &phoseedkuNotStctime_1, &b_phoseedkuNotStctime_1);
     fInTree->SetBranchAddress("phoseedtime_1", &phoseedtime_1, &b_phoseedtime_1);
-    //fInTree->SetBranchAddress("phoseedpctime_1", &phoseedpctime_1, &b_phoseedpctime_1);
-    fInTree->SetBranchAddress("phoseedPcalotime_1", &phoseedpctime_1, &b_phoseedpctime_1);
+    fInTree->SetBranchAddress("phoseedpctime_1", &phoseedpctime_1, &b_phoseedpctime_1);
     fInTree->SetBranchAddress("phoseedkuWtStctime_1", &phoseedkuWtStctime_1, &b_phoseedkuWtStctime_1);
     fInTree->SetBranchAddress("phoseedkuWootStctime_1", &phoseedkuWootStctime_1, &b_phoseedkuWootStctime_1);
     fInTree->SetBranchAddress("phoseedkuMfootStctime_1", &phoseedkuMfootStctime_1, &b_phoseedkuMfootStctime_1);
@@ -255,18 +253,6 @@ void makeplots( const string califilename, const string infilename, const string
 
     string histname_data("Data_Hist");
     string histname_data_profile("Data_Hist_Profile");
-    string histname_data_rt("Data_Hist_rt");
-    string histname_data_wt("Data_Hist_wt");
-    string histname_data_tmf("Data_Hist_tmf");
-    string histname_data_cc("Data_Hist_cc");
-    string histname_data_not("Data_Hist_not");
-    string histname_data_dum("Data_Hist_dum");
-    string histname_data_prt("Data_Hist_Profile_rt");
-    string histname_data_pwt("Data_Hist_Profile_wt");
-    string histname_data_ptmf("Data_Hist_Profile_tmf");
-    string histname_data_pcc("Data_Hist_Profile_cc");
-    string histname_data_pnot("Data_Hist_Profile_not");
-    string histname_data_pdum("Data_Hist_Profile_dum");
     string fTitle("#Delta(Photon Seed Time) [ns] vs. A_{eff}/#sigma_{n} (EBEB)");
     string fXTitle("A_{eff}/#sigma_{n} (EBEB)");
     std::vector<Double_t> fXBins;
@@ -276,8 +262,7 @@ void makeplots( const string califilename, const string infilename, const string
     string fYTitle("#Delta(Photon Seed Time) [ns] (EBEB)");
     std::vector<Double_t> fYBins;
     Bool_t fYVarBins = false;
-    //string ybinstr("CONSTANT 1536 -6 6");
-    string ybinstr("CONSTANT 256 -4 4");
+    string ybinstr("CONSTANT 1536 -6 6");
     Common::SetupBins(xbinstr,fXBins,fXVarBins);
     Common::SetupBins(ybinstr,fYBins,fYVarBins);
     const auto xbins = &fXBins[0];
@@ -287,111 +272,62 @@ void makeplots( const string califilename, const string infilename, const string
     theHist->GetYaxis()->SetTitle(fYTitle.c_str());
     theHist->Sumw2();
 
-    std::cout << "Setting up Data Hist " << std::endl;
-    auto theHist_rt = new TH2F(histname_data_rt.c_str(),fTitle.c_str(),fXBins.size()-1,xbins,fYBins.size()-1,ybins);
-    theHist_rt->GetXaxis()->SetTitle(fXTitle.c_str());
-    theHist_rt->GetYaxis()->SetTitle("#Delta(pcalo-Ratio) [ns] (EBEB)");
-    theHist_rt->Sumw2();
-    auto theHist_wt = new TH2F(histname_data_wt.c_str(),fTitle.c_str(),fXBins.size()-1,xbins,fYBins.size()-1,ybins);
-    theHist_wt->GetXaxis()->SetTitle(fXTitle.c_str());
-    theHist_wt->GetYaxis()->SetTitle("#Delta(pcalo-Wt) [ns] (EBEB)");
-    theHist_wt->Sumw2();
-    auto theHist_tmf = new TH2F(histname_data_tmf.c_str(),fTitle.c_str(),fXBins.size()-1,xbins,fYBins.size()-1,ybins);
-    theHist_tmf->GetXaxis()->SetTitle(fXTitle.c_str());
-    theHist_tmf->GetYaxis()->SetTitle("#Delta(pcalo-KUTMF) [ns] (EBEB)");
-    theHist_tmf->Sumw2();
-    auto theHist_cc = new TH2F(histname_data_cc.c_str(),fTitle.c_str(),fXBins.size()-1,xbins,fYBins.size()-1,ybins);
-    theHist_cc->GetXaxis()->SetTitle(fXTitle.c_str());
-    theHist_cc->GetYaxis()->SetTitle("#Delta(pcalo-KUCC) [ns] (EBEB)");
-    theHist_cc->Sumw2();
-    auto theHist_not = new TH2F(histname_data_not.c_str(),fTitle.c_str(),fXBins.size()-1,xbins,fYBins.size()-1,ybins);
-    theHist_not->GetXaxis()->SetTitle(fXTitle.c_str());
-    theHist_not->GetYaxis()->SetTitle("#Delta(pcalo-KUNot) [ns] (EBEB)");
-    theHist_not->Sumw2();
-    auto theHist_dum = new TH2F(histname_data_dum.c_str(),fTitle.c_str(),fXBins.size()-1,xbins,fYBins.size()-1,ybins);
-    theHist_dum->GetXaxis()->SetTitle(fXTitle.c_str());
-    theHist_dum->GetYaxis()->SetTitle("#Delta(pcalo-Dummy) [ns] (EBEB)");
-    theHist_dum->Sumw2();
+    float tdiv = 400;
+    float tstart = -20;
+    float tend = 20;
 
-    float tdiv = 256;
-    float tstart = -10;
-    float tend = 10;
-
-    float stddiv = 256;
     //  +/- 2 sd
-    float pcalotdiv = stddiv;
+    float pcalotdiv = 512;
     //float pcalotstart = 1.9884;
     //float pcalotstart = 3.7;
     //float pcalotstart = -0.0537;
-    //float pcalotstart = -0.6987;
-    float pcalotstart = -2.0;
+    float pcalotstart = -0.6987;
+    //float pcalotstart = -8.0;
     //float pcalotend = 3.6536;//1.6652
     //float pcalotend = 6.3;//1.495
     //float pcalotend = 0.6539;//0.7076
-    //float pcalotend = 1.3013;//2
-    float pcalotend = 2.0;//8
+    float pcalotend = 1.3013;//2
+    //float pcalotend = 0.0;//8
 
-    float ratiotdiv = stddiv;
+    float ratiotdiv = 512;
     //float ratiotstart = -1.609;
-    //float ratiotstart = -1.2075;
-    float ratiotstart = -2.0;
+    float ratiotstart = -1.2075;
     //float ratiotend = 1.2522;//2.8612
-    //float ratiotend = 0.7925;//2
-    float ratiotend = 2.0;//2
+    float ratiotend = 0.7925;//2
 
-    float wttdiv = stddiv;
+    float wttdiv = 512;
     //float wttstart = -0.9237;
-    //float wttstart = -0.6546;
-    float wttstart = -2.0;
+    float wttstart = -0.6546;
     //float wttend = 1.5635; //2.4872
-    //float wttend = 1.3454; //2
-    float wttend = 2.0; //2
+    float wttend = 1.3454; //2
 
-    float kutmftdiv = stddiv;
+    float kutmftdiv = 512;
     //float kutmftstart = -0.6794;
-    //float kutmftstart = -0.93381;
-    float kutmftstart = -2.0;
+    float kutmftstart = -0.93381;
     //float kutmftend = 0.637;//1.3164
-    //float kutmftend = 1.06619;//2
-    float kutmftend = 2.0;//2
+    float kutmftend = 1.06619;//2
 
-    float kucctdiv = stddiv;
+    float kucctdiv = 512;
     //float kucctstart = -3.4418;
-    //float kucctstart = -2.96;
-    float kucctstart = -2.0;
+    float kucctstart = -2.96;
     //float kucctend = -1.1082;//2.3336
-    //float kucctend = -0.96;//2
-    float kucctend = 2.0;//2
+    float kucctend = -0.96;//2
 
-    float dtdiv = stddiv;
-    float dtstart = -2;
-    float dtend = 2;
+    float dtdiv = 512;
+    float dtstart = -1;
+    float dtend = 1;
 
     auto hist_data_profile = new TH1F(histname_data_profile.c_str(),histtitletmp.c_str(),1536,-6.0,6.0);
     hist_data_profile->Sumw2();
-
-    std::cout << "Setting up Data Hist Profile" << std::endl;
-    auto hist_data_prt = new TH1F(histname_data_prt.c_str(),histtitletmp.c_str(),1536,-6.0,6.0);
-    hist_data_prt->Sumw2();
-    auto hist_data_pwt = new TH1F(histname_data_pwt.c_str(),histtitletmp.c_str(),1536,-6.0,6.0);
-    hist_data_pwt->Sumw2();
-    auto hist_data_ptmf = new TH1F(histname_data_ptmf.c_str(),histtitletmp.c_str(),1536,-6.0,6.0);
-    hist_data_ptmf->Sumw2();
-    auto hist_data_pcc = new TH1F(histname_data_pcc.c_str(),histtitletmp.c_str(),1536,-6.0,6.0);
-    hist_data_pcc->Sumw2();
-    auto hist_data_pnot = new TH1F(histname_data_pnot.c_str(),histtitletmp.c_str(),1536,-6.0,6.0);
-    hist_data_pnot->Sumw2();
-    auto hist_data_pdum = new TH1F(histname_data_pdum.c_str(),histtitletmp.c_str(),1536,-6.0,6.0);
-    hist_data_pdum->Sumw2();
 
     auto hist_ratio = new TH1F(histname_ratio.c_str(),histtitletmp.c_str(),tdiv,tstart,tend);
     hist_ratio->Sumw2();
     auto hist_pcalo = new TH1F(histname_pcalo.c_str(),histtitletmp.c_str(),tdiv,tstart,tend);
     hist_pcalo->Sumw2();
-    //auto hist_pcTOF = new TH1F(histname_pcTOF.c_str(),histtitletmp.c_str(),tdiv,tstart,tend);
-    //hist_pcTOF->Sumw2();
-    //auto hist_rawpcalo = new TH1F(histname_rawpcalo.c_str(),histtitletmp.c_str(),tdiv,tstart,tend);
-    //hist_rawpcalo->Sumw2();
+    auto hist_pcTOF = new TH1F(histname_pcTOF.c_str(),histtitletmp.c_str(),tdiv,tstart,tend);
+    hist_pcTOF->Sumw2();
+    auto hist_rawpcalo = new TH1F(histname_rawpcalo.c_str(),histtitletmp.c_str(),tdiv,tstart,tend);
+    hist_rawpcalo->Sumw2();
     auto hist_wt = new TH1F(histname_wt.c_str(),histtitletmp.c_str(),tdiv,tstart,tend);
     hist_wt->Sumw2();
     auto hist_kutmf = new TH1F(histname_kutmf.c_str(),histtitletmp.c_str(),tdiv,tstart,tend);
@@ -399,9 +335,9 @@ void makeplots( const string califilename, const string infilename, const string
     auto hist_kucc = new TH1F(histname_kucc.c_str(),histtitletmp.c_str(),tdiv,tstart,tend);
     hist_kucc->Sumw2();
     auto hist_kunot = new TH1F(histname_kunot.c_str(),histtitletmp.c_str(),tdiv,tstart,tend);
-    hist_kunot->Sumw2();
+    hist_kutmf->Sumw2();
     auto hist_dummy = new TH1F(histname_dummy.c_str(),histtitletmp.c_str(),tdiv,tstart,tend);
-    hist_dummy->Sumw2();
+    hist_kucc->Sumw2();
 
     auto hist_pctvratio = new TH2F(histname_pctvratio.c_str(),histtitletmp.c_str(),ratiotdiv,ratiotstart,ratiotend,pcalotdiv,pcalotstart,pcalotend);
     hist_pctvratio->Sumw2();
@@ -412,39 +348,39 @@ void makeplots( const string califilename, const string infilename, const string
     auto hist_pctvkucc = new TH2F(histname_pctvkucc.c_str(),histtitletmp.c_str(),kucctdiv,kucctstart,kucctend,pcalotdiv,pcalotstart,pcalotend);
     hist_pctvkucc->Sumw2();
 
-//    auto hist_dpctvdratio = new TH2F(histname_dpctvdratio.c_str(),histtitletmp.c_str(),dtdiv,dtstart,dtend,dtdiv,dtstart,dtend);
-//    hist_dpctvdratio->Sumw2();
-//    auto hist_dpctvdwt = new TH2F(histname_dpctvdwt.c_str(),histtitletmp.c_str(),dtdiv,dtstart,dtend,dtdiv,dtstart,dtend);
-//    hist_dpctvdwt->Sumw2();
-//    auto hist_dpctvdkutmf = new TH2F(histname_dpctvdkutmf.c_str(),histtitletmp.c_str(),dtdiv,dtstart,dtend,dtdiv,dtstart,dtend);
-//    hist_dpctvdkutmf->Sumw2();
-//    auto hist_dpctvdkucc = new TH2F(histname_dpctvdkucc.c_str(),histtitletmp.c_str(),dtdiv,dtstart,dtend,dtdiv,dtstart,dtend);
-//    hist_dpctvdkucc->Sumw2();
-//
-//    auto hist_dratiovdwt = new TH2F(histname_dratiovdwt.c_str(),histtitletmp.c_str(),dtdiv,dtstart,dtend,dtdiv,dtstart,dtend);
-//    hist_dratiovdwt->Sumw2();
-//    auto hist_dratiovdkutmf = new TH2F(histname_dratiovdkutmf.c_str(),histtitletmp.c_str(),dtdiv,dtstart,dtend,dtdiv,dtstart,dtend);
-//    hist_dratiovdkutmf->Sumw2();
-//    auto hist_dratiovdkucc = new TH2F(histname_dratiovdkucc.c_str(),histtitletmp.c_str(),dtdiv,dtstart,dtend,dtdiv,dtstart,dtend);
-//    hist_dratiovdkucc->Sumw2();
-//
-//    auto hist_ratiovwt = new TH2F(histname_ratiovwt.c_str(),histtitletmp.c_str(),wttdiv,wttstart,wttend,ratiotdiv,ratiotstart,ratiotend);
-//    hist_ratiovwt->Sumw2();
-//    auto hist_ratiovkutmf = new TH2F(histname_ratiovkutmf.c_str(),histtitletmp.c_str(),kutmftdiv,kutmftstart,kutmftend,ratiotdiv,ratiotstart,ratiotend);
-//    hist_ratiovkutmf->Sumw2();
-//    auto hist_ratiovkucc = new TH2F(histname_ratiovkucc.c_str(),histtitletmp.c_str(),kucctdiv,kucctstart,kucctend,ratiotdiv,ratiotstart,ratiotend);
-//    hist_ratiovkucc->Sumw2();
-//
-//    auto hist_ratiova = new TH2F(histname_ratiova.c_str(),histtitletmp.c_str(),200,0,2000,tdiv,tstart,tend);
-//    hist_ratiova->Sumw2();
-//    auto hist_pcalova = new TH2F(histname_pcalova.c_str(),histtitletmp.c_str(),200,0,2000,tdiv,tstart,tend);
-//    hist_pcalova->Sumw2();
-//    auto hist_wtva = new TH2F(histname_wtva.c_str(),histtitletmp.c_str(),200,0,2000,tdiv,tstart,tend);
-//    hist_wtva->Sumw2();
-//    auto hist_kutmfva = new TH2F(histname_kutmfva.c_str(),histtitletmp.c_str(),200,0,2000,tdiv,tstart,tend);
-//    hist_kutmfva->Sumw2();
-//    auto hist_kuccva = new TH2F(histname_kuccva.c_str(),histtitletmp.c_str(),200,0,2000,tdiv,tstart,tend);
-//    hist_kuccva->Sumw2();
+    auto hist_dpctvdratio = new TH2F(histname_dpctvdratio.c_str(),histtitletmp.c_str(),dtdiv,dtstart,dtend,dtdiv,dtstart,dtend);
+    hist_dpctvdratio->Sumw2();
+    auto hist_dpctvdwt = new TH2F(histname_dpctvdwt.c_str(),histtitletmp.c_str(),dtdiv,dtstart,dtend,dtdiv,dtstart,dtend);
+    hist_dpctvdwt->Sumw2();
+    auto hist_dpctvdkutmf = new TH2F(histname_dpctvdkutmf.c_str(),histtitletmp.c_str(),dtdiv,dtstart,dtend,dtdiv,dtstart,dtend);
+    hist_dpctvdkutmf->Sumw2();
+    auto hist_dpctvdkucc = new TH2F(histname_dpctvdkucc.c_str(),histtitletmp.c_str(),dtdiv,dtstart,dtend,dtdiv,dtstart,dtend);
+    hist_dpctvdkucc->Sumw2();
+
+    auto hist_dratiovdwt = new TH2F(histname_dratiovdwt.c_str(),histtitletmp.c_str(),dtdiv,dtstart,dtend,dtdiv,dtstart,dtend);
+    hist_dratiovdwt->Sumw2();
+    auto hist_dratiovdkutmf = new TH2F(histname_dratiovdkutmf.c_str(),histtitletmp.c_str(),dtdiv,dtstart,dtend,dtdiv,dtstart,dtend);
+    hist_dratiovdkutmf->Sumw2();
+    auto hist_dratiovdkucc = new TH2F(histname_dratiovdkucc.c_str(),histtitletmp.c_str(),dtdiv,dtstart,dtend,dtdiv,dtstart,dtend);
+    hist_dratiovdkucc->Sumw2();
+
+    auto hist_ratiovwt = new TH2F(histname_ratiovwt.c_str(),histtitletmp.c_str(),wttdiv,wttstart,wttend,ratiotdiv,ratiotstart,ratiotend);
+    hist_ratiovwt->Sumw2();
+    auto hist_ratiovkutmf = new TH2F(histname_ratiovkutmf.c_str(),histtitletmp.c_str(),kutmftdiv,kutmftstart,kutmftend,ratiotdiv,ratiotstart,ratiotend);
+    hist_ratiovkutmf->Sumw2();
+    auto hist_ratiovkucc = new TH2F(histname_ratiovkucc.c_str(),histtitletmp.c_str(),kucctdiv,kucctstart,kucctend,ratiotdiv,ratiotstart,ratiotend);
+    hist_ratiovkucc->Sumw2();
+
+    auto hist_ratiova = new TH2F(histname_ratiova.c_str(),histtitletmp.c_str(),200,0,2000,tdiv,tstart,tend);
+    hist_ratiova->Sumw2();
+    auto hist_pcalova = new TH2F(histname_pcalova.c_str(),histtitletmp.c_str(),200,0,2000,tdiv,tstart,tend);
+    hist_pcalova->Sumw2();
+    auto hist_wtva = new TH2F(histname_wtva.c_str(),histtitletmp.c_str(),200,0,2000,tdiv,tstart,tend);
+    hist_wtva->Sumw2();
+    auto hist_kutmfva = new TH2F(histname_kutmfva.c_str(),histtitletmp.c_str(),200,0,2000,tdiv,tstart,tend);
+    hist_kutmfva->Sumw2();
+    auto hist_kuccva = new TH2F(histname_kuccva.c_str(),histtitletmp.c_str(),200,0,2000,tdiv,tstart,tend);
+    hist_kuccva->Sumw2();
 
     //std::cout << "Getting calibration values and plotting for " << cmbs << std::endl;
 //     get maps from fCaliFile
@@ -514,7 +450,7 @@ void makeplots( const string califilename, const string infilename, const string
     for (auto entry = 0U; entry < nEntries; entry++){
         // if( entry%int(nEntries*0.1) == 0 ) std::cout << "Proccessed " << entry/nEntries << "\% of " << nEntries << " entries." << std::endl;
 	     if( entry%100000 == 0 ) std::cout << "Proccessed " << entry << " of " << nEntries << " entries." << std::endl;        
-        //std::cout << "Getting Entries Pho 0" << std::endl;
+        //std::cout << "Getting Entries" << std::endl;
 
 	     fInFile->cd();
 
@@ -524,30 +460,26 @@ void makeplots( const string califilename, const string infilename, const string
         //b_elTrackZ_1->GetEntry(entry);
         //b_vtxZ->GetEntry(entry);
 
-        b_phoseedI1_0->GetEntry(entry);
-	     b_phoseedI2_0->GetEntry(entry);	
+        //b_phoseedI1_0->GetEntry(entry);
+	     //b_phoseedI2_0->GetEntry(entry);	
 	     b_phoseedEcal_0->GetEntry(entry);
         b_phoseedTT_0->GetEntry(entry);
         b_phoseedE_0->GetEntry(entry);
         b_phoseedadcToGeV_0->GetEntry(entry);
         b_phoseedpedrms12_0->GetEntry(entry);
         b_phoseedTOF_0->GetEntry(entry);
-        //std::cout << "half way 0" << std::endl;
         b_phoseedpcTOF_0->GetEntry(entry);
         b_phoseedtime_0->GetEntry(entry);
         //b_phoseedtimeErr_0->GetEntry(entry);
         b_phoseedpctime_0->GetEntry(entry);
-        //std::cout << "3/4 way 0" << std::endl;
         b_phoseedkuNotStctime_0->GetEntry(entry);
         b_phoseedkuWtStctime_0->GetEntry(entry);
         b_phoseedkuWootStctime_0->GetEntry(entry);
         b_phoseedkuMfootStctime_0->GetEntry(entry);
         b_phoseedkuMfootCCStctime_0->GetEntry(entry);
 
-        //std::cout << "Getting Entries Pho 1" << std::endl;
-
-        b_phoseedI1_1->GetEntry(entry);
-        b_phoseedI2_1->GetEntry(entry);
+        //b_phoseedI1_1->GetEntry(entry);
+        //b_phoseedI2_1->GetEntry(entry);
         b_phoseedEcal_1->GetEntry(entry);
         b_phoseedTT_1->GetEntry(entry);
         b_phoseedE_1->GetEntry(entry);
@@ -564,7 +496,7 @@ void makeplots( const string califilename, const string infilename, const string
         b_phoseedkuMfootStctime_1->GetEntry(entry);
         b_phoseedkuMfootCCStctime_1->GetEntry(entry);
 
-        //std::cout << "Fill Hists" << std::endl;
+        ///////std::cout << "Fill Hists" << std::endl;
         //if( (phoseedE_0 < 5.f) or (phoseedE_1 < 5.f) ) continue;
 
         auto amp_0 = (phoseedE_0/phoseedadcToGeV_0)/phoseedpedrms12_0;
@@ -576,8 +508,6 @@ void makeplots( const string califilename, const string infilename, const string
         //if( (phoseedEcal_0 == ECAL::EB) || (phoseedEcal_1 == ECAL::EB) ) continue;
         if( (phoseedEcal_0 == ECAL::EP) || (phoseedEcal_1 == ECAL::EP) ) continue;
         if( (phoseedEcal_0 == ECAL::EM) || (phoseedEcal_1 == ECAL::EM) ) continue;
-        //if( phoseedrhID > 840000000 ){ continue; }
-        //if( phoseedpctime_0 < 0.0 ){ continue; }
 
         int bin_offset = 86;
 
@@ -621,6 +551,7 @@ void makeplots( const string califilename, const string infilename, const string
                }
         }
 
+
         auto tof_cor_0 = phoseedTOF_0;
         auto tof_cor_1 = phoseedTOF_1;
 
@@ -647,22 +578,25 @@ void makeplots( const string califilename, const string infilename, const string
         //auto kuMfootCCStctime_0 = phoseedkuMfootCCStctime_0 - ic4_0;
         //auto kuMfootCCStctime_1 = phoseedkuMfootCCStctime_1 - ic4_1;
 
-        if( (phoseedpctime_0 < 0.0 ) || (phoseedpctime_1 < 0.0 ) )  continue;
         auto pctime_0 = phoseedpctime_0 - phoseedpcTOF_0;
         auto pctime_1 = phoseedpctime_1 - phoseedpcTOF_1;
 
-        auto yfillrt0 = pctime_0 - time_0;
-        auto yfillrt1 = pctime_1 - time_1;
-        auto yfillnot0 = pctime_0 - kuNotStctime_0;
-        auto yfillnot1 = pctime_1 - kuNotStctime_1;
-        auto yfillwt0 = pctime_0 - kuWtStctime_0;
-        auto yfillwt1 = pctime_1 - kuWtStctime_1;
-        auto yfilldum0 = pctime_0 - kuWootStctime_0;
-        auto yfilldum1 = pctime_1 - kuWootStctime_1;
-        auto yfilltmf0 = pctime_0 - kuMfootStctime_0;
-        auto yfilltmf1 = pctime_1 - kuMfootStctime_1;
-        auto yfillcc0 = pctime_0 - kuMfootCCStctime_0;
-        auto yfillcc1 = pctime_1 - kuMfootCCStctime_1;
+        //auto pctime_0 = phoseedpctime_0 + tof_cor_0;
+        //auto pctime_1 = phoseedpctime_1 + tof_cor_1;
+
+        //auto yfill0 = pctime_0 - time_0;		
+        ////(phoseedtime_0-phoseedtimeCaliIc_0)-(phoseedtime_1-phoseedtimeCaliIc_1)+(phoseedTOF_0-phoseedTOF_1);
+        //auto yfill1 = pctime_1 - time_1;
+        auto yfill0 = pctime_0 - kuNotStctime_0;
+        auto yfill1 = pctime_1 - kuNotStctime_1;
+        //auto yfill0 = pctime_0 - kuWtStctime_0;
+        //auto yfill1 = pctime_1 - kuWtStctime_1;
+        //auto yfill0 = pctime_0 - kuWootStctime_0;
+        //auto yfill1 = pctime_1 - kuWootStctime_1;
+        //auto yfill0 = pctime_0 - kuMfootStctime_0;
+        //auto yfill1 = pctime_1 - kuMfootStctime_1;
+        //auto yfill0 = pctime_0 - kuMfootCCStctime_0;
+        //auto yfill1 = pctime_1 - kuMfootCCStctime_1;
         auto yfill = pctime_0 - pctime_1;
 
         auto effa0 = ((phoseedE_0/phoseedadcToGeV_0)/phoseedpedrms12_0)/sqrt(2);
@@ -677,67 +611,45 @@ void makeplots( const string califilename, const string infilename, const string
         auto event_good = e_cut && eta_cut && isd_cut;
 
         if( event_good ){ 
+				//theHist->Fill(effa0,yfill0);
+            //theHist->Fill(effa1,yfill1);
             theHist->Fill(xfill,yfill);
+				//hist_data_profile->Fill(yfill0);
+            //hist_data_profile->Fill(yfill1);
             hist_data_profile->Fill(yfill);
-        //}
-
-            theHist_rt->Fill(effa0,yfillrt0);
-            hist_data_prt->Fill(yfillrt0);
-            theHist_wt->Fill(effa0,yfillwt0);
-            hist_data_pwt->Fill(yfillwt0);
-            theHist_not->Fill(effa0,yfillnot0);
-            hist_data_pnot->Fill(yfillnot0);
-            theHist_dum->Fill(effa0,yfilldum0);
-            hist_data_pdum->Fill(yfilldum0);
-            theHist_tmf->Fill(effa0,yfilltmf0);
-            hist_data_ptmf->Fill(yfilltmf0);
-            theHist_cc->Fill(effa0,yfillcc0);
-            hist_data_pcc->Fill(yfillcc0);
-
-            theHist_rt->Fill(effa1,yfillrt1);
-            hist_data_prt->Fill(yfillrt1);
-            theHist_wt->Fill(effa1,yfillwt1);
-            hist_data_pwt->Fill(yfillwt1);
-            theHist_not->Fill(effa1,yfillnot1);
-            hist_data_pnot->Fill(yfillnot1);
-            theHist_dum->Fill(effa1,yfilldum1);
-            hist_data_pdum->Fill(yfilldum1);
-            theHist_tmf->Fill(effa1,yfilltmf1);
-            hist_data_ptmf->Fill(yfilltmf1);
-            theHist_cc->Fill(effa1,yfillcc1);
-            hist_data_pcc->Fill(yfillcc1);
+        }
 
 		  hist_ratio->Fill(time_0);
         hist_pcalo->Fill(pctime_0);
-        //hist_rawpcalo->Fill(phoseedpctime_0);
-        //hist_pcTOF->Fill(phoseedpcTOF_0);
+        hist_rawpcalo->Fill(phoseedpctime_0);
+        hist_pcTOF->Fill(phoseedpcTOF_0);
         hist_wt->Fill(kuWtStctime_0);
         hist_kutmf->Fill(kuMfootStctime_0);
         hist_kucc->Fill(kuMfootCCStctime_0);
         hist_kunot->Fill(kuNotStctime_0);
         hist_dummy->Fill(kuWootStctime_0);
 
-        //hist_ratiova->Fill(amp_0,time_0);
-        //hist_pcalova->Fill(amp_0,pctime_0);
-        //hist_wtva->Fill(amp_0,kuWtStctime_0);
-        //hist_kutmfva->Fill(amp_0,kuMfootStctime_0);
-        //hist_kuccva->Fill(amp_0,kuMfootCCStctime_0);
+        hist_ratiova->Fill(amp_0,time_0);
+        hist_pcalova->Fill(amp_0,pctime_0);
+        hist_wtva->Fill(amp_0,kuWtStctime_0);
+        hist_kutmfva->Fill(amp_0,kuMfootStctime_0);
+        hist_kuccva->Fill(amp_0,kuMfootCCStctime_0);
 
         hist_ratio->Fill(time_1);
         hist_pcalo->Fill(pctime_1);
-        //hist_rawpcalo->Fill(phoseedpctime_1);
-        //hist_pcTOF->Fill(phoseedpcTOF_1);
+        hist_rawpcalo->Fill(phoseedpctime_1);
+        hist_pcTOF->Fill(phoseedpcTOF_1);
         hist_wt->Fill(kuWtStctime_1);
         hist_kutmf->Fill(kuMfootStctime_1);
         hist_kucc->Fill(kuMfootCCStctime_1);
         hist_kunot->Fill(kuNotStctime_1);
         hist_dummy->Fill(kuWootStctime_1);
 
-        //hist_ratiova->Fill(amp_1,time_1);
-        //hist_pcalova->Fill(amp_1,pctime_1);
-        //hist_wtva->Fill(amp_1,kuWtStctime_1);
-        //hist_kutmfva->Fill(amp_1,kuMfootStctime_1);
-        //hist_kuccva->Fill(amp_1,kuMfootCCStctime_1);
+        hist_ratiova->Fill(amp_1,time_1);
+        hist_pcalova->Fill(amp_1,pctime_1);
+        hist_wtva->Fill(amp_1,kuWtStctime_1);
+        hist_kutmfva->Fill(amp_1,kuMfootStctime_1);
+        hist_kuccva->Fill(amp_1,kuMfootCCStctime_1);
 
         hist_pctvratio->Fill(time_0,pctime_0);
         hist_pctvwt->Fill(kuWtStctime_0,pctime_0);
@@ -749,23 +661,23 @@ void makeplots( const string califilename, const string infilename, const string
         hist_pctvkutmf->Fill(kuMfootStctime_1,pctime_1);
         hist_pctvkucc->Fill(kuMfootCCStctime_1,pctime_1);
 
-        //hist_dpctvdratio->Fill(time_0-time_1,pctime_0-pctime_1);
-        //hist_dpctvdwt->Fill(kuWtStctime_0-kuWtStctime_1,pctime_0-pctime_1);
-        //hist_dpctvdkutmf->Fill(kuMfootStctime_0-kuMfootStctime_1,pctime_0-pctime_1);
-        //hist_dpctvdkucc->Fill(kuMfootCCStctime_0-kuMfootCCStctime_1,pctime_0-pctime_1);
+        hist_dpctvdratio->Fill(time_0-time_1,pctime_0-pctime_1);
+        hist_dpctvdwt->Fill(kuWtStctime_0-kuWtStctime_1,pctime_0-pctime_1);
+        hist_dpctvdkutmf->Fill(kuMfootStctime_0-kuMfootStctime_1,pctime_0-pctime_1);
+        hist_dpctvdkucc->Fill(kuMfootCCStctime_0-kuMfootCCStctime_1,pctime_0-pctime_1);
 
-        //hist_dratiovdwt->Fill(kuWtStctime_0-kuWtStctime_1,time_0-time_1);
-        //hist_dratiovdkutmf->Fill(kuMfootStctime_0-kuMfootStctime_1,time_0-time_1);
-        //hist_dratiovdkucc->Fill(kuMfootCCStctime_0-kuMfootCCStctime_1,time_0-time_1);
+        hist_dratiovdwt->Fill(kuWtStctime_0-kuWtStctime_1,time_0-time_1);
+        hist_dratiovdkutmf->Fill(kuMfootStctime_0-kuMfootStctime_1,time_0-time_1);
+        hist_dratiovdkucc->Fill(kuMfootCCStctime_0-kuMfootCCStctime_1,time_0-time_1);
 
-        //hist_ratiovwt->Fill(kuWtStctime_0,time_0);
-        //hist_ratiovkutmf->Fill(kuMfootStctime_0,time_0);
-        //hist_ratiovkucc->Fill(kuMfootCCStctime_0,time_0);
+        hist_ratiovwt->Fill(kuWtStctime_0,time_0);
+        hist_ratiovkutmf->Fill(kuMfootStctime_0,time_0);
+        hist_ratiovkucc->Fill(kuMfootCCStctime_0,time_0);
 
-        //hist_ratiovwt->Fill(kuWtStctime_1,time_1);
-        //hist_ratiovkutmf->Fill(kuMfootStctime_1,time_1);
-        //hist_ratiovkucc->Fill(kuMfootCCStctime_1,time_1);
-        } // if event good 
+        hist_ratiovwt->Fill(kuWtStctime_1,time_1);
+        hist_ratiovkutmf->Fill(kuMfootStctime_1,time_1);
+        hist_ratiovkucc->Fill(kuMfootCCStctime_1,time_1);
+
     }
 
     Common::Scale(theHist,false,fXVarBins,fYVarBins);
@@ -775,106 +687,80 @@ void makeplots( const string califilename, const string infilename, const string
     theHist->Write();
     hist_data_profile->Write();
 
-    theHist_rt->Write();
-    hist_data_prt->Write();
-    theHist_wt->Write();
-    hist_data_pwt->Write();
-    theHist_not->Write();
-    hist_data_pnot->Write();
-    theHist_dum->Write();
-    hist_data_pdum->Write();
-    theHist_tmf->Write();
-    hist_data_ptmf->Write();
-    theHist_cc->Write();
-    hist_data_pcc->Write();
-
     hist_ratio->Write();
     hist_pcalo->Write();
-    //hist_rawpcalo->Write();
-    //hist_pcTOF->Write();
+    hist_rawpcalo->Write();
+    hist_pcTOF->Write();
     hist_wt->Write();
     hist_kutmf->Write();
     hist_kucc->Write();
     hist_kunot->Write();
     hist_dummy->Write();
 
-    //hist_ratiova->Write();
-    //hist_pcalova->Write();
-    //hist_wtva->Write();
-    //hist_kutmfva->Write();
-    //hist_kuccva->Write();
+    hist_ratiova->Write();
+    hist_pcalova->Write();
+    hist_wtva->Write();
+    hist_kutmfva->Write();
+    hist_kuccva->Write();
 
     hist_pctvratio->Write();
     hist_pctvwt->Write();
     hist_pctvkutmf->Write();
     hist_pctvkucc->Write();
 
-    //hist_dpctvdratio->Write();
-    //hist_dpctvdwt->Write();
-    //hist_dpctvdkutmf->Write();
-    //hist_dpctvdkucc->Write();
+    hist_dpctvdratio->Write();
+    hist_dpctvdwt->Write();
+    hist_dpctvdkutmf->Write();
+    hist_dpctvdkucc->Write();
 
-    //hist_dratiovdwt->Write();
-    //hist_dratiovdkutmf->Write();
-    //hist_dratiovdkucc->Write();
+    hist_dratiovdwt->Write();
+    hist_dratiovdkutmf->Write();
+    hist_dratiovdkucc->Write();
 
-    //hist_ratiovwt->Write();
-    //hist_ratiovkutmf->Write();
-    //hist_ratiovkucc->Write();
+    hist_ratiovwt->Write();
+    hist_ratiovkutmf->Write();
+    hist_ratiovkucc->Write();
 
     delete theHist;
     delete hist_data_profile;
-
-    delete theHist_rt;
-    delete hist_data_prt;
-    delete theHist_wt;
-    delete hist_data_pwt;
-    delete theHist_dum;
-    delete hist_data_pdum;
-    delete theHist_not;
-    delete hist_data_pnot;
-    delete theHist_cc;
-    delete hist_data_pcc;
-    delete theHist_tmf;
-    delete hist_data_ptmf;
 
     delete hist_pctvratio;
     delete hist_pctvwt;
     delete hist_pctvkutmf;
     delete hist_pctvkucc;
 
-    //delete hist_dpctvdratio;
-    //delete hist_dpctvdwt;
-    //delete hist_dpctvdkutmf;
-    //delete hist_dpctvdkucc;
+    delete hist_dpctvdratio;
+    delete hist_dpctvdwt;
+    delete hist_dpctvdkutmf;
+    delete hist_dpctvdkucc;
 
-    //delete hist_dratiovdwt;
-    //delete hist_dratiovdkutmf;
-    //delete hist_dratiovdkucc;
+    delete hist_dratiovdwt;
+    delete hist_dratiovdkutmf;
+    delete hist_dratiovdkucc;
 
-    //delete hist_ratiovwt;
-    //delete hist_ratiovkutmf;
-    //delete hist_ratiovkucc;
+    delete hist_ratiovwt;
+    delete hist_ratiovkutmf;
+    delete hist_ratiovkucc;
 
     delete hist_ratio;
     delete hist_pcalo;
-    //delete hist_rawpcalo;
-    //delete hist_pcTOF;
+    delete hist_rawpcalo;
+    delete hist_pcTOF;
     delete hist_wt;
     delete hist_kutmf;
     delete hist_kucc;
     delete hist_kunot;
     delete hist_dummy;
 
-    //delete hist_ratiova;
-    //delete hist_pcalova;
-    //delete hist_wtva;
-    //delete hist_kutmfva;
-    //delete hist_kuccva;
+    delete hist_ratiova;
+    delete hist_pcalova;
+    delete hist_wtva;
+    delete hist_kutmfva;
+    delete hist_kuccva;
 
     delete fInFile;
     delete fOutFile;
-    delete fCaliFile;
+    //delete fCaliFile;
 
     std::cout << "Thats all Folks!" << std::endl;
 }

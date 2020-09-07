@@ -143,6 +143,11 @@ Skimmer::Skimmer(const TString & indir, const TString & outdir, const TString & 
   fOutPcalogtidvtHist = new TH2F("pcalogtidvtHist","pcalogtidvtHist",5000,0,500000,5000,0,50);
   fOutPcalogtidvtHist->Sumw2();
 
+  std::string hnameEB( "AveXtaldpCaloTimeRecTimeEBMap");
+  std::string htitleEB( "AveXtal dpCalotime RecTimeEBMap EB ");
+  IcMapEB = new TH2F(hnameEB.c_str(),htitleEB.c_str(),171,-85.5,85.5,360,0.5,360.5);
+  IcMapEB->Sumw2();
+
 }
 
 Skimmer::~Skimmer()
@@ -168,6 +173,8 @@ Skimmer::~Skimmer()
   delete fOutPcaloGTIdHist;
   delete fOutPcalogtidvtHist;
 
+  delete IcMapEB;
+
   delete fOutTree;
   delete fOutFile;
 }
@@ -185,7 +192,7 @@ void Skimmer::EventLoop()
   float ele_dz = 0.005;  //  0.1 or 0.005
   bool useTOF = true;
   //bool useTOF = false;
-  //const auto nEntries = 100000;
+  //const auto nEntries = 500;
   for (Long64_t centry = 0; centry < nEntries; centry++)
   //for (auto entry = 0U; entry < 100; entry++)
   {
@@ -450,6 +457,12 @@ void Skimmer::EventLoop()
   } // end loop over events
   std::cout << "Finished proccessing events." << std::endl;
 
+  for( std::map<UInt_t,Float_t>::iterator it=sumXtalpCaloTimeMapEB.begin(); it!=sumXtalpCaloTimeMapEB.end(); ++it){
+		const auto & fill_idinfo = Common::DetIDMap[it->first];
+		const auto & map_time = ((sumXtalpCaloTimeMapEB[it->first])/(numXtalpCaloTimeMapEB[it->first]));
+		if( fill_idinfo.ecal == ECAL::EB ) IcMapEB->Fill( fill_idinfo.i2, fill_idinfo.i1, map_time );
+  }
+
   std::cout << "write hist output!"<< std::endl;
   fOutFile->cd();
   tofHist->Write();
@@ -468,6 +481,8 @@ void Skimmer::EventLoop()
   fOutPcaloevtHist->Write();
   fOutPcaloGTIdHist->Write();
   fOutPcalogtidvtHist->Write();
+
+  IcMapEB->Write();
 
   std::cout << "write tree output!"<< std::endl;
   //fOutConfigTree->Write();
@@ -573,7 +588,7 @@ void Skimmer::FillOutEvent(const UInt_t entry, const Float_t evtwgt)
 void Skimmer::FillOutPhos(const UInt_t entry)
 {  
   // get input photon branches
- //std::cout << "Starting get entry" << std::endl;
+  //std::cout << "Starting get entry" << std::endl;
   for (auto ipho : fPhoList)
   {
     auto & inpho = fInPhos[ipho];
@@ -633,6 +648,7 @@ void Skimmer::FillOutPhos(const UInt_t entry)
       // inpho.b_seedZ->GetEntry(entry);
       inpho.b_seedE->GetEntry(entry);
       inpho.b_seedtime->GetEntry(entry);
+      inpho.b_seedpCalotime->GetEntry(entry);
       inpho.b_seedtimeErr->GetEntry(entry);
       inpho.b_seedTOF->GetEntry(entry);
       inpho.b_seedpcTOF->GetEntry(entry);
@@ -648,7 +664,7 @@ void Skimmer::FillOutPhos(const UInt_t entry)
       inpho.b_seedpedrms1->GetEntry(entry);
     }
   }  
- //std::cout << "Finished Pho list" << std::endl;
+  //std::cout << "Finished Get entry Pho list" << std::endl;
   // get input recHits if needed
   //if (fInConfig.storeRecHits)
   if( true )
@@ -658,6 +674,7 @@ void Skimmer::FillOutPhos(const UInt_t entry)
     // fInRecHits.b_Z->GetEntry(entry);
     fInRecHits.b_E->GetEntry(entry);
     fInRecHits.b_time->GetEntry(entry);
+    fInRecHits.b_pCalotime->GetEntry(entry);
     fInRecHits.b_timeErr->GetEntry(entry);
     fInRecHits.b_TOF->GetEntry(entry);
     fInRecHits.b_pcTOF->GetEntry(entry);
@@ -760,7 +777,7 @@ void Skimmer::FillOutPhos(const UInt_t entry)
   //  out_kuNotStcrhtime = kuNotStcrhtime;
   //  out_kuWootStcrhtime = kuWootStcrhtime;
 
- //std::cout << "Finished get entry" << std::endl;
+  //std::cout << "Finished get entry" << std::endl;
   // set output photon branches
   for (auto ipho = 0; ipho < fNOutPhos; ipho++) 
   {
@@ -810,6 +827,7 @@ void Skimmer::FillOutPhos(const UInt_t entry)
     outpho.ootID = inpho.ootID;
 
     //if (fInConfig.storeRecHits)
+    //std::cout << "Starting store Rechits" << std::endl;
     if ( true )
     {
       // something unholy and utterly disgusting
@@ -825,13 +843,13 @@ void Skimmer::FillOutPhos(const UInt_t entry)
 	// outpho.seedY = (*fInRecHits.Y)[seed];
 	// outpho.seedZ = (*fInRecHits.Z)[seed];
 	outpho.seedE = (*fInRecHits.E)[seed];
-
 	outpho.seedtime    = (*fInRecHits.time)   [seed];
 	outpho.seedtimeErr = (*fInRecHits.timeErr)[seed];
+   outpho.seedpCalotime    = (*fInRecHits.pCalotime)   [seed];
 	outpho.seedTOF     = (*fInRecHits.TOF)    [seed];
    outpho.seedpcTOF     = (*fInRecHits.pcTOF)    [seed];
    tofHist->Fill(outpho.seedTOF);
-
+   //std::cout << "Set all seed E and time outpho" << std::endl;
    if( ipho < 3 ){
    	inpho.b_elMatched->GetEntry(entry);
    	noEleMatchHist->Fill(outpho.seedtime);
@@ -846,6 +864,9 @@ void Skimmer::FillOutPhos(const UInt_t entry)
    }
 
    //  pcalo time fill
+   if( (*fInRecHits.ID)[seed] > 840000000 ) {
+              outpho.seedpctime = -25.0;
+   } else {
    //std::cout << "hit flag for outpho fill pcalo" << std::endl;
    float pce = 0.0;
    float pct = 0.0;
@@ -894,8 +915,10 @@ void Skimmer::FillOutPhos(const UInt_t entry)
    	fOutPcaloSumEnergyHist->Fill(pce);
    	fOutPcaloEvWTHist->Fill(pce,wt);
       //std::cout << "pct : " << pct << " pce : " << pce << " pcwt(pct*pce) : " << pcwt << " wt(pcwt/pce) : " << wt << std::endl; 
-   } 	
-
+   } else if( pcwt == 0.0f ) { outpho.seedpctime = -5.0f; }
+   else if( pce == 0.0f ) { outpho.seedpctime = -50.0f; }
+   else { outpho.seedpctime = -100.0f; }
+   }
    //std::cout << "hit flag for outpho fill" << std::endl;
 	// get trigger tower
 	outpho.seedTT = Common::GetTriggerTower((*fInRecHits.ID)[seed]);
@@ -1146,6 +1169,7 @@ void Skimmer::FillOutPhos(const UInt_t entry)
 	outpho.seedE = -9999.f;
 
 	outpho.seedtime    = -9999.f;
+   outpho.seedpCalotime    = -9999.f;
    outpho.seedpctime    = -9999.f;
 	outpho.seedtimeErr = -9999.f;
 	outpho.seedTOF     = -9999.f;	
@@ -1227,6 +1251,7 @@ void Skimmer::FillOutPhos(const UInt_t entry)
       // outpho.seedZ = inpho.seedZ;
       outpho.seedE = inpho.seedE;
       outpho.seedtime = inpho.seedtime;
+      outpho.seedpCalotime = inpho.seedpCalotime;
       outpho.seedtimeErr = inpho.seedtimeErr;
       outpho.seedTOF = inpho.seedTOF;
       outpho.seedpcTOF = inpho.seedpcTOF;
@@ -1246,6 +1271,13 @@ void Skimmer::FillOutPhos(const UInt_t entry)
     }
     
   }
+
+  if( fOutPhos[0].seedEcal == ECAL::EB  and fOutPhos[1].seedEcal == ECAL::EB ){
+		sumXtalpCaloTimeMapEB[fOutPhos[0].seedID] += (fOutPhos[0].seedpCalotime - fOutPhos[1].seedpCalotime );
+      numXtalpCaloTimeMapEB[fOutPhos[0].seedID] += 1;
+      sumXtalpCaloTimeMapEB[fOutPhos[1].seedID] += (fOutPhos[0].seedpCalotime - fOutPhos[1].seedpCalotime );
+      numXtalpCaloTimeMapEB[fOutPhos[1].seedID] += 1;
+  } 
 }
 
 void Skimmer::InitInTree() 
@@ -1374,6 +1406,7 @@ void Skimmer::InitInBranchVecs()
     fInRecHits.E = 0;
     fInRecHits.time = 0;
     fInRecHits.timeErr = 0;
+    fInRecHits.pCalotime = 0;
     fInRecHits.TOF = 0;
     fInRecHits.pcTOF = 0;
     fInRecHits.ID = 0;
@@ -1538,6 +1571,7 @@ void Skimmer::InitInBranches()
     fInTree->SetBranchAddress(fInRecHits.s_E.c_str(), &fInRecHits.E, &fInRecHits.b_E);
     fInTree->SetBranchAddress(fInRecHits.s_time.c_str(), &fInRecHits.time, &fInRecHits.b_time);
     fInTree->SetBranchAddress(fInRecHits.s_timeErr.c_str(), &fInRecHits.timeErr, &fInRecHits.b_timeErr);
+    fInTree->SetBranchAddress(fInRecHits.s_pCalotime.c_str(), &fInRecHits.pCalotime, &fInRecHits.b_pCalotime);
     fInTree->SetBranchAddress(fInRecHits.s_TOF.c_str(), &fInRecHits.TOF, &fInRecHits.b_TOF);
     fInTree->SetBranchAddress(fInRecHits.s_pcTOF.c_str(), &fInRecHits.pcTOF, &fInRecHits.b_pcTOF);
     fInTree->SetBranchAddress(fInRecHits.s_ID.c_str(), &fInRecHits.ID, &fInRecHits.b_ID);
@@ -1604,6 +1638,7 @@ void Skimmer::InitInBranches()
       // fInTree->SetBranchAddress(Form("%s_%i",pho.s_seedZ.c_str(),ipho), &pho.seedZ, &pho.b_seedZ);
       fInTree->SetBranchAddress(Form("%s_%i",pho.s_seedE.c_str(),ipho), &pho.seedE, &pho.b_seedE);
       fInTree->SetBranchAddress(Form("%s_%i",pho.s_seedtime.c_str(),ipho), &pho.seedtime, &pho.b_seedtime);
+      fInTree->SetBranchAddress(Form("%s_%i",pho.s_seedpCalotime.c_str(),ipho), &pho.seedpCalotime, &pho.b_seedpCalotime);
       fInTree->SetBranchAddress(Form("%s_%i",pho.s_seedtimeErr.c_str(),ipho), &pho.seedtimeErr, &pho.b_seedtimeErr);
       fInTree->SetBranchAddress(Form("%s_%i",pho.s_seedTOF.c_str(),ipho), &pho.seedTOF, &pho.b_seedTOF);
       fInTree->SetBranchAddress(Form("%s_%i",pho.s_seedpcTOF.c_str(),ipho), &pho.seedpcTOF, &pho.b_seedpcTOF);
@@ -1769,6 +1804,7 @@ void Skimmer::InitOutBranches()
     // fOutTree->Branch(Form("%s_%i",pho.s_seedZ.c_str(),ipho), &pho.seedZ);
     fOutTree->Branch(Form("%s_%i",pho.s_seedE.c_str(),ipho), &pho.seedE);
     fOutTree->Branch(Form("%s_%i",pho.s_seedtime.c_str(),ipho), &pho.seedtime);
+    fOutTree->Branch(Form("%s_%i",pho.s_seedpCalotime.c_str(),ipho), &pho.seedpCalotime);
     fOutTree->Branch(Form("%s_%i",pho.s_seedpctime.c_str(),ipho), &pho.seedpctime);
     fOutTree->Branch(Form("%s_%i",pho.s_seedtimeErr.c_str(),ipho), &pho.seedtimeErr);
     fOutTree->Branch(Form("%s_%i",pho.s_seedTOF.c_str(),ipho), &pho.seedTOF);
@@ -1953,21 +1989,21 @@ void Skimmer::SetupSkimConfig()
       str = Common::RemoveDelim(str,"isLHCInfo=");
       if( str == "true" ) isLHCInfo = true;
       if( str == "false" ) isLHCInfo = false;
-      std::cout << " Config set isLHCInfo to " << isLHCInfo << std::endl;
+      //std::cout << " Config set isLHCInfo to " << isLHCInfo << std::endl;
     }
     else if (str.find("hasUrecDigi=") != std::string::npos)
     {
       str = Common::RemoveDelim(str,"hasUrecDigi=");
       if( str == "true" ) hasUrecDigi = true;
       if( str == "false" ) hasUrecDigi = false;
-      std::cout << " Config set hasUrecDigi to " << hasUrecDigi << std::endl;
+      //std::cout << " Config set hasUrecDigi to " << hasUrecDigi << std::endl;
     }
     else if (str.find("hasMultiKURecHit=") != std::string::npos)
     {
       str = Common::RemoveDelim(str,"hasMultiKURecHit=");
       if( str == "true" ) hasMultiKURecHit = true;
       if( str == "false" ) hasMultiKURecHit = false;
-      std::cout << " Config set hasMultiKURecHit to " << hasMultiKURecHit << std::endl;
+      //std::cout << " Config set hasMultiKURecHit to " << hasMultiKURecHit << std::endl;
     }
     else
     {

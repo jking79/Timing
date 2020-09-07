@@ -78,6 +78,7 @@ def subcrab( runs, events, reqmem ):
         #config.General.requestName = None
 
         config.JobType.pluginName  = 'Analysis'
+        #config.JobType.pluginName  = 'PrivateMC'
         #config.JobType.psetName    = 'jwk_raw_dispho.py'
         #config.JobType.psetName    = 'dispho_rawlist_twotier.py'
         #config.JobType.psetName    = 'dispho_raw_twotier.py'
@@ -97,7 +98,8 @@ def subcrab( runs, events, reqmem ):
         config.Data.splitting    = 'EventAwareLumiBased'
         #config.Data.splitting    = 'Automatic'
         #config.Data.runRange  = runs #'321122-321128'
-        config.Data.unitsPerJob  =  5000    
+        config.Data.unitsPerJob  =  10000    
+        config.Data.totalUnits   =  10000
 	     # unitsPerJob = 1000 for 321122-321128 and maxMemoryMB = 4000  on EventAwareLumiBased
 
         #config.Data.outputDatasetTag = 'reducedRAW_EGamma_ntuple'
@@ -133,7 +135,8 @@ def subcrab( runs, events, reqmem ):
             #trial          = "tt_kurhs_pc_mc_v28"  # as v27 plus depth, bx, event from pcalo, Wt is wt method not dummy
             #trial          = "tt_kurhs_pc_mc_v29"  # as v28 added pCalotime to match kuootstc collection.
             #trial          = "tt_kurhs_pc_mc_v30"  # as v29 with pcalo double checked and expanded.
-            trial          = "tt_kurhs_pc_mc_v31"  # as v30 with p_dv  pulled.
+            #trial          = "tt_kurhs_pc_mc_v31"  # as v30 with p_dv  pulled.
+            trial          = "tt_kurhs_pc_mc_v32_10k"  # as v31 with pcalo time produced in ana by rechit.
 
             rname = trial+'_'+primaryDataset+'_'+dataset+'_request_dispho'
             config.General.requestName = trial+'_'+primaryDataset+'_'+dataset+'_request_dispho'

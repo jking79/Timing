@@ -436,6 +436,7 @@ struct RecHits
   std::vector<Float_t> * timeErr;
   std::vector<Float_t> * TOF;
   std::vector<Float_t> * pcTOF;
+  std::vector<double> * pCalotime;
   std::vector<UInt_t>  * ID;
   std::vector<Int_t>   * isOOT;
   std::vector<Int_t>   * isGS6;
@@ -453,6 +454,7 @@ struct RecHits
   std::string s_Z = "rhZ";
   std::string s_E = "rhE";
   std::string s_time = "rhtime";
+  std::string s_pCalotime = "pCalotime";
   std::string s_timeErr = "rhtimeErr";
   std::string s_TOF = "rhTOF";
   std::string s_pcTOF = "rhpcTOF";
@@ -473,6 +475,7 @@ struct RecHits
   TBranch * b_Z;
   TBranch * b_E;
   TBranch * b_time;
+  TBranch * b_pCalotime;
   TBranch * b_timeErr;
   TBranch * b_TOF;
   TBranch * b_pcTOF;
@@ -540,6 +543,7 @@ struct Pho
   Float_t seedZ;
   Float_t seedE;
   Float_t seedtime;
+  Float_t seedpCalotime;
   Float_t seedpctime;
   Float_t seedtimeCali;
   Float_t seedtimeErr;
@@ -761,6 +765,7 @@ struct Pho
   std::string s_seedZ = "phoseedZ";
   std::string s_seedE = "phoseedE";
   std::string s_seedtime = "phoseedtime";
+  std::string s_seedpCalotime = "phoseedPcalotime";
   std::string s_seedpctime = "phoseedpctime";
   std::string s_seedtimeCali = "phoseedtimeCali";
   std::string s_seedtimeErr = "phoseedtimeErr";
@@ -977,6 +982,7 @@ struct Pho
   TBranch * b_seedZ;
   TBranch * b_seedE;
   TBranch * b_seedtime;
+  TBranch * b_seedpCalotime;
   TBranch * b_seedpctime;
   TBranch * b_seedpcTOF;
   TBranch * b_seedtimeCali;
