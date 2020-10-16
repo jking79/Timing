@@ -31,8 +31,8 @@ void makeplots( const string califilename, const string infilename, const string
     fInFile->cd();
     auto fInTree = (TTree*)fInFile->Get(disphotreename.c_str());
 
-    string calimapname("E5");
-    //string calimapname("none");
+    //string calimapname("E5");
+    string calimapname("none");
     auto fCaliFile = TFile::Open(califilename.c_str(), "update");
     std::cout << "fInFile : " << fInFile  << " fInTree : " << fInTree << " fCaliFile : " << fCaliFile << std::endl;
 
@@ -52,6 +52,8 @@ void makeplots( const string califilename, const string infilename, const string
 //	 tvarname_kuMfootCCStc='phoseedkuMfootCCStctime'
     std::cout << "set branches to get from fInFile : fInTree" << std::endl;
 
+    double icPC_0(0.0);
+    double icPC_1(0.0);
     double ic0_0(0.0);
     double ic0_1(0.0);
     double ic1_0(0.0);
@@ -166,7 +168,8 @@ void makeplots( const string califilename, const string infilename, const string
     fInTree->SetBranchAddress("phoseedpcTOF_0", &phoseedpcTOF_0, &b_phoseedpcTOF_0);
     fInTree->SetBranchAddress("phoseedtime_0", &phoseedtime_0, &b_phoseedtime_0);
     //fInTree->SetBranchAddress("phoseedpctime_0", &phoseedpctime_0, &b_phoseedpctime_0);
-    fInTree->SetBranchAddress("phoseedPcalotime_0", &phoseedpctime_0, &b_phoseedpctime_0);
+    fInTree->SetBranchAddress("phoseedpcltime_0", &phoseedpctime_0, &b_phoseedpctime_0);
+    //fInTree->SetBranchAddress("phoseedPcalotime_0", &phoseedpctime_0, &b_phoseedpctime_0);
     fInTree->SetBranchAddress("phoseedkuNotStctime_0", &phoseedkuNotStctime_0, &b_phoseedkuNotStctime_0);
     fInTree->SetBranchAddress("phoseedkuWtStctime_0", &phoseedkuWtStctime_0, &b_phoseedkuWtStctime_0);
     fInTree->SetBranchAddress("phoseedkuWootStctime_0", &phoseedkuWootStctime_0, &b_phoseedkuWootStctime_0);
@@ -189,7 +192,8 @@ void makeplots( const string califilename, const string infilename, const string
     fInTree->SetBranchAddress("phoseedkuNotStctime_1", &phoseedkuNotStctime_1, &b_phoseedkuNotStctime_1);
     fInTree->SetBranchAddress("phoseedtime_1", &phoseedtime_1, &b_phoseedtime_1);
     //fInTree->SetBranchAddress("phoseedpctime_1", &phoseedpctime_1, &b_phoseedpctime_1);
-    fInTree->SetBranchAddress("phoseedPcalotime_1", &phoseedpctime_1, &b_phoseedpctime_1);
+    fInTree->SetBranchAddress("phoseedpcltime_1", &phoseedpctime_1, &b_phoseedpctime_1);
+    //fInTree->SetBranchAddress("phoseedPcalotime_1", &phoseedpctime_1, &b_phoseedpctime_1);
     fInTree->SetBranchAddress("phoseedkuWtStctime_1", &phoseedkuWtStctime_1, &b_phoseedkuWtStctime_1);
     fInTree->SetBranchAddress("phoseedkuWootStctime_1", &phoseedkuWootStctime_1, &b_phoseedkuWootStctime_1);
     fInTree->SetBranchAddress("phoseedkuMfootStctime_1", &phoseedkuMfootStctime_1, &b_phoseedkuMfootStctime_1);
@@ -317,6 +321,10 @@ void makeplots( const string califilename, const string infilename, const string
     float tstart = -10;
     float tend = 10;
 
+    float tpdiv = 512;
+    float tpstart = 0;
+    float tpend = 40;
+
     float stddiv = 256;
     //  +/- 2 sd
     float pcalotdiv = stddiv;
@@ -388,10 +396,10 @@ void makeplots( const string califilename, const string infilename, const string
     hist_ratio->Sumw2();
     auto hist_pcalo = new TH1F(histname_pcalo.c_str(),histtitletmp.c_str(),tdiv,tstart,tend);
     hist_pcalo->Sumw2();
-    //auto hist_pcTOF = new TH1F(histname_pcTOF.c_str(),histtitletmp.c_str(),tdiv,tstart,tend);
-    //hist_pcTOF->Sumw2();
-    //auto hist_rawpcalo = new TH1F(histname_rawpcalo.c_str(),histtitletmp.c_str(),tdiv,tstart,tend);
-    //hist_rawpcalo->Sumw2();
+    auto hist_pcTOF = new TH1F(histname_pcTOF.c_str(),histtitletmp.c_str(),tpdiv,tpstart,tpend);
+    hist_pcTOF->Sumw2();
+    auto hist_rawpcalo = new TH1F(histname_rawpcalo.c_str(),histtitletmp.c_str(),tpdiv,tpstart,tpend);
+    hist_rawpcalo->Sumw2();
     auto hist_wt = new TH1F(histname_wt.c_str(),histtitletmp.c_str(),tdiv,tstart,tend);
     hist_wt->Sumw2();
     auto hist_kutmf = new TH1F(histname_kutmf.c_str(),histtitletmp.c_str(),tdiv,tstart,tend);
@@ -461,6 +469,7 @@ void makeplots( const string califilename, const string infilename, const string
     //string cmbs(calimapname);
     //string itcnt("_i95");
     string itcnt("");
+    string ebmapstringPC("AveXtaldpCaloTimeRecTimeEBMap");
     string ebmapstring0(cmbs0+"EBMap"+itcnt);
     string ebmapstring1(cmbs1+"EBMap"+itcnt);
     string ebmapstring2(cmbs2+"EBMap"+itcnt);
@@ -481,6 +490,8 @@ void makeplots( const string califilename, const string infilename, const string
     string emmapstring2b(cmbs2b+"EMMap"+itcnt);
     string emmapstring3(cmbs3+"EMMap"+itcnt);
     string emmapstring4(cmbs4+"EMMap"+itcnt);
+
+    auto ebmapicPC = (TH2F*)fInFile->Get(ebmapstringPC.c_str());
 
     auto ebmapic0 = (TH2F*)fCaliFile->Get(ebmapstring0.c_str());
     auto ebmapic1 = (TH2F*)fCaliFile->Get(ebmapstring1.c_str());
@@ -511,11 +522,13 @@ void makeplots( const string califilename, const string infilename, const string
 
     fInFile->cd();
     const auto nEntries = fInTree->GetEntries();
+    auto counter = 0;
     for (auto entry = 0U; entry < nEntries; entry++){
         // if( entry%int(nEntries*0.1) == 0 ) std::cout << "Proccessed " << entry/nEntries << "\% of " << nEntries << " entries." << std::endl;
 	     if( entry%100000 == 0 ) std::cout << "Proccessed " << entry << " of " << nEntries << " entries." << std::endl;        
         //std::cout << "Getting Entries Pho 0" << std::endl;
-
+        //if( counter > 25082 ) continue;
+        if( counter > 3865 ) continue;
 	     fInFile->cd();
 
         //b_gZmass->GetEntry(entry);
@@ -572,10 +585,15 @@ void makeplots( const string califilename, const string infilename, const string
         auto effA = (amp_0*amp_1)/sqrt((amp_0*amp_0)+(amp_1*amp_1));
 
         //if( (amp_0 < 10.f) or (amp_1 < 10.f) ) continue;
-        if( effA < 20.f ) continue;
+        //if( effA < 20.f ) continue;
         //if( (phoseedEcal_0 == ECAL::EB) || (phoseedEcal_1 == ECAL::EB) ) continue;
         if( (phoseedEcal_0 == ECAL::EP) || (phoseedEcal_1 == ECAL::EP) ) continue;
         if( (phoseedEcal_0 == ECAL::EM) || (phoseedEcal_1 == ECAL::EM) ) continue;
+        //if( not( phoseedI2_0 == phoseedI2_1 ) ) continue; // ieta
+        //if( not( phoseedI1_0 == phoseedI1_1 ) ) continue; // iphi
+        //std::cout << " ------------------- " << std::endl;
+        //std::cout << " ieta : " << phoseedI2_0 << " - " << phoseedI2_1 << std::endl;
+        //std::cout << " iphi : " << phoseedI1_0 << " - " << phoseedI1_1 << std::endl;
         //if( phoseedrhID > 840000000 ){ continue; }
         //if( phoseedpctime_0 < 0.0 ){ continue; }
 
@@ -583,6 +601,7 @@ void makeplots( const string califilename, const string infilename, const string
 
         if( calimapname != "none" ){
                if ( phoseedEcal_0 == ECAL::EB ){
+                        icPC_0 = ebmapicPC->GetBinContent( phoseedI2_0 + bin_offset, phoseedI1_0 );
                         ic0_0 = ebmapic0->GetBinContent( phoseedI2_0 + bin_offset, phoseedI1_0 );
                         ic1_0 = ebmapic1->GetBinContent( phoseedI2_0 + bin_offset, phoseedI1_0 );
                         ic2_0 = ebmapic2->GetBinContent( phoseedI2_0 + bin_offset, phoseedI1_0 );
@@ -602,6 +621,7 @@ void makeplots( const string califilename, const string infilename, const string
                }
 
                if ( phoseedEcal_1 == ECAL::EB ){
+                        icPC_1 = ebmapicPC->GetBinContent( phoseedI2_1 + bin_offset, phoseedI1_1 );
                         ic0_1 = ebmapic0->GetBinContent( phoseedI2_1 + bin_offset, phoseedI1_1 );
                         ic1_1 = ebmapic1->GetBinContent( phoseedI2_1 + bin_offset, phoseedI1_1 );
                         ic2_1 = ebmapic2->GetBinContent( phoseedI2_1 + bin_offset, phoseedI1_1 );
@@ -649,7 +669,13 @@ void makeplots( const string califilename, const string infilename, const string
 
         if( (phoseedpctime_0 < 0.0 ) || (phoseedpctime_1 < 0.0 ) )  continue;
         auto pctime_0 = phoseedpctime_0 - phoseedpcTOF_0;
+        //auto pctime_0 = phoseedpctime_0;
+        //auto pctime_0c = phoseedpctime_0; // - icPC_0;
+        //auto pctime_0c = phoseedpctime_0 - icPC_0;
         auto pctime_1 = phoseedpctime_1 - phoseedpcTOF_1;
+        //auto pctime_1 = phoseedpctime_1;
+        //auto pctime_1c = phoseedpctime_1;  // - icPC_1;
+        //auto pctime_1c = phoseedpctime_1 - icPC_1;
 
         auto yfillrt0 = pctime_0 - time_0;
         auto yfillrt1 = pctime_1 - time_1;
@@ -664,6 +690,7 @@ void makeplots( const string califilename, const string infilename, const string
         auto yfillcc0 = pctime_0 - kuMfootCCStctime_0;
         auto yfillcc1 = pctime_1 - kuMfootCCStctime_1;
         auto yfill = pctime_0 - pctime_1;
+        auto yfillc = (pctime_0 - pctime_1) - icPC_0;
 
         auto effa0 = ((phoseedE_0/phoseedadcToGeV_0)/phoseedpedrms12_0)/sqrt(2);
         auto effa1 = ((phoseedE_1/phoseedadcToGeV_1)/phoseedpedrms12_1)/sqrt(2);
@@ -677,8 +704,9 @@ void makeplots( const string califilename, const string infilename, const string
         auto event_good = e_cut && eta_cut && isd_cut;
 
         if( event_good ){ 
-            theHist->Fill(xfill,yfill);
-            hist_data_profile->Fill(yfill);
+            counter++;
+            theHist->Fill(xfill,yfillc);
+            hist_data_profile->Fill(yfillc);
         //}
 
             theHist_rt->Fill(effa0,yfillrt0);
@@ -709,8 +737,8 @@ void makeplots( const string califilename, const string infilename, const string
 
 		  hist_ratio->Fill(time_0);
         hist_pcalo->Fill(pctime_0);
-        //hist_rawpcalo->Fill(phoseedpctime_0);
-        //hist_pcTOF->Fill(phoseedpcTOF_0);
+        hist_rawpcalo->Fill(phoseedpctime_0);
+        hist_pcTOF->Fill(phoseedpcTOF_0);
         hist_wt->Fill(kuWtStctime_0);
         hist_kutmf->Fill(kuMfootStctime_0);
         hist_kucc->Fill(kuMfootCCStctime_0);
@@ -725,8 +753,8 @@ void makeplots( const string califilename, const string infilename, const string
 
         hist_ratio->Fill(time_1);
         hist_pcalo->Fill(pctime_1);
-        //hist_rawpcalo->Fill(phoseedpctime_1);
-        //hist_pcTOF->Fill(phoseedpcTOF_1);
+        hist_rawpcalo->Fill(phoseedpctime_1);
+        hist_pcTOF->Fill(phoseedpcTOF_1);
         hist_wt->Fill(kuWtStctime_1);
         hist_kutmf->Fill(kuMfootStctime_1);
         hist_kucc->Fill(kuMfootCCStctime_1);
@@ -790,8 +818,8 @@ void makeplots( const string califilename, const string infilename, const string
 
     hist_ratio->Write();
     hist_pcalo->Write();
-    //hist_rawpcalo->Write();
-    //hist_pcTOF->Write();
+    hist_rawpcalo->Write();
+    hist_pcTOF->Write();
     hist_wt->Write();
     hist_kutmf->Write();
     hist_kucc->Write();
@@ -858,8 +886,8 @@ void makeplots( const string califilename, const string infilename, const string
 
     delete hist_ratio;
     delete hist_pcalo;
-    //delete hist_rawpcalo;
-    //delete hist_pcTOF;
+    delete hist_rawpcalo;
+    delete hist_pcTOF;
     delete hist_wt;
     delete hist_kutmf;
     delete hist_kucc;

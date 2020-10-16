@@ -27,6 +27,8 @@ p19=wc_ku_plot2dRes_ctu_mini
 p20=wc_ku_plot2dResolution_mf_glo_eta
 p21=wc_ku_InterCali_aveRecHit_mini_mf
 p22=wc_ku_ana_plot_kurh_vs_mc
+p23=wc_ku_InterCali_aveRecHit_isoot_kurhs_mc
+p24=wc_ku_plot2dRes_ctu_mc
 
 all: $(p1) $(p2) $(p3) $(6) $(22)
 # $(p4) $(p5) $(p7)
@@ -96,5 +98,11 @@ $(p21): $(p21).cpp
 
 $(p22): $(p22).cpp
 	$(CC) -o $(p22).obj $(p22).cpp $(CFLAGS) $(INCLUDES) $(LFLAGS) $(LIBS)
+
+$(p23): $(p23).cpp
+	$(CC) -o $(p23).obj $(p23).cpp $(CFLAGS) $(INCLUDES) $(LFLAGS) $(LIBS)
+
+$(p24): $(p24).cpp
+	$(CC) -o $(p24).obj $(p24).cpp $(CFLAGS) $(INCLUDES) $(LFLAGS) $(LIBS)
 
 

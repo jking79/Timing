@@ -170,13 +170,13 @@ calioutfile='caliplots_tt_Run2018pABCDmf_global_v2a_v2b_i50_e5e3.root'
 eta='EBEB'
 #eta='EPEM'
 era='Full'
-res='Local'
+#res='Local'
 #isd_list=['Inclusive','Same','Different']
 #isd_list=['Same','Different']
-isd_list=['Same']
+#isd_list=['Same']
 #isd_list=['Different']
-#res='Global'
-#isd_list=['Inclusive']
+res='Global'
+isd_list=['Inclusive']
 
 # Final output file
 outfile=res+'_'+eta+'_'+era
@@ -218,6 +218,7 @@ kuMfootStc_e5_outfile='kuMfootStc_e5_'+outfile
 kuMfootStc_outfile='kuMfootStc_'+outfile
 kuMfootCCStc_e5_outfile='kuMfootCCStc_e5_'+outfile
 kuMfootCCStc_outfile='kuMfootCCStc_'+outfile
+pcalo_outfile='pCalo_'+outfile
 
 # 2D plotter output file
 outfile_2D='deltaT_vs_'+outfile
@@ -259,6 +260,8 @@ outfile_kuMfootStc_e5_2D='kuMfootStc_e5_deltaT_vs_'+kuoutfile
 outfile_kuMfootStc_2D='kuMfootStc_deltaT_vs_'+kuoutfile
 outfile_kuMfootCCStc_e5_2D='kuMfootCCStc_e5_deltaT_vs_'+kuoutfile
 outfile_kuMfootCCStc_2D='kuMfootCCStc_deltaT_vs_'+kuoutfile
+
+outfile_pcalo='pcalo_deltaT_vs_'+kuoutfile
 
 timefile='_timefit'
 timefilec='_core_timefit'
@@ -304,6 +307,7 @@ plot_kuWtStc_e5_2D='ku_config/tmp_kuWtStc_cali_e5_deltaT_vs_A_eff_EBEB.txt'
 plot_kuWootStc_e5_2D='ku_config/tmp_kuWootStc_cali_e5_deltaT_vs_A_eff_EBEB.txt'
 plot_kuMfootStc_e5_2D='ku_config/tmp_kuMfootStc_cali_e5_deltaT_vs_A_eff_EBEB.txt'
 plot_kuMfootCCStc_e5_2D='ku_config/tmp_kuMfootCCStc_cali_e5_deltaT_vs_A_eff_EBEB.txt'
+plot_pcalo_e5_2D='ku_config/tmp_pcalo_cali_e5_deltaT_vs_A_eff_EBEB.txt'
 
 tvarname_mini='phoseedtime'
 tvarname_ku='phoseedkutime'
@@ -313,6 +317,7 @@ tvarname_kuWtStc='phoseedkuWtStctime'
 tvarname_kuWootStc='phoseedkuWootStctime'
 tvarname_kuMfootStc='phoseedkuMfootStctime'
 tvarname_kuMfootCCStc='phoseedkuMfootCCStctime'
+tvarname_pcalo='phoseedPcalotime'
 
 calimapname_none='none'
 #calimapname_AveRtStcE5='AveXtalRtStcRecTimeE5'
@@ -326,6 +331,7 @@ calimapname_AveMiniE5='AveXtalMiniRecTime'
 calimapname_AveWtStcE5='AveXtalWtStcRecTime'
 calimapname_AveMfootStcE5='AveXtalMfootStcRecTime'
 calimapname_AveMfootCCStcE5='AveXtalMfootCCStcRecTime'
+calimapname_pcalo='AveXtalpCaloRecTime'
 
 base = [ plot_2D, outfile_2D, outfile, tvarname_mini, calimapname_none ]
 base_v2 = [ plot_2D_v2, outfile_2D, outfile, tvarname_mini, calimapname_none ]
@@ -365,6 +371,7 @@ kuMfootStcE5 = [ plot_kuMfootStc_e5_2D, outfile_kuMfootStc_e5_2D, kuMfootStc_e5_
 kuMfootStc = [ plot_kuMfootStc_e5_2D, outfile_kuMfootStc_2D, kuMfootStc_outfile, tvarname_kuMfootStc, calimapname_none ]
 kuMfootCCStcE5 = [ plot_kuMfootCCStc_e5_2D, outfile_kuMfootCCStc_e5_2D, kuMfootCCStc_e5_outfile, tvarname_kuMfootCCStc, calimapname_AveMfootCCStcE5 ]
 kuMfootCCStc = [ plot_kuMfootCCStc_e5_2D, outfile_kuMfootCCStc_2D, kuMfootCCStc_outfile, tvarname_kuMfootCCStc, calimapname_none ]
+pCaloE5 = [plot_pcalo_e5_2D, outfile_pcalo, pcalo_outfile, tvarname_pcalo, calimapname_pcalo]
 
 # set plot list for plots    <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 #plot_list = [ base, ku, kuStc, kuNot, kuNotStc ]
@@ -380,9 +387,10 @@ kuMfootCCStc = [ plot_kuMfootCCStc_e5_2D, outfile_kuMfootCCStc_2D, kuMfootCCStc_
 #plot_list = [ kuNotStcIc ]
 #plot_list = [ kuNotStcE5, kuNotStc, kuStcE5, kuStc, ku, base ]
 #plot_list = [ kuNotStc, kuStc, ku, base ]
-plot_list = [ base ]
+#plot_list = [ base ]
 #plot_list = [ base_v2 ]  #  Effective ENERGY based, change 2d plot to E based version
 #plot_list = [ baseE5 ]
+plot_list = [ pCaloE5 ]
 #plot_list = [ base, baseE5 ]
 #plot_list = [ base, kuStcE5, kuNotStcE5 ]
 #plot_list = [ base, kuStcE5, kuNotStcE5, kuWtStcE5, kuWootStcE5, kuMfootStcE5, kuMfootCCStcE5 ]
@@ -462,7 +470,10 @@ plot_list = [ base ]
 #skiminlist='dispho_mc_v29p2_DYJetsToLL.txt'
 #skiminlist='dispho_mc_v30_DYJetsToLL.txt'
 #skiminlist='dispho_mc_v31_DYJetsToLL.txt'
-skiminlist='dispho_mc_v32_DYJetsToLL.txt'
+#skiminlist='dispho_mc_v32_DYJetsToLL.txt'
+#skiminlist='dispho_mc_v32_Zee_woutztrk_DYJetsToLL.txt'
+#skiminlist='dispho_mc_v32_Zee_invtztrk_DYJetsToLL.txt'
+skiminlist='dispho_mc_v32a_DYJetsToLL.txt'
 
 #skiminlist='dispho_ot_mini_Run2018C_319337_319579_ele.txt'
 #skiminlist='dispho_ot_mini_Run2018A_ele.txt'
@@ -583,7 +594,14 @@ skimoutfile_mc_dytoll_v29='dispho_mc_v29_DYJetsToLL_pce0p0.root'
 skimoutfile_mc_dytoll_v29v2='dispho_mc_v29p2_DYJetsToLL.root'
 skimoutfile_mc_dytoll_v30='dispho_mc_v30_DYJetsToLL.root'
 skimoutfile_mc_dytoll_v31='dispho_mc_v31_DYJetsToLL.root'
+skimoutfile_mc_dytoll_v32_old='dispho_mc_v32_DYJetsToLL_old.root'
+skimoutfile_mc_dytoll_v32_v2='dispho_mc_v32_DYJetsToLL_v2.root'
+skimoutfile_mc_dytoll_v32_ecp099='dispho_mc_v32_DYJetsToLL_ecp099_v2.root'
 skimoutfile_mc_dytoll_v32='dispho_mc_v32_DYJetsToLL.root'
+
+skimoutfile_mc_dytoll_v32_invtz='dispho_mc_v32_Zee_invtztrk_DYJetsToLL.root'
+skimoutfile_mc_dytoll_v32_withz='dispho_mc_v32_Zee_withztrk_DYJetsToLL.root'
+skimoutfile_mc_dytoll_v32_woutz='dispho_mc_v32_Zee_woutztrk_DYJetsToLL.root'
 
 skimoutfile501='dispho_tt_kurh_Run2017D.root'
 skimoutfile502a='dispho_ot_mini_Run2018C_319337_319579_noele.root'
@@ -695,6 +713,7 @@ caliinfile_ul16='dispho_ot_mini_ul_deg_Run2016_ave_e5_cali.root'
 
 caliinfile_mc_dytoll='dispho_mc_kurhs_DYJetsToLL_ave_e5_cali.root'
 caliinfile_mcv31_dytoll='dispho_mc_v31_DYJetsToLL_ave_e5_cali.root'
+caliinfile_mcv32_dytoll='dispho_mc_v32_DYJetsToLL_ave_e5_cali.root'
 
 # set cali and infile here <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 #caliinfile=caliinfile8c_kurhoot
@@ -727,7 +746,9 @@ caliinfile=caliinfile_mcv31_dytoll
 #infile=skimoutfile0146# run2017F V16
 #infile=skimoutfile01320# run2018D V20
 #infile=skimoutfile01321# run2018D V21
-infile=skimoutfile_mc_dytoll_v32
+#infile=skimoutfile_mc_dytoll_v32
+#infile=skimoutfile_mc_dytoll_v32_ecp099
+infile=skimoutfile_mc_dytoll_v32_woutz
 #infile=skimoutfile2016ul
 #infile=skimoutfile2017ul
 #infile=skimoutfile2018ul
@@ -773,6 +794,8 @@ skimoutdirglo="/home/t3-ku/jaking/ecaltiming/skimmed_trees/global_chain/"
 skimoutdir="./"
 if 'Local' in res : pskimindir=skimoutdirloc
 else : pskimindir=skimoutdirglo
+#mcskimoutdirloc=skimoutdirloc
+mcskimoutdir=skimoutdir
 
 #in_skim_list='dispho_ot_mini_Run2018.txt'
 #in_skim_list='dispho_ot_mini_Run2018_ele_dZ1p0.txt'
@@ -780,7 +803,7 @@ else : pskimindir=skimoutdirglo
 #in_skim_list='dispho_ot_mini_ul_Run2017.txt'
 #in_skim_list='dispho_ot_mini_Run2016.txt'
 #in_skim_list='dispho_ot_mini_Run2.txt'
-#in_skim_list='dispho_ot_mini_ul_Run2.txt'
+in_skim_list='dispho_ot_mini_ul_Run2.txt'
 #in_skim_list='dispho_ot_mini_Eeff_Run2018.txt'
 #in_skim_list='dispho_ot_mini_Eeff_Run2017.txt'
 #in_skim_list='dispho_ot_mini_Eeff_Run2016.txt'
@@ -790,7 +813,7 @@ else : pskimindir=skimoutdirglo
 #in_skim_list='dispho_ot_mini_ele_pl_Run2018C.txt'
 #in_skim_list='dispho_ot_mini_ele_pl_Run2018D.txt'
 #in_skim_list='dispho_mc_v31_DYJetsToLL_Eta.txt'
-in_skim_list='dispho_tt_kurhs_v21_Run2018D_320807_320824_Eta.txt'
+#in_skim_list='dispho_tt_kurhs_v21_Run2018D_320807_320824_Eta.txt'
 #in_skim_list='none'
 
 #caliindir="/home/t3-ku/jaking/ecaltiming/skimmed_trees/global_ta/"
@@ -833,6 +856,7 @@ dotimeres2d_mf_abseta='./wc_ku_plot2dResolution_mf_abseta.obj '
 dotimeres2d_mf_gloeta='./wc_ku_plot2dResolution_mf_glo_eta.obj '
 dotimeres2d_mfe='./wc_ku_plot2dResolution_energy_mf.obj '
 dotimeres2d_ctu='./wc_ku_plot2dRes_ctu.obj '
+dotimeres2d_ctu_mc='./wc_ku_plot2dRes_ctu_mc.obj '
 dotimeres2d_ctu_mini='./wc_ku_plot2dRes_ctu_mini.obj '
 #dotimeres2d_ctu='./wc_ku_plot2dRes_ctu_notof.obj '
 dotimeres2dE_ctu='./wc_ku_plot2dResE_ctu.obj '
@@ -860,6 +884,7 @@ doocccalimini='./wc_ku_InterCali_occ_mini.obj '
 doavecaliminipho='./wc_ku_InterCali_aveRecHit_mini_pho_mf.obj '
 doocccalikurh='./wc_ku_InterCali_aveRecHit_kurhs.obj '
 doocccalikurhoot='./wc_ku_InterCali_aveRecHit_isoot_kurhs.obj '
+doocccalikurhootmc='./wc_ku_InterCali_aveRecHit_isoot_kurhs_mc.obj '
 #doocccalikurhootf='./wc_ku_InterCali_aveRecHit_isoot_kurhs_fliter.obj '
 doocccalikurhootf='./wc_ku_InterCali_aveRecHit_isoot_kurhs_fliter_red.obj '
 #doocccalikurhootf='./wc_ku_InterCali_aveRecHit_isoot_kurhs_fliter_e0p5.obj '
@@ -951,8 +976,9 @@ def do_plots( plot_list ):
         write_file_3d=entry[1]+'_'+isd_type+'_AvsA'
         plot_file=entry[2]+'_'+isd_type
         ##cmd2d=dotimeres2d+caliindir+caliinfile+sp+pskimindir+infile+sp+'./'+entry[1]+sp+entry[3]+sp+entry[4]+sp+isd_type
-        cmd2d=dotimeres2d_ctu+caliindir+caliinfile+sp+pskimindir+infile+sp+'./'+write_file+sp+entry[3]+sp+entry[4]+sp+isd_type
-        #cmd2d=domcplot+caliindir+caliinfile+sp+pskimindir+infile+sp+'./'+write_file #+sp+entry[3]+sp+entry[4]+sp+isd_type
+        #cmd2d=dotimeres2d_ctu+caliindir+caliinfile+sp+pskimindir+infile+sp+'./'+write_file+sp+entry[3]+sp+entry[4]+sp+isd_type
+        #cmd2d=dotimeres2d_ctu_mc+caliindir+caliinfile+sp+pskimindir+infile+sp+'./'+write_file+sp+entry[3]+sp+entry[4]+sp+isd_type
+        cmd2d=domcplot+caliindir+caliinfile+sp+pskimindir+infile+sp+'./'+write_file #+sp+entry[3]+sp+entry[4]+sp+isd_type
         #cmd2d=dotimeres2d_ctu_mini+caliindir+caliinfile+sp+pskimindir+infile+sp+'./'+write_file+sp+entry[3]+sp+entry[4]+sp+isd_type
         #cmd2d=dotimeres2dE_ctu+caliindir+caliinfile+sp+pskimindir+infile+sp+'./'+write_file+sp+entry[3]+sp+entry[4]+sp+isd_type
         #cmd3d=dotimeres3d+caliindir+caliinfile+sp+pskimindir+infile+sp+'./'+write_file_3d+sp+entry[3]+sp+entry[4]+sp+isd_type
@@ -1126,7 +1152,8 @@ def do_skimmer():
 #        cmdskim=skim2b+indir+qc+skimoutdir+qc+skiminfile+qc+skim_cf+end_skim
 #        cmdskim=skim2+indir+qc+skimoutdir+qc+skiminfile+qc+skim_cf+end_skim
          print(cmdskim)
-         os.system(cmdskim)
+         keyval = raw_input("Press y to continue: ")
+         if 'y' == keyval : os.system(cmdskim)
 
 def do_skimmer_list(infilelist):
  
@@ -1136,69 +1163,80 @@ def do_skimmer_list(infilelist):
         	    cmdskim=skim2b+indir+qc+skimoutdir+qc+skimfile+qc+skim_cf+end_skim
              #cmdskim=skim2wt+indir+qc+skimoutdir+qc+skimfile+qc+skim_cf+end_skim
              #print(cmdskim)
+             #keyval = raw_input("Press y to continue: ")
+             #if 'y' == keyval : os.system(cmdskim)
              #os.system(cmdskim)
 
 def do_skimmer_chain():
         cmdskim=skim_chain_kurh_2a+indir+sp+skimoutdir+sp++sldir+skiminlist+sp+skim_loc_cf
         #cmdskim=skim_chain_kurh_2a+indir+sp+skimoutdir+sp+sldir+skiminlist+sp+skim_loc_cf
         print(cmdskim)
-        os.system(cmdskim)
+        keyval = raw_input("Press y to continue: ")
+        if 'y' == keyval : os.system(cmdskim)
 
 def do_skimmer_glo_chain():
 
         #cmdskim=skim_chain_2a+indir+sp+skimoutdirglo+sp+sldir+skiminlist+sp+skim_glo_cf
         cmdskim=skim_chain_kurh_2a+indir+sp+skimoutdirglo+sp+sldir+skiminlist+sp+skim_glo_cf
         print(cmdskim)
-        os.system(cmdskim)
+        keyval = raw_input("Press y to continue: ")
+        if 'y' == keyval : os.system(cmdskim)
 
 def do_skimmer_glo_mini_chain():
 
         #cmdskim=skim_chain_2a+indir+sp+skimoutdirglo+sp+sldir+skiminlist+sp+skim_glo_cf
         cmdskim=skim_chain_kurh_2a+indir+sp+skimoutdirglo+sp+sldir+skiminlist+sp+skim_glo_mini_cf
         print(cmdskim)
-        os.system(cmdskim)
+        keyval = raw_input("Press y to continue: ")
+        if 'y' == keyval : os.system(cmdskim)
 
 def do_skimmer_noele_glo_chain():
 
         #cmdskim=skim_chain_2a+indir+sp+skimoutdirglo+sp+sldir+skiminlist+sp+skim_glo_cf
         cmdskim=skim_chain_kurh_2a_noele+indir+sp+skimoutdirglo+sp+sldir+skiminlist+sp+skim_glo_cf
         print(cmdskim)
-        os.system(cmdskim)
+        keyval = raw_input("Press y to continue: ")
+        if 'y' == keyval : os.system(cmdskim)
 
 def do_skimmer_loc_chain():
 
         #cmdskim=skim_chain_2a+indir+sp+skimoutdirloc+sp+sldir+skiminlist+sp+skim_loc_cf
         cmdskim=skim_chain_kurh_2a+indir+sp+skimoutdirloc+sp+sldir+skiminlist+sp+skim_loc_cf
         print(cmdskim)
-        os.system(cmdskim)
+        keyval = raw_input("Press y to continue: ")
+        if 'y' == keyval : os.system(cmdskim)
 
 def do_skimmer_loc_mini_chain():
 
         cmdskim=skim_chain_2a+indir+sp+skimoutdirloc+sp+sldir+skiminlist+sp+skim_loc_cf
         #cmdskim=skim_chain_kurh_2a+indir+sp+skimoutdirloc+sp+sldir+skiminlist+sp+skim_loc_cf
         print(cmdskim)
-        os.system(cmdskim)
+        keyval = raw_input("Press y to continue: ")
+        if 'y' == keyval : os.system(cmdskim)
 
 def do_skimmer_loc_mc_chain():
 
         #cmdskim=skim_chain_2a+indir+sp+skimoutdirloc+sp+sldir+skiminlist+sp+skim_loc_cf
         #cmdskim=skim_chain_mc_2a+indir+sp+skimoutdirloc+sp+sldir+skiminlist+sp+skim_loc_cf
-        cmdskim=skim_chain_mc_2a+indir+sp+skimoutdirloc+sp+sldir+skiminlist+sp+skim_loc_cf
+        cmdskim=skim_chain_mc_2a+indir+sp+mcskimoutdir+sp+sldir+skiminlist+sp+skim_loc_cf
         print(cmdskim)
-        os.system(cmdskim)
+        keyval = raw_input("Press y to continue: ")
+        if 'y' == keyval : os.system(cmdskim)
 
 def do_skimmer_glo_mc_chain():
 
-        cmdskim=skim_chain_mc_2a+indir+sp+skimoutdirglo+sp+sldir+skiminlist+sp+skim_glo_cf
+        cmdskim=skim_chain_mc_2a+indir+sp+mcskimoutdir+sp+sldir+skiminlist+sp+skim_glo_cf
         print(cmdskim)
-        os.system(cmdskim)
+        keyval = raw_input("Press y to continue: ")
+        if 'y' == keyval : os.system(cmdskim)
 
 ##  run preplot skimmer
 def do_avecali():
 
         cmdintercali=doavecali+indir+sp+sldir+skiminlist+sp+skimoutdir+caliinfile
         print(cmdintercali)
-        os.system(cmdintercali)
+        keyval = raw_input("Press y to continue: ")
+        if 'y' == keyval : os.system(cmdintercali)
 
 def do_avecalimini():
 
@@ -1209,26 +1247,38 @@ def do_avecalimini():
         #cmdintercali=doavecalimini_100+indir+sp+sldir+skiminlist+sp+calioutdir+caliinfile
         #cmdintercali=doavecalimini_test+indir+sp+sldir+skiminlist+sp+calioutdir+caliinfile
         print(cmdintercali)
-        os.system(cmdintercali)
+        keyval = raw_input("Press y to continue: ")
+        if 'y' == keyval : os.system(cmdintercali)
 
 def do_avecalikurh():
 
         #cmdintercali=doocccalikurh+indir+sp+sldir+skiminlist+sp+calioutdir+caliinfile
         cmdintercali=doocccalikurhootf+indir+sp+sldir+skiminlist+sp+calioutdir+caliinfile
         print(cmdintercali)
-        os.system(cmdintercali)
+        keyval = raw_input("Press y to continue: ")
+        if 'y' == keyval : os.system(cmdintercali)
+
+def do_avecalikurhmc():
+
+        #cmdintercali=doocccalikurh+indir+sp+sldir+skiminlist+sp+calioutdir+caliinfile
+        cmdintercali=doocccalikurhootmc+indir+sp+sldir+skiminlist+sp+calioutdir+caliinfile
+        print(cmdintercali)
+        keyval = raw_input("Press y to continue: ")
+        if 'y' == keyval : os.system(cmdintercali)
 
 def do_occcalimini():
 
         cmdintercali=doocccalimini+indir+sp+sldir+skiminlist+sp+sldir+skiminlist[0:-4]+'_Ave_Mini_Occ.root'
         print(cmdintercali)
-        os.system(cmdintercali)
+        keyval = raw_input("Press y to continue: ")
+        if 'y' == keyval : os.system(cmdintercali)
 
 def do_avecaliminipho():
 
         cmdintercali=doavecaliminipho+indir+sp+sldir+skiminlist+sp+calioutdir+caliinfile
         print(cmdintercali)
-        os.system(cmdintercali)
+        keyval = raw_input("Press y to continue: ")
+        if 'y' == keyval : os.system(cmdintercali)
 
 def do_intercaliXX():
 
@@ -1322,13 +1372,14 @@ def do_wc_ku_plot_ootamp():
 #do_skimmer_chain()                         #########  skimmer set for kurhs false
 #do_skimmer_loc_chain()
 #do_skimmer_loc_mini_chain()
-#do_skimmer_loc_mc_chain()
+do_skimmer_loc_mc_chain()
 #do_skimmer_glo_chain()
 #do_skimmer_glo_mini_chain()
 #do_skimmer_glo_mc_chain()
 #do_skimmer_noele_glo_chain()
 ##do_avecali()
-#do_avecalikurh()
+##do_avecalikurh()
+#do_avecalikurhmc()
 #do_avecalimini()
 ##do_avecaliminipho()
 ##do_intercaliXX()
@@ -1362,7 +1413,7 @@ etalist = [[0,25],[26,45],[46,65],[66,90],[-25,0],[-45,-26],[-65,-46],[-90,-66]]
 #do_wc_ku_plot1dcali()
 #do_wc_ku_plot_eleZ()
 #do_wc_ku_plot_ootamp()
-do_wc_ku_mcanaplots()
+#do_wc_ku_mcanaplots()
 #do_wc_ku_mcplots()
 
 

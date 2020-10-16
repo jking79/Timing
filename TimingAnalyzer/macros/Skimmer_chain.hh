@@ -414,6 +414,23 @@ private:
 
 /// hists for pcalo
   TH1F  * fOutPcaloWTimeHist;
+  TH1F  * fOutPcaloMTimeHist0;
+  TH1F  * fOutPcaloMTimeHist1;
+  TH1F  * fOutPcaloMTimeHist2;
+  TH1F  * fOutPcaloMTimeHist3;
+  TH1F  * fOutPcaloWaveTimeHist0;
+  TH1F  * fOutPcaloRMSTimeHist0;
+  TH1F  * fOutPcaloWrmsTimeHist0;
+  TH1F  * fOutPcaloWaveTimeHist1;
+  TH1F  * fOutPcaloRMSTimeHist1;
+  TH1F  * fOutPcaloWrmsTimeHist1;
+  TH1F  * fOutPcaloWaveTimeHist2;
+  TH1F  * fOutPcaloRMSTimeHist2;
+  TH1F  * fOutPcaloWrmsTimeHist2;
+  TH1F  * fOutPcaloWaveTimeHist3;
+  TH1F  * fOutPcaloRMSTimeHist3;
+  TH1F  * fOutPcaloWrmsTimeHist3;
+
   TH1F  * fOutPcaloTimeHist;
   TH1F  * fOutPcaloEnergyHist;
   TH2F  * fOutPcaloEvWTHist;
@@ -421,7 +438,7 @@ private:
   TH2F  * fOutPcalogtidvtHist;
   TH1F  * fOutPcaloSumTimeHist;
   TH1F  * fOutPcaloSumEnergyHist;
-  TH1I  * fOutPcaloGTIdHist;
+  TH1I  * fOutPcaloHitHist;
 
 //////////////////////////////////////////////////////
 

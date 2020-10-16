@@ -880,10 +880,10 @@ int main ( int argc, char *argv[] ){
 
         auto califilename = "none"; //"local_skims/local_chain/dispho_mc_v31_DYJetsToLL_ave_e5_cali.root";
         auto infilename = "ku_mc_test_tt_dispho_6k_v2.root"; 
-        auto outfilename = "ku_mc_test_tt_dispho_6k_v2_mc_plots.root";
+        auto outfilename = "ku_mc_test_tt_dispho_6k_v2_mc_plots";
         if( argc == 2 ){
                infilename = argv[1];
-               outfilename = "ku_mc_v2_plots.root";
+               outfilename = "ku_mc_v2_plots";
         } 
         else if( argc == 4 ) { //std::cout << "Insufficent arguments." << std::endl; }
         //else {
