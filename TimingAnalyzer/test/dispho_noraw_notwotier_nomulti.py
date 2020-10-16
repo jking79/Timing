@@ -238,8 +238,9 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 100000
 #eventList = open(options.rlelist,'r')
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(#'file:jwk_reco_data_DIGI2RAW.root'),
+    '/store/data/Run2017B/SingleElectron/MINIAOD/09Aug2019_UL2017-v1/130000/000698DC-325D-BA42-8BAB-FE708FC18AE5.root'
 	#'/store/data/Run2017D/DoubleEG/MINIAOD/31Mar2018-v1/00000/A20F8F1B-4137-E811-A406-B083FED12B5C.root'
-	'/store/data/Run2016B/DoubleEG/MINIAOD/17Jul2018_ver2-v1/00000/FA955B82-4C8D-E811-B99F-008CFA165F44.root'
+	#'/store/data/Run2016B/DoubleEG/MINIAOD/17Jul2018_ver2-v1/00000/FA955B82-4C8D-E811-B99F-008CFA165F44.root'
 	#'file:rootSourceFiles/run2017D/miniaod/A20F8F1B-4137-E811-A406-B083FED12B5C.root'
         ),
 #    secondaryFileNames = cms.untracked.vstring(
