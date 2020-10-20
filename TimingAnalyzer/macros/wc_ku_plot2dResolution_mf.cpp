@@ -281,7 +281,8 @@ void plot2dResolution( string indir, string infilelistname, string outfilename, 
 	         int bin_offset = 86;
 	         int adjust = 0.0;
 
-	         if( calimapname != "none" ){
+	         if( calimapname != "none" and califilename != "none" ){
+
                 	if ( phoseedEcal_0 == ECAL::EB ){
                             phoseedtimeCaliIc_0 = ebmapic->GetBinContent( phoseedI2_0 + bin_offset, phoseedI1_0 ) - adjust;
                	   }else if ( phoseedEcal_0 == ECAL::EP ){

@@ -103,9 +103,9 @@ skiminfile014='dispho_tt_Run2018A.root'
 skiminfile015='dispho_tt_Run2018C.root'
 skiminfile016='dispho_tt_Run2018D.root'
 skiminfile017='dispho_tt_Run2018D_320673-320824.root'
-skiminlist018='dispho_tt_Run2018D_320673-320824.txt'
+skiminfile018='dispho_tt_Run2018D_320673-320824.txt'
 skiminfile019='dispho_tt_Run2018A_315257-315488.root'
-skiminlist020='dispho_tt_Run2018A_315257-315488.txt'
+skiminfile020='dispho_tt_Run2018A_315257-315488.txt'
 skiminfile021='dispho_tt_Run2018B_global.root'
 skiminfile022='dispho_tt_Run2018B_local_icv2.root'
 skiminfile023='dispho_tt_Run2018B_local.root'
@@ -170,13 +170,13 @@ calioutfile='caliplots_tt_Run2018pABCDmf_global_v2a_v2b_i50_e5e3.root'
 eta='EBEB'
 #eta='EPEM'
 era='Full'
-#res='Local'
+res='Local'
 #isd_list=['Inclusive','Same','Different']
-#isd_list=['Same','Different']
+isd_list=['Same','Different']
 #isd_list=['Same']
 #isd_list=['Different']
-res='Global'
-isd_list=['Inclusive']
+#res='Global'
+#isd_list=['Inclusive']
 
 # Final output file
 outfile=res+'_'+eta+'_'+era
@@ -389,8 +389,8 @@ pCaloE5 = [plot_pcalo_e5_2D, outfile_pcalo, pcalo_outfile, tvarname_pcalo, calim
 #plot_list = [ kuNotStc, kuStc, ku, base ]
 #plot_list = [ base ]
 #plot_list = [ base_v2 ]  #  Effective ENERGY based, change 2d plot to E based version
-#plot_list = [ baseE5 ]
-plot_list = [ pCaloE5 ]
+plot_list = [ baseE5 ]
+#plot_list = [ pCaloE5 ]
 #plot_list = [ base, baseE5 ]
 #plot_list = [ base, kuStcE5, kuNotStcE5 ]
 #plot_list = [ base, kuStcE5, kuNotStcE5, kuWtStcE5, kuWootStcE5, kuMfootStcE5, kuMfootCCStcE5 ]
@@ -473,7 +473,7 @@ plot_list = [ pCaloE5 ]
 #skiminlist='dispho_mc_v32_DYJetsToLL.txt'
 #skiminlist='dispho_mc_v32_Zee_woutztrk_DYJetsToLL.txt'
 #skiminlist='dispho_mc_v32_Zee_invtztrk_DYJetsToLL.txt'
-skiminlist='dispho_mc_v32a_DYJetsToLL.txt'
+#skiminlist='dispho_mc_v32a_DYJetsToLL.txt'
 
 #skiminlist='dispho_ot_mini_Run2018C_319337_319579_ele.txt'
 #skiminlist='dispho_ot_mini_Run2018A_ele.txt'
@@ -514,7 +514,9 @@ skiminlist='dispho_mc_v32a_DYJetsToLL.txt'
 
 #skiminlist='dispho_ot_mini_ul_deg_Run2018.txt'
 #skiminlist='dispho_ot_mini_ul_deg_Run2018D.txt'
-#skiminlist='dispho_ot_mini_ul_gt28_deg_Run2018D.txt'
+#skiminlist='dispho_ot_mini_ul_gt28_deg_Run2018A.txt'
+#skiminlist='dispho_ot_mini_ul_gt28_deg_Run2018B.txt'
+skiminlist='dispho_ot_mini_ul_gt28_deg_Run2018D.txt'
 #skiminlist='dispho_ot_mini_ul_gt28_deg_Run2018C.txt'
 #skiminlist='dispho_ot_mini_ul_deg_Run2018ABC.txt'
 #skiminlist='dispho_ot_mini_ul_deg_Run2017.txt'
@@ -773,9 +775,9 @@ skim_glo_mini_cf='skim_config/Zee_nokurecs_Skim.txt'  #  GLOBAL  SKIMS nokurhs
 misc_fit_cf='ku_config/tmp_misc_fit.txt'
 
 #indir="/home/t3-ku/jaking/trees/ecal/datasets/"
-indir="/home/t3-ku/jaking/datasets/ecalTiming/"
+#indir="/home/t3-ku/jaking/datasets/ecalTiming/"
 #indir="/home/t3-ku/jaking/datasets/ecalTiming/SingleElectron/"
-#indir="/home/t3-ku/jaking/datasets/ecalTiming/EGamma/"
+indir="/home/t3-ku/jaking/datasets/ecalTiming/EGamma/"
 #indir="/home/t3-ku/jaking/datasets/ecalTiming/DoubleEG/"
 #indir="/scratch/jaking/"
 #indir="../test/"
@@ -803,7 +805,9 @@ mcskimoutdir=skimoutdir
 #in_skim_list='dispho_ot_mini_ul_Run2017.txt'
 #in_skim_list='dispho_ot_mini_Run2016.txt'
 #in_skim_list='dispho_ot_mini_Run2.txt'
-in_skim_list='dispho_ot_mini_ul_Run2.txt'
+#in_skim_list='dispho_ot_mini_ul_Run2.txt'
+in_skim_list='dispho_ot_mini_ul_gt28_sl_Run2.txt'
+#in_skim_list='dispho_ot_mini_ul_gt28_sl_Run2018D.txt'
 #in_skim_list='dispho_ot_mini_Eeff_Run2018.txt'
 #in_skim_list='dispho_ot_mini_Eeff_Run2017.txt'
 #in_skim_list='dispho_ot_mini_Eeff_Run2016.txt'
@@ -1184,8 +1188,8 @@ def do_skimmer_glo_chain():
 
 def do_skimmer_glo_mini_chain():
 
-        #cmdskim=skim_chain_2a+indir+sp+skimoutdirglo+sp+sldir+skiminlist+sp+skim_glo_cf
-        cmdskim=skim_chain_kurh_2a+indir+sp+skimoutdirglo+sp+sldir+skiminlist+sp+skim_glo_mini_cf
+        cmdskim=skim_chain_2a+indir+sp+skimoutdirglo+sp+sldir+skiminlist+sp+skim_glo_cf
+        #cmdskim=skim_chain_kurh_2a+indir+sp+skimoutdirglo+sp+sldir+skiminlist+sp+skim_glo_mini_cf
         print(cmdskim)
         keyval = raw_input("Press y to continue: ")
         if 'y' == keyval : os.system(cmdskim)
@@ -1372,7 +1376,7 @@ def do_wc_ku_plot_ootamp():
 #do_skimmer_chain()                         #########  skimmer set for kurhs false
 #do_skimmer_loc_chain()
 #do_skimmer_loc_mini_chain()
-do_skimmer_loc_mc_chain()
+#do_skimmer_loc_mc_chain()
 #do_skimmer_glo_chain()
 #do_skimmer_glo_mini_chain()
 #do_skimmer_glo_mc_chain()
@@ -1396,12 +1400,12 @@ runlist = [[100000,400000]]
 #runlist = [[315000,316000]] # 2018A
 #runlist = [[315000,315300]]
 #runlist = [[318100,322800]]
-#etalist = [[-90,90]]
+etalist = [[-90,90]]
 #etalist = [[0,90]]
 #etalist = [[1,4],[5,10],[11,15],[16,20],[21,25],[26,30],[31,35],[36,40],[41,45],[46,50],[51,55],[56,60],[61,65],[66,70],[71,75],[76,80],[81,85],[5,6],[7,10]]
 #etalist = [[0,25],[26,45],[46,65],[66,90]]
 #etalist = [[-25,0],[-45,-26],[-65,-46],[-90,-66]]
-etalist = [[0,25],[26,45],[46,65],[66,90],[-25,0],[-45,-26],[-65,-46],[-90,-66]]
+#etalist = [[0,25],[26,45],[46,65],[66,90],[-25,0],[-45,-26],[-65,-46],[-90,-66]]
 #etalist = [[46,65]]
 #etalist = [[-65,-46]]
 #do_plots_runs_list( plot_list, runlist )
@@ -1414,7 +1418,7 @@ etalist = [[0,25],[26,45],[46,65],[66,90],[-25,0],[-45,-26],[-65,-46],[-90,-66]]
 #do_wc_ku_plot_eleZ()
 #do_wc_ku_plot_ootamp()
 #do_wc_ku_mcanaplots()
-#do_wc_ku_mcplots()
+do_wc_ku_mcplots()
 
 
 
