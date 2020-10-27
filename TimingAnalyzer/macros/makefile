@@ -29,6 +29,7 @@ p21=wc_ku_InterCali_aveRecHit_mini_mf
 p22=wc_ku_ana_plot_kurh_vs_mc
 p23=wc_ku_InterCali_aveRecHit_isoot_kurhs_mc
 p24=wc_ku_plot2dRes_ctu_mc
+p25=wc_ku_plot_kurh_vs_mc_eta
 
 all: $(p1) $(p2) $(p3) $(6) $(22)
 # $(p4) $(p5) $(p7)
@@ -105,4 +106,6 @@ $(p23): $(p23).cpp
 $(p24): $(p24).cpp
 	$(CC) -o $(p24).obj $(p24).cpp $(CFLAGS) $(INCLUDES) $(LFLAGS) $(LIBS)
 
+$(p25): $(p25).cpp
+	$(CC) -o $(p25).obj $(p25).cpp $(CFLAGS) $(INCLUDES) $(LFLAGS) $(LIBS)
 

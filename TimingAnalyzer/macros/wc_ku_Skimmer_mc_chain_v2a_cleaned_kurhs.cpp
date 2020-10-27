@@ -58,7 +58,7 @@ Skimmer::Skimmer(const TString & indir, const TString & outdir, const TString & 
   //const TString infilename = Form("%s/%s", fInDir.Data(), fFileName.Data());
   const std::string ifn_str(fFileName.Data());
   std::cout << "Getting input file " << ifn_str << std::endl;
-  std::string outfilename(ifn_str.substr(0,(ifn_str.length()-3)) + "root");
+  std::string outfilename(ifn_str.substr(0,(ifn_str.length()-4)) + "_multi_pcalo.root");
   std::cout << "Outfile Name : " << outfilename << std::endl;
   std::ifstream infile(ifn_str);
   //fInFile = TFile::Open(fFilename.Data());
@@ -138,10 +138,73 @@ Skimmer::Skimmer(const TString & indir, const TString & outdir, const TString & 
   fOutPcaloEnergyHist->Sumw2();
   fOutPcaloevtHist = new TH2F("pcaloevtHist","pcaloevtHist",5000,0,5,5000,0,50);
   fOutPcaloevtHist->Sumw2();
-  fOutPcaloGTIdHist = new TH1I("pcaloGTIdHist","pcaloGTIdHist",5000,0,500000);
-  fOutPcaloGTIdHist->Sumw2();
+  //fOutPcaloGTIdHist = new TH1I("pcaloGTIdHist","pcaloGTIdHist",5000,0,500000);
+  //fOutPcaloGTIdHist->Sumw2();
   fOutPcalogtidvtHist = new TH2F("pcalogtidvtHist","pcalogtidvtHist",5000,0,500000,5000,0,50);
   fOutPcalogtidvtHist->Sumw2();
+
+  fOutPcaloMTimeHist0 = new TH1F("pcaloMTimeHist0","pcalo hit times 0",700,3,10);
+  fOutPcaloMTimeHist0->Sumw2();
+  fOutPcaloMTimeHist1 = new TH1F("pcaloMTimeHist1","pcalo hit times 1",700,3,10);
+  fOutPcaloMTimeHist1->Sumw2();
+  fOutPcaloMTimeHist2 = new TH1F("pcaloMTimeHist2","pcalo hit times 2",700,3,10);
+  fOutPcaloMTimeHist2->Sumw2();
+  fOutPcaloMTimeHist3 = new TH1F("pcaloMTimeHist3","pcalo hit times 3",700,3,10);
+  fOutPcaloMTimeHist3->Sumw2();
+
+  fOutPcaloWaveTimeHist0 = new TH1F("pcaloWaveTimeHist0","pcalo wt ave time 0",700,3,10);
+  fOutPcaloWaveTimeHist0->Sumw2();
+  fOutPcaloWaveTimeHist1 = new TH1F("pcaloWaveTimeHist1","pcalo wt ave time 1",700,3,10);
+  fOutPcaloWaveTimeHist1->Sumw2();
+  fOutPcaloWaveTimeHist2 = new TH1F("pcaloWaveTimeHist2","pcalo wt ave time 2",700,3,10);
+  fOutPcaloWaveTimeHist2->Sumw2();
+  fOutPcaloWaveTimeHist3 = new TH1F("pcaloWaveTimeHist3","pcalo wt ave time 3",700,3,10);
+  fOutPcaloWaveTimeHist3->Sumw2();
+
+  fOutPcaloRMSTimeHist0 = new TH1F("pcaloRMSTimeHist0","pcalo time rms 0",800,-0.1,0.7);
+  fOutPcaloRMSTimeHist0->Sumw2();
+  fOutPcaloRMSTimeHist1 = new TH1F("pcaloRMSTimeHist1","pcalo time rms 1",800,-0.1,0.7);
+  fOutPcaloRMSTimeHist1->Sumw2();
+  fOutPcaloRMSTimeHist2 = new TH1F("pcaloRMSTimeHist2","pcalo time rms 2",800,-0.1,0.7);
+  fOutPcaloRMSTimeHist2->Sumw2();
+  fOutPcaloRMSTimeHist3 = new TH1F("pcaloRMSTimeHist3","pcalo time rms 3",800,-0.1,0.7);
+  fOutPcaloRMSTimeHist3->Sumw2();
+
+  fOutPcaloWrmsTimeHist0 = new TH1F("pcaloWrmsTimeHist0","pcalo time wt rms 0",800,-0.1,0.7);
+  fOutPcaloWrmsTimeHist0->Sumw2();
+  fOutPcaloWrmsTimeHist1 = new TH1F("pcaloWrmsTimeHist1","pcalo time wt rms 1",800,-0.1,0.7);
+  fOutPcaloWrmsTimeHist1->Sumw2();
+  fOutPcaloWrmsTimeHist2 = new TH1F("pcaloWrmsTimeHist2","pcalo time wt rms 2",800,-0.1,0.7);
+  fOutPcaloWrmsTimeHist2->Sumw2();
+  fOutPcaloWrmsTimeHist3 = new TH1F("pcaloWrmsTimeHist3","pcalo time wt rms 3",800,-0.1,0.7);
+  fOutPcaloWrmsTimeHist3->Sumw2();
+
+  fOutPcaloMultiHist0 = new TH1F("pcaloMultiHist0","pcalo multiplicity 0",21,-0.5,20.5);
+  fOutPcaloMultiHist0->Sumw2();
+  fOutPcaloMultiHist1 = new TH1F("pcaloMultiHist1","pcalo multiplicity 1",21,-0.5,20.5);
+  fOutPcaloMultiHist1->Sumw2();
+  fOutPcaloMultiHist2 = new TH1F("pcaloMultiHist2","pcalo multiplicity 2",21,-0.5,20.5);
+  fOutPcaloMultiHist2->Sumw2();
+  fOutPcaloMultiHist3 = new TH1F("pcaloMultiHist3","pcalo multiplicity 3",21,-0.5,20.5);
+  fOutPcaloMultiHist3->Sumw2();
+
+  fOutPcaloWrmsvMultiHist0 = new TH2F("pcaloWrmsvMultiHist0","pcalo wt rms vs multi 0",40,-0.1,0.3,21,-0.5,20.5);
+  fOutPcaloWrmsvMultiHist0->Sumw2();
+  fOutPcaloWrmsvMultiHist1 = new TH2F("pcaloWrmsvMultiHist1","pcalo wt rms vs multi 1",40,-0.1,0.3,21,-0.5,20.5);
+  fOutPcaloWrmsvMultiHist1->Sumw2();
+  fOutPcaloWrmsvMultiHist2 = new TH2F("pcaloWrmsvMultiHist2","pcalo wt rms vs multi 2",40,-0.1,0.3,21,-0.5,20.5);
+  fOutPcaloWrmsvMultiHist2->Sumw2();
+  fOutPcaloWrmsvMultiHist3 = new TH2F("pcaloWrmsvMultiHist3","pcalo wt rms vs multi 3",40,-0.1,0.3,21,-0.5,20.5);
+  fOutPcaloWrmsvMultiHist3->Sumw2();
+
+  fOutPcaloWrmsvEHist0 = new TH2F("pcaloWrmsvEHist0","pcalo wt rms vs sum e 0",40,-0.1,0.3,40,0,10);
+  fOutPcaloWrmsvEHist0->Sumw2();
+  fOutPcaloWrmsvEHist1 = new TH2F("pcaloWrmsvEHist1","pcalo wt rms vs sum e 1",40,-0.1,0.3,40,0,10);
+  fOutPcaloWrmsvEHist1->Sumw2();
+  fOutPcaloWrmsvEHist2 = new TH2F("pcaloWrmsvEHist2","pcalo wt rms vs sum e 2",40,-0.1,0.3,40,0,10);
+  fOutPcaloWrmsvEHist2->Sumw2();
+  fOutPcaloWrmsvEHist3 = new TH2F("pcaloWrmsvEHist3","pcalo wt rms vs sum e 3",40,-0.1,0.3,40,0,10);
+  fOutPcaloWrmsvEHist3->Sumw2();
 
   std::string hnameEB( "AveXtaldpCaloTimeRecTimeEBMap");
   std::string htitleEB( "AveXtal dpCalotime RecTimeEBMap EB ");
@@ -170,8 +233,43 @@ Skimmer::~Skimmer()
   delete fOutPcaloevtHist;
   delete fOutPcaloTimeHist;
   delete fOutPcaloEnergyHist;
-  delete fOutPcaloGTIdHist;
+  //delete fOutPcaloGTIdHist;
   delete fOutPcalogtidvtHist;
+
+  delete fOutPcaloMTimeHist0;
+  delete fOutPcaloMTimeHist1;
+  delete fOutPcaloMTimeHist2;
+  delete fOutPcaloMTimeHist3;
+
+  delete fOutPcaloWaveTimeHist0;
+  delete fOutPcaloWaveTimeHist1;
+  delete fOutPcaloWaveTimeHist2;
+  delete fOutPcaloWaveTimeHist3;
+
+  delete fOutPcaloRMSTimeHist0;
+  delete fOutPcaloRMSTimeHist1;
+  delete fOutPcaloRMSTimeHist2;
+  delete fOutPcaloRMSTimeHist3;
+
+  delete fOutPcaloWrmsTimeHist0;
+  delete fOutPcaloWrmsTimeHist1;
+  delete fOutPcaloWrmsTimeHist2;
+  delete fOutPcaloWrmsTimeHist3;
+
+  delete fOutPcaloMultiHist0;
+  delete fOutPcaloMultiHist1;
+  delete fOutPcaloMultiHist2;
+  delete fOutPcaloMultiHist3;
+
+  delete fOutPcaloWrmsvMultiHist0;
+  delete fOutPcaloWrmsvMultiHist1;
+  delete fOutPcaloWrmsvMultiHist2;
+  delete fOutPcaloWrmsvMultiHist3;
+
+  delete fOutPcaloWrmsvEHist0;
+  delete fOutPcaloWrmsvEHist1;
+  delete fOutPcaloWrmsvEHist2;
+  delete fOutPcaloWrmsvEHist3;
 
   delete IcMapEB;
 
@@ -192,7 +290,7 @@ void Skimmer::EventLoop()
   float ele_dz = 0.005;  //  0.1 or 0.005
   bool useTOF = true;
   //bool useTOF = false;
-  //const auto nEntries = 500;
+  //const auto nEntries = 50000;
   for (Long64_t centry = 0; centry < nEntries; centry++)
   //for (auto entry = 0U; entry < 100; entry++)
   {
@@ -472,6 +570,41 @@ void Skimmer::EventLoop()
   eleTrackTrueHist->Write();
   eleTrackFalseHist->Write();
 
+  fOutPcaloMTimeHist0->Write();
+  fOutPcaloMTimeHist1->Write();
+  fOutPcaloMTimeHist2->Write();
+  fOutPcaloMTimeHist3->Write();
+
+  fOutPcaloWaveTimeHist0->Write();
+  fOutPcaloWaveTimeHist1->Write();
+  fOutPcaloWaveTimeHist2->Write();
+  fOutPcaloWaveTimeHist3->Write();
+
+  fOutPcaloRMSTimeHist0->Write();
+  fOutPcaloRMSTimeHist1->Write();
+  fOutPcaloRMSTimeHist2->Write();
+  fOutPcaloRMSTimeHist3->Write();
+
+  fOutPcaloWrmsTimeHist0->Write();
+  fOutPcaloWrmsTimeHist1->Write();
+  fOutPcaloWrmsTimeHist2->Write();
+  fOutPcaloWrmsTimeHist3->Write();
+
+  fOutPcaloMultiHist0->Write();
+  fOutPcaloMultiHist1->Write();
+  fOutPcaloMultiHist2->Write();
+  fOutPcaloMultiHist3->Write();
+
+  fOutPcaloWrmsvMultiHist0->Write();
+  fOutPcaloWrmsvMultiHist1->Write();
+  fOutPcaloWrmsvMultiHist2->Write();
+  fOutPcaloWrmsvMultiHist3->Write();
+  
+  fOutPcaloWrmsvEHist0->Write();
+  fOutPcaloWrmsvEHist1->Write();
+  fOutPcaloWrmsvEHist2->Write();
+  fOutPcaloWrmsvEHist3->Write();
+
   fOutPcaloWTimeHist->Write();
   fOutPcaloTimeHist->Write();
   fOutPcaloSumEnergyHist->Write();
@@ -479,7 +612,7 @@ void Skimmer::EventLoop()
   fOutPcaloEnergyHist->Write();
   fOutPcaloEvWTHist->Write();
   fOutPcaloevtHist->Write();
-  fOutPcaloGTIdHist->Write();
+  //fOutPcaloGTIdHist->Write();
   fOutPcalogtidvtHist->Write();
 
   IcMapEB->Write();
@@ -581,6 +714,112 @@ void Skimmer::FillOutEvent(const UInt_t entry, const Float_t evtwgt)
 
 
  //std::cout << "event info done" << std::endl;
+
+   fInRecHits.b_ID->GetEntry(entry);
+   b_pcalo_id->GetEntry(entry);
+   b_pcalo_t->GetEntry(entry);
+   b_pcalo_e->GetEntry(entry);
+   b_pcalo_emf->GetEntry(entry);
+   b_pcalo_hadf->GetEntry(entry);
+   b_pcalo_gtid->GetEntry(entry);
+   b_pcalo_eventid->GetEntry(entry);
+   b_pcalo_bx->GetEntry(entry);
+   b_pcalo_event->GetEntry(entry);
+   b_pcalo_depth->GetEntry(entry);  
+
+// loop over all rechits and get pcalo info for 4 rh of instrest
+	for ( UInt_t seed = 0; seed < (*fInRecHits.ID).size(); seed++ ){
+   	if( ((*fInRecHits.ID)[seed] == 838960444 ) 
+			or ((*fInRecHits.ID)[seed] == 838940005 ) or ((*fInRecHits.ID)[seed] == 838863032 ) or ((*fInRecHits.ID)[seed] == 838885437) ) {
+
+   	//std::cout << "hit flag for outpho fill pcalo" << std::endl;
+   	int cnt = 0;
+   	float pce = 0.0;
+   	float pct = 0.0;
+   	float pct2 = 0.0;
+   	float pcwt = 0.0;
+   	float pcwt2 = 0.0;
+   	float pcrmst = 0.0;
+   	float pcwrmst = 0.0;
+   	float pclt = 0.0;
+   	float pcpe = 0.0;
+   	float vart = 0.0;
+   	float wvart = 0.0;
+   	float pvar = 0.0;
+   	float pwvar = 0.0;
+   	float wt = 0.0;
+   	float mt = 0.0;
+   	for(UInt_t pcseed = 0; pcseed < (*pcalo_id).size(); pcseed++ ){
+          if( (*pcalo_id)[pcseed] == (*fInRecHits.ID)[seed] ){
+                  auto depth = (*pcalo_depth)[pcseed];
+                  if( depth > 0 ) continue;
+                  auto time = (*pcalo_t)[pcseed];
+                  auto energy = (*pcalo_e)[pcseed];
+                  if( energy < 0.099 ) continue;
+                  if( energy > pcpe ){ pcpe = energy; pclt = time; }
+                  pct += time;
+                  pce += energy;
+                  pct2 += time*time;
+                  pcwt += (energy*time);
+                  pcwt2 += (energy*time*time);
+                  cnt += 1;
+         }
+   	}
+   	if( pce > 0.0 and cnt > 1) {
+      	wt = pcwt/pce;
+      	for(UInt_t pcseed = 0; pcseed < (*pcalo_id).size(); pcseed++ ){
+         	if( (*pcalo_id)[pcseed] == (*fInRecHits.ID)[seed] ){
+                  auto depth = (*pcalo_depth)[pcseed];
+                  if( depth > 0 ) continue;
+                  auto time = (*pcalo_t)[pcseed];
+                  auto energy = (*pcalo_e)[pcseed];
+                  if( energy < 0.099 ) continue;
+                  pvar += (time-wt)*(time-wt);
+                  pwvar += energy*(time-wt)*(time-wt);
+                  if( (*fInRecHits.ID)[seed] == 838960444 ){fOutPcaloMTimeHist0->Fill(time);}
+                  if( (*fInRecHits.ID)[seed] == 838940005 ){fOutPcaloMTimeHist1->Fill(time);}
+                  if( (*fInRecHits.ID)[seed] == 838863032 ){fOutPcaloMTimeHist2->Fill(time);}
+                  if( (*fInRecHits.ID)[seed] == 838885437 ){fOutPcaloMTimeHist3->Fill(time);}
+         	}
+      	}
+      	vart = sqrt(pvar/cnt);
+      	wvart = sqrt(pwvar/pce);
+
+   		if( (*fInRecHits.ID)[seed] == 838960444 ){
+         	fOutPcaloWaveTimeHist0->Fill(wt);
+         	fOutPcaloRMSTimeHist0->Fill(vart);
+         	fOutPcaloWrmsTimeHist0->Fill(wvart);
+            fOutPcaloMultiHist0->Fill(cnt);
+            fOutPcaloWrmsvMultiHist0->Fill(wvart,cnt);
+            fOutPcaloWrmsvEHist0->Fill(wvart,pce);
+   		}
+   		if( (*fInRecHits.ID)[seed] == 838940005 ){
+         	fOutPcaloWaveTimeHist1->Fill(wt);
+         	fOutPcaloRMSTimeHist1->Fill(vart);
+         	fOutPcaloWrmsTimeHist1->Fill(wvart);
+            fOutPcaloMultiHist1->Fill(cnt);
+            fOutPcaloWrmsvMultiHist1->Fill(wvart,cnt);
+            fOutPcaloWrmsvEHist1->Fill(wvart,pce);
+   		}
+   		if( (*fInRecHits.ID)[seed] == 838863032 ){
+         	fOutPcaloWaveTimeHist2->Fill(wt);
+         	fOutPcaloRMSTimeHist2->Fill(vart);
+         	fOutPcaloWrmsTimeHist2->Fill(wvart);
+            fOutPcaloMultiHist2->Fill(cnt);
+            fOutPcaloWrmsvMultiHist2->Fill(wvart,cnt);
+            fOutPcaloWrmsvEHist2->Fill(wvart,pce);
+   		}
+   		if( (*fInRecHits.ID)[seed] == 838885437 ){
+         	fOutPcaloWaveTimeHist3->Fill(wt);
+         	fOutPcaloRMSTimeHist3->Fill(vart);
+         	fOutPcaloWrmsTimeHist3->Fill(wvart);
+            fOutPcaloMultiHist3->Fill(cnt);
+            fOutPcaloWrmsvMultiHist3->Fill(wvart,cnt);
+            fOutPcaloWrmsvEHist3->Fill(wvart,pce);
+   		}
+      }//if( pce > 0.0 )
+   	}// 4 rh filter
+	} // end loop over all rechits and get pcalo info for 4 rh of instrest
 
   // isMC only branches
 }
@@ -871,6 +1110,7 @@ void Skimmer::FillOutPhos(const UInt_t entry)
    float pce = 0.0;
    float pct = 0.0;
    float pcwt = 0.0;
+   int cnt = 0;
    for(UInt_t pcseed = 0; pcseed < (*pcalo_id).size(); pcseed++ ){
           if( (*pcalo_id)[pcseed] == (*fInRecHits.ID)[seed] ){
 						//auto pcid = (*pcalo_id)[pcseed];
@@ -893,6 +1133,7 @@ void Skimmer::FillOutPhos(const UInt_t entry)
                   pce += energy;
 						pct += time;
 						pcwt += (energy*time);
+                  cnt += 1;
                   fOutPcaloTimeHist->Fill(time);
                   fOutPcaloEnergyHist->Fill(energy);
                   fOutPcaloevtHist->Fill(energy,time);
@@ -902,12 +1143,12 @@ void Skimmer::FillOutPhos(const UInt_t entry)
                   auto event = (*pcalo_event)[pcseed];
                   //std::cout << " - gtid: " << gtid << " eventid: " << eventid << " bx: " << bx << " event: " << event << std::endl;
                   //if( thegtid < 75001 ){ 
-						fOutPcaloGTIdHist->Fill(gtid);
+						//fOutPcaloGTIdHist->Fill(gtid);
 						fOutPcalogtidvtHist->Fill(gtid,time); 
 					   //}
          }
    }		
-   if( pce > 0.0 ) {
+   if( pce > 0.0 and cnt > 1 ) {
    	auto wt = pcwt/pce;
    	outpho.seedpctime = wt;
    	fOutPcaloWTimeHist->Fill(wt);

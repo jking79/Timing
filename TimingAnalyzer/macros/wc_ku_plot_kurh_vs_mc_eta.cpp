@@ -21,8 +21,7 @@ int getBinNumber( float value, std::vector<Double_t> bins ){
 
 }	 
 
-void makeplots( const string califilename, const string infilename, const string outfilename ){
-
+void makeplots( const string califilename, const string infilename, const string outfilename, int leta, int heta ){
     //std::cout << "Make plots with " << califilename <<  " " << infilename <<  " " << outfilename << std::endl;
     std::cout << "open input files" << std::endl;
     string disphotreename("disphotree");
@@ -167,8 +166,8 @@ void makeplots( const string califilename, const string infilename, const string
     fInTree->SetBranchAddress("phoseedTOF_0", &phoseedTOF_0, &b_phoseedTOF_0);
     fInTree->SetBranchAddress("phoseedpcTOF_0", &phoseedpcTOF_0, &b_phoseedpcTOF_0);
     fInTree->SetBranchAddress("phoseedtime_0", &phoseedtime_0, &b_phoseedtime_0);
-    fInTree->SetBranchAddress("phoseedpctime_0", &phoseedpctime_0, &b_phoseedpctime_0);
-    //fInTree->SetBranchAddress("phoseedpcltime_0", &phoseedpctime_0, &b_phoseedpctime_0);
+    //fInTree->SetBranchAddress("phoseedpctime_0", &phoseedpctime_0, &b_phoseedpctime_0);
+    fInTree->SetBranchAddress("phoseedpcltime_0", &phoseedpctime_0, &b_phoseedpctime_0);
     //fInTree->SetBranchAddress("phoseedPcalotime_0", &phoseedpctime_0, &b_phoseedpctime_0);
     fInTree->SetBranchAddress("phoseedkuNotStctime_0", &phoseedkuNotStctime_0, &b_phoseedkuNotStctime_0);
     fInTree->SetBranchAddress("phoseedkuWtStctime_0", &phoseedkuWtStctime_0, &b_phoseedkuWtStctime_0);
@@ -191,8 +190,8 @@ void makeplots( const string califilename, const string infilename, const string
     fInTree->SetBranchAddress("phoseedpcTOF_1", &phoseedpcTOF_1, &b_phoseedpcTOF_1);
     fInTree->SetBranchAddress("phoseedkuNotStctime_1", &phoseedkuNotStctime_1, &b_phoseedkuNotStctime_1);
     fInTree->SetBranchAddress("phoseedtime_1", &phoseedtime_1, &b_phoseedtime_1);
-    fInTree->SetBranchAddress("phoseedpctime_1", &phoseedpctime_1, &b_phoseedpctime_1);
-    //fInTree->SetBranchAddress("phoseedpcltime_1", &phoseedpctime_1, &b_phoseedpctime_1);
+    //fInTree->SetBranchAddress("phoseedpctime_1", &phoseedpctime_1, &b_phoseedpctime_1);
+    fInTree->SetBranchAddress("phoseedpcltime_1", &phoseedpctime_1, &b_phoseedpctime_1);
     //fInTree->SetBranchAddress("phoseedPcalotime_1", &phoseedpctime_1, &b_phoseedpctime_1);
     fInTree->SetBranchAddress("phoseedkuWtStctime_1", &phoseedkuWtStctime_1, &b_phoseedkuWtStctime_1);
     fInTree->SetBranchAddress("phoseedkuWootStctime_1", &phoseedkuWootStctime_1, &b_phoseedkuWootStctime_1);
@@ -528,7 +527,7 @@ void makeplots( const string califilename, const string infilename, const string
 	     if( entry%100000 == 0 ) std::cout << "Proccessed " << entry << " of " << nEntries << " entries." << std::endl;        
         //std::cout << "Getting Entries Pho 0" << std::endl;
         //if( counter > 25082 ) continue;
-        //if( counter > 3865 ) continue;
+        if( counter > 3865 ) continue;
 	     fInFile->cd();
 
         //b_gZmass->GetEntry(entry);
@@ -596,6 +595,17 @@ void makeplots( const string califilename, const string infilename, const string
         //std::cout << " iphi : " << phoseedI1_0 << " - " << phoseedI1_1 << std::endl;
         //if( phoseedrhID > 840000000 ){ continue; }
         //if( phoseedpctime_0 < 0.0 ){ continue; }
+
+        auto i10 = phoseedI1_0;
+        auto i11 = phoseedI1_1;
+        //auto i20 = phoseedI2_0;
+        auto i20 = abs(phoseedI2_0);
+        //auto i21 = phoseedI2_1;
+        auto i21 = abs(phoseedI2_1);
+        //std::cout << "I2_0 : " << i20 << " I2_1 : " << i21  << " " << leta << " " << heta << std::endl;
+        if( (i20 < leta ) or ( i20 > heta ) ) continue;
+        if( (i21 < leta ) or ( i21 > heta ) ) continue;
+        //std::cout << "Passed eta filter" << std::endl;
 
         int bin_offset = 86;
 
@@ -699,15 +709,14 @@ void makeplots( const string califilename, const string infilename, const string
         auto e_cut = (phoseedE_0>=10)&&(phoseedE_0<=120)&&(phoseedE_1>=10)&&(phoseedE_1<=120);
         auto eta_cut = (phoseedEcal_0 == ECAL::EB)&&(phoseedEcal_1 == ECAL::EB);
         //auto isd_cut = true; //inclusive
-        auto pccut = (phoseedpctime_0>0)&&(phoseedpctime_1>0);
         //auto isd_cut = (phoseedTT_0!=phoseedTT_1); //diffrent
         auto isd_cut = (phoseedTT_0==phoseedTT_1); //same
-        auto event_good = e_cut && eta_cut && isd_cut && pccut;
+        auto event_good = e_cut && eta_cut && isd_cut;
 
         if( event_good ){ 
             counter++;
-            theHist->Fill(xfill,yfill);
-            hist_data_profile->Fill(yfill);
+            theHist->Fill(xfill,yfillc);
+            hist_data_profile->Fill(yfillc);
         //}
 
             theHist_rt->Fill(effa0,yfillrt0);
@@ -911,7 +920,7 @@ void makeplots( const string califilename, const string infilename, const string
 
 int main ( int argc, char *argv[] ){
 
-        if( argc != 4 ) { std::cout << "Insufficent arguments." << std::endl; }
+        if( argc != 6 ) { std::cout << "Insufficent arguments." << std::endl; }
         else {
                 auto califilename = argv[1];
                 auto infilename = argv[2];
@@ -919,8 +928,10 @@ int main ( int argc, char *argv[] ){
                 //auto tvarname = argv[4];
 					 //auto calimapname = argv[5];
                 //auto isd_type = argv[6];
+                auto leta = std::stoi(argv[4]);
+                auto heta = std::stoi(argv[5]);
                 std::cout << " Running with " << califilename <<  " " << infilename <<  " " << outfilename <<  " " << std::endl;
-      			 makeplots( califilename, infilename, outfilename );
+      			 makeplots( califilename, infilename, outfilename, leta, heta );
         }
         return 1;
 }

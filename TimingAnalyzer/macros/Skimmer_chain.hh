@@ -430,6 +430,18 @@ private:
   TH1F  * fOutPcaloWaveTimeHist3;
   TH1F  * fOutPcaloRMSTimeHist3;
   TH1F  * fOutPcaloWrmsTimeHist3;
+  TH1F  * fOutPcaloMultiHist0;
+  TH1F  * fOutPcaloMultiHist1;
+  TH1F  * fOutPcaloMultiHist2;
+  TH1F  * fOutPcaloMultiHist3;
+  TH2F  * fOutPcaloWrmsvMultiHist0;
+  TH2F  * fOutPcaloWrmsvMultiHist1;
+  TH2F  * fOutPcaloWrmsvMultiHist2;
+  TH2F  * fOutPcaloWrmsvMultiHist3;
+  TH2F  * fOutPcaloWrmsvEHist0;
+  TH2F  * fOutPcaloWrmsvEHist1;
+  TH2F  * fOutPcaloWrmsvEHist2;
+  TH2F  * fOutPcaloWrmsvEHist3;
 
   TH1F  * fOutPcaloTimeHist;
   TH1F  * fOutPcaloEnergyHist;
