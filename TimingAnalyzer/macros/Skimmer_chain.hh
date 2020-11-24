@@ -414,35 +414,101 @@ private:
 
 /// hists for pcalo
   TH1F  * fOutPcaloWTimeHist;
+
+  TH1F  * fOutPcaloMTimeHist;
   TH1F  * fOutPcaloMTimeHist0;
   TH1F  * fOutPcaloMTimeHist1;
   TH1F  * fOutPcaloMTimeHist2;
   TH1F  * fOutPcaloMTimeHist3;
+
+  TH1F  * fOutPcaloWaveTimeHist;
+  TH1F  * fOutPcaloRMSTimeHist;
+  TH1F  * fOutPcaloWrmsTimeHist;
+  TH1F  * fOutPcaloPhoMultiHist;
+  TH1F  * fOutPcaloLeadTimeHist;
+
   TH1F  * fOutPcaloWaveTimeHist0;
   TH1F  * fOutPcaloRMSTimeHist0;
   TH1F  * fOutPcaloWrmsTimeHist0;
+
   TH1F  * fOutPcaloWaveTimeHist1;
   TH1F  * fOutPcaloRMSTimeHist1;
   TH1F  * fOutPcaloWrmsTimeHist1;
+
   TH1F  * fOutPcaloWaveTimeHist2;
   TH1F  * fOutPcaloRMSTimeHist2;
   TH1F  * fOutPcaloWrmsTimeHist2;
+
   TH1F  * fOutPcaloWaveTimeHist3;
   TH1F  * fOutPcaloRMSTimeHist3;
   TH1F  * fOutPcaloWrmsTimeHist3;
+
+  TH1F  * fOutPcaloMultiHist;
   TH1F  * fOutPcaloMultiHist0;
   TH1F  * fOutPcaloMultiHist1;
   TH1F  * fOutPcaloMultiHist2;
   TH1F  * fOutPcaloMultiHist3;
+
+  TH2F  * fOutPcaloWrmsvMultiHist;
   TH2F  * fOutPcaloWrmsvMultiHist0;
   TH2F  * fOutPcaloWrmsvMultiHist1;
   TH2F  * fOutPcaloWrmsvMultiHist2;
   TH2F  * fOutPcaloWrmsvMultiHist3;
+
+  TH2F  * fOutPcaloWrmsvEHist;
   TH2F  * fOutPcaloWrmsvEHist0;
   TH2F  * fOutPcaloWrmsvEHist1;
   TH2F  * fOutPcaloWrmsvEHist2;
   TH2F  * fOutPcaloWrmsvEHist3;
 
+  TH2F  * fOutPcaloMultvEHist;
+  TH2F  * fOutPcaloMultvEHist0;
+  TH2F  * fOutPcaloMultvEHist1;
+  TH2F  * fOutPcaloMultvEHist2;
+  TH2F  * fOutPcaloMultvEHist3;
+
+  TH2F  * fOutPcaloWaveTimevEHist;
+  TH2F  * fOutPcaloWaveTimevEHist0;
+  TH2F  * fOutPcaloWaveTimevEHist1;
+  TH2F  * fOutPcaloWaveTimevEHist2;
+  TH2F  * fOutPcaloWaveTimevEHist3;
+
+  TH2F  * fOutPcaloPcTimevEHist;
+  TH1F  * fOutPcaloPcTimevEProfile;
+  TH2F  * fOutPcaloPcTimevEHist0;
+  TH2F  * fOutPcaloPcTimevEHist1;
+  TH2F  * fOutPcaloPcTimevEHist2;
+  TH2F  * fOutPcaloPcTimevEHist3;
+
+  TH2F  * fOutPcaloPcTimevNeHist;
+  TH2F  * fOutPcaloPcTimevNeHist0;
+  TH2F  * fOutPcaloPcTimevNeHist1;
+  TH2F  * fOutPcaloPcTimevNeHist2;
+  TH2F  * fOutPcaloPcTimevNeHist3;
+
+  TH2F  * fOutPcaloWrmsvRheHist;
+  TH2F  * fOutPcaloWrmsvRheHist0;
+  TH2F  * fOutPcaloWrmsvRheHist1;
+  TH2F  * fOutPcaloWrmsvRheHist2;
+  TH2F  * fOutPcaloWrmsvRheHist3;
+
+  TH2F  * fOutPcaloMultvRheHist;
+  TH2F  * fOutPcaloMultvRheHist0;
+  TH2F  * fOutPcaloMultvRheHist1;
+  TH2F  * fOutPcaloMultvRheHist2;
+  TH2F  * fOutPcaloMultvRheHist3;
+
+  TH2F  * fOutPcaloWaveTimevRheHist;
+  TH2F  * fOutPcaloWaveTimevRheHist0;
+  TH2F  * fOutPcaloWaveTimevRheHist1;
+  TH2F  * fOutPcaloWaveTimevRheHist2;
+  TH2F  * fOutPcaloWaveTimevRheHist3;
+
+  TH2F  * fOutPcaloM0vM1Hist;
+  TH2F  * fOutPcaloMvEHist;
+  TH2F  * fOutPcaloEvRheHist; 
+
+  TH1F  * fOutPcaloGTIdHist; 
   TH1F  * fOutPcaloTimeHist;
   TH1F  * fOutPcaloEnergyHist;
   TH2F  * fOutPcaloEvWTHist;
@@ -650,6 +716,11 @@ private:
    std::vector<Float_t>  * ku_ootA9;
    std::vector<UInt_t>  * ku_uRhId;
 
+   struct tp { float t,e; };
+   //tp temp;
+   //std::vector <tp> v;
+   static bool comp_tp(tp tp1, tp tp2){ return( tp1.e > tp2.e ); }
+
    std::vector<unsigned int> * pcalo_id;
    std::vector<uint16_t> * pcalo_depth;
    std::vector<double> * pcalo_t;
@@ -661,6 +732,23 @@ private:
    std::vector<int> * pcalo_bx;
    std::vector<int> * pcalo_event;
 
+   std::vector<double> pc_min_t;
+   std::vector<double> pc_min_t0;
+   std::vector<double> pc_min_t1;
+   std::vector<double> pc_min_t2;
+   std::vector<double> pc_min_t3;
+
+   std::vector<double> pc_pce;
+   std::vector<double> pc_pce0;
+   std::vector<double> pc_pce1;
+   std::vector<double> pc_pce2;
+   std::vector<double> pc_pce3;
+
+   std::vector<double> pc_amp;
+   std::vector<double> pc_amp0;
+   std::vector<double> pc_amp1;
+   std::vector<double> pc_amp2;
+   std::vector<double> pc_amp3;
 
    std::vector<Float_t> * kurhE;
    std::vector<Float_t> * kurhtime;

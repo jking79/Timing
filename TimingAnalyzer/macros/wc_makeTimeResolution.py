@@ -308,6 +308,8 @@ plot_kuWootStc_e5_2D='ku_config/tmp_kuWootStc_cali_e5_deltaT_vs_A_eff_EBEB.txt'
 plot_kuMfootStc_e5_2D='ku_config/tmp_kuMfootStc_cali_e5_deltaT_vs_A_eff_EBEB.txt'
 plot_kuMfootCCStc_e5_2D='ku_config/tmp_kuMfootCCStc_cali_e5_deltaT_vs_A_eff_EBEB.txt'
 plot_pcalo_e5_2D='ku_config/tmp_pcalo_cali_e5_deltaT_vs_A_eff_EBEB.txt'
+plot_pcalo_e5_2D_v2='ku_config/tmp_pcalo_cali_e5_deltaT_vs_E_eff_EBEB.txt'
+plot_pcalo_e5_2D_sp='ku_config/tmp_pcalo_calitime_vs_pce_EBEB.txt'
 
 tvarname_mini='phoseedtime'
 tvarname_ku='phoseedkutime'
@@ -372,6 +374,8 @@ kuMfootStc = [ plot_kuMfootStc_e5_2D, outfile_kuMfootStc_2D, kuMfootStc_outfile,
 kuMfootCCStcE5 = [ plot_kuMfootCCStc_e5_2D, outfile_kuMfootCCStc_e5_2D, kuMfootCCStc_e5_outfile, tvarname_kuMfootCCStc, calimapname_AveMfootCCStcE5 ]
 kuMfootCCStc = [ plot_kuMfootCCStc_e5_2D, outfile_kuMfootCCStc_2D, kuMfootCCStc_outfile, tvarname_kuMfootCCStc, calimapname_none ]
 pCaloE5 = [plot_pcalo_e5_2D, outfile_pcalo, pcalo_outfile, tvarname_pcalo, calimapname_pcalo]
+pCaloE5_v2 = [plot_pcalo_e5_2D_v2, outfile_pcalo, pcalo_outfile, tvarname_pcalo, calimapname_pcalo]
+pCaloE5_sp = [plot_pcalo_e5_2D_sp, outfile_pcalo, pcalo_outfile, tvarname_pcalo, calimapname_none]
 
 # set plot list for plots    <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 #plot_list = [ base, ku, kuStc, kuNot, kuNotStc ]
@@ -391,6 +395,8 @@ pCaloE5 = [plot_pcalo_e5_2D, outfile_pcalo, pcalo_outfile, tvarname_pcalo, calim
 #plot_list = [ base_v2 ]  #  Effective ENERGY based, change 2d plot to E based version
 #plot_list = [ baseE5 ]
 plot_list = [ pCaloE5 ]
+#plot_list = [ pCaloE5_sp ]
+#plot_list = [ pCaloE5_v2 ] #  Effective ENERGY based, change 2d plot to E based version
 #plot_list = [ base, baseE5 ]
 #plot_list = [ base, kuStcE5, kuNotStcE5 ]
 #plot_list = [ base, kuStcE5, kuNotStcE5, kuWtStcE5, kuWootStcE5, kuMfootStcE5, kuMfootCCStcE5 ]
@@ -603,6 +609,11 @@ skimoutfile_mc_dytoll_v32='dispho_mc_v32_DYJetsToLL.root'
 skimoutfile_mc_dytoll_v32a_multi='dispho_mc_v32a_DYJetsToLL_multi_pcalo.root'
 skimoutfile_mc_dytoll_v32a_full='dispho_mc_v32a_DYJetsToLL_full_pcalo_v2.root'
 skimoutfile_mc_dytoll_v32a_single='dispho_mc_v32a_DYJetsToLL_single_pcalo.root'
+skimoutfile_mc_v32a4='dispho_mc_v32a_DYJetsToLL_full_v4_ecut_pcalo.root'
+skimoutfile_mc_v32a6='dispho_mc_v32a_DYJetsToLL_full_v6_ecut_pcalo.root'
+skimoutfile_mc_v32a8b_glo='dispho_mc_v32a_DYJetsToLL_full_glo_v8b_ecut_pcalo.root'
+skimoutfile_mc_v32a8b='dispho_mc_v32a_DYJetsToLL_full_v8b_ecut_pcalo.root'
+skimoutfile_mc_v32a9='dispho_mc_v32a_DYJetsToLL_full_v9_ecut_pcalo.root'
 
 skimoutfile_mc_dytoll_v32_invtz='dispho_mc_v32_Zee_invtztrk_DYJetsToLL.root'
 skimoutfile_mc_dytoll_v32_withz='dispho_mc_v32_Zee_withztrk_DYJetsToLL.root'
@@ -752,7 +763,8 @@ caliinfile=caliinfile_mcv31_dytoll
 #infile=skimoutfile01320# run2018D V20
 #infile=skimoutfile01321# run2018D V21
 #infile=skimoutfile_mc_dytoll_v32
-infile=skimoutfile_mc_dytoll_v32a_full
+infile=skimoutfile_mc_v32a9
+#infile=skimoutfile_mc_v32a8b_glo
 #infile=skimoutfile_mc_dytoll_v32_ecp099
 #infile=skimoutfile_mc_dytoll_v32_woutz
 #infile=skimoutfile2016ul
@@ -844,6 +856,7 @@ plotter2d='./runTreePlotter2D.obj '
 plotter2dsh='./scripts/runTreePlotter2D.sh '
 timefitsh='./scripts/runTimeFitter.sh '
 timefit='./runTimeFitter.obj '
+timefit_sp='./runTimeFitter_sp.obj '
 
 skim2a='./wc_runKUSkimmer_v2a.obj '
 skim2wt='root -b -q -l wc_runKUSkimmer_v2wt.C\(\\"'
@@ -970,6 +983,64 @@ def do_3dplots( plot_list ):
         cmd3d=dotimeres3d+caliindir+caliinfile+sp+pskimindir+infile+sp+'./'+write_file+sp+entry[3]+sp+entry[4]+sp+isd_type
         print( '>>>>>>>>>>>>>>>>>  ' + cmd3d )
         os.system(cmd3d)
+
+def do_sp_plot( plot_list ):
+
+##########     <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<     change the local/global type!!!!!!!!!!!!
+    print( 'Processing Plot List' )
+    date = time.strftime("%d%m%Y")+'_'+time.strftime("%H%M")
+    for entry in plot_list :
+      for isd_type in isd_list :
+        print( 'Producing plots for : ' + entry[0] )
+        #write_file=entry[1]+'_'+isd_type
+        #write_file='dispho_mc_v32a_DYJetsToLL_full_v8b_ecut_pcalo'
+        write_file='dispho_mc_v32a_DYJetsToLL_full_v8c_ecut_pcalo'
+        #write_file_3d=entry[1]+'_'+isd_type+'_AvsA'
+        plot_file=entry[2]+'_'+isd_type
+
+        #print( '>>>>>>>>>>>>>>>>>  ' + cmd3d )
+        #os.system(cmd3d)
+        #----  add clean up
+        if 'Local' in res : plotres = '_loc'
+        else : plotres = '_glo'
+        #writedir = plotdir+outdir[0:9]+plotres+outdir[9:]+"_"+"cali"+caliinfile[6:-5]+"_"+date+"/"
+        writedir = ""
+        #if( not os.path.exists(writedir) ) : os.mkdir(writedir)
+        #for ext in [ 'png', 'pdf' ] : 
+        #   for sca in [ 'lin', 'log' ] : 
+        #      fmove( write_file+'_'+sca+'.'+ext , writedir )
+        #fmove( write_file+'.root', writedir )
+        #fmove( write_file_3d+'.root', writedir )
+        #fmove( write_file+'_integrals.log', writedir )
+        print( 'Finished TreePlotting for plot: ' + entry[0] )
+
+        #shutil.move(f, 'dest_folder')    
+        ## run fitter, getting 2D plots from before
+        cmdtf=timefit+sp+writedir+write_file+'.root'+sp+entry[0]+sp+misc_fit_cf+sp+timefit_cf+sp+era+sp+plot_file+timefile
+        print( '>>>>>>>>>>>>>>>>>  ' + cmdtf )
+        os.system(cmdtf)
+        cmdtfc=timefit+sp+writedir+write_file+'.root'+sp+entry[0]+sp+misc_fit_cf+sp+timefit_c_cf+sp+era+sp+plot_file+timefilec
+        print( '>>>>>>>>>>>>>>>>>  ' + cmdtfc )
+        #os.system(cmdtfc)
+        cmdtft=timefit+sp+writedir+write_file+'.root'+sp+entry[0]+sp+misc_fit_cf+sp+timefit_t_cf+sp+era+sp+plot_file+timefilet
+        print( '>>>>>>>>>>>>>>>>>  ' + cmdtft )
+        #os.system(cmdtft)
+        cmdtf2g=timefit+sp+writedir+write_file+'.root'+sp+entry[0]+sp+misc_fit_cf+sp+timefit_g2_cf+sp+era+sp+plot_file+timefile2g
+        print( '>>>>>>>>>>>>>>>>>  ' + cmdtf2g )
+        #os.system(cmdtf2g)
+
+        #-----  add clean up
+        #for ext in [ 'png', 'pdf' ] :
+        #  for sca in [ 'lin', 'log', 'lin_logx', 'log_logx' ] :
+        #    for typ in [ 'mu', 'sigma' ] :
+               #if( ('log' not in sca) and ('mu' not in typ) ) :      
+               #fmove( typ+'_'+plot_file+'_timefit_'+sca+'.'+ext , writedir )
+               #fmove( typ+'_'+plot_file+'_timefit_'+sca+'.'+ext , writedir )
+        #for tfile in [ timefile, timefilec, timefilet, timefile2g ] :
+               #fmove( plot_file+tfile+'.root', writedir )
+               #fmove( plot_file+tfile+'_fitinfo.log', writedir )
+        print( 'Finished TimeFitting for plot: ' + entry[0] )
+        print( '------------------------------------------------------------' )
 
 def do_plots( plot_list ):
 
@@ -1383,7 +1454,7 @@ def do_wc_ku_plot_ootamp():
 #do_skimmer_chain()                         #########  skimmer set for kurhs false
 #do_skimmer_loc_chain()
 #do_skimmer_loc_mini_chain()
-#do_skimmer_loc_mc_chain()
+do_skimmer_loc_mc_chain()
 #do_skimmer_glo_chain()
 #do_skimmer_glo_mini_chain()
 #do_skimmer_glo_mc_chain()
@@ -1395,7 +1466,8 @@ def do_wc_ku_plot_ootamp():
 ##do_avecaliminipho()
 ##do_intercaliXX()
 #do_3dplots( plot_list )
-do_plots( plot_list )    #######  <<<<<<<<<<<<<<<<<     change the local/global type!!!!!!!!!!!!
+#do_sp_plot( plot_list )
+#do_plots( plot_list )    #######  <<<<<<<<<<<<<<<<<     change the local/global type!!!!!!!!!!!!
 #do_plots_runs( plot_list, '1', '400000' ) 
 runlist = [[100000,400000]]
 #runlist = [[297000,30600]] # full 2017

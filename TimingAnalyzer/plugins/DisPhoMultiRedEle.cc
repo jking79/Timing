@@ -2903,7 +2903,7 @@ void DisPhoMulti::SetRecHitBranches(const EcalRecHitCollection * recHits, const 
                       if( depth > 0 ) continue;
                       auto energy = pcalo_e[pcseed];
                       //std::cout << " energy : " << energy << std::endl;
-                      //if( (energy <= 0.f) or (energy==2.f) ) continue;
+                      if( energy < 0.099 ) continue;
                       pce += energy;
                       //pct += time;
                       pcwt += (energy*time);

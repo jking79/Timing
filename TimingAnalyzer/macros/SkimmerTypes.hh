@@ -544,6 +544,8 @@ struct Pho
   Float_t seedE;
   Float_t seedtime;
   Float_t seedpCalotime;
+  Float_t seedpcmulti;
+  Float_t seedpce;
   Float_t seedpctime;
   Float_t seedpcltime;
   Float_t seedpcrmstime;
@@ -769,6 +771,8 @@ struct Pho
   std::string s_seedE = "phoseedE";
   std::string s_seedtime = "phoseedtime";
   std::string s_seedpCalotime = "phoseedPcalotime";
+  std::string s_seedpcmulti = "phoseedpcmulti";
+  std::string s_seedpce = "phoseedpce";
   std::string s_seedpctime = "phoseedpctime";
   std::string s_seedpcltime = "phoseedpcltime";
   std::string s_seedpcrmstime = "phoseedpcrmstime";
@@ -989,6 +993,8 @@ struct Pho
   TBranch * b_seedE;
   TBranch * b_seedtime;
   TBranch * b_seedpCalotime;
+  TBranch * b_seedpcmulti;
+  TBranch * b_seedpce;
   TBranch * b_seedpctime;
   TBranch * b_seedpcltime;
   TBranch * b_seedpcrmstime;

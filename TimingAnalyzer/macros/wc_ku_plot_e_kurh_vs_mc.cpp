@@ -92,7 +92,6 @@ void makeplots( const string califilename, const string infilename, const string
     Float_t phoseedtimeErr_0;
     Float_t phoseedpcmulti_0;
     Float_t phoseedpctime_0;
-    Float_t phoseedpcltime_0;
     Float_t phoseedpce_0;
     Float_t phoseedkuNotStctime_0;
     Float_t phoseedkuWtStctime_0;
@@ -113,7 +112,6 @@ void makeplots( const string califilename, const string infilename, const string
     TBranch * b_phoseedtimeErr_0;
     TBranch * b_phoseedpcmulti_0;
     TBranch * b_phoseedpctime_0;
-    TBranch * b_phoseedpcltime_0;
     TBranch * b_phoseedpce_0;
     TBranch * b_phoseedkuNotStctime_0;
     TBranch * b_phoseedkuWtStctime_0;
@@ -134,7 +132,6 @@ void makeplots( const string califilename, const string infilename, const string
     Float_t phoseedtimeErr_1;
     Float_t phoseedpcmulti_1;
     Float_t phoseedpctime_1;
-    Float_t phoseedpcltime_1;
     Float_t phoseedpce_1;
     Float_t phoseedkuNotStctime_1;
     Float_t phoseedkuWtStctime_1;
@@ -155,7 +152,6 @@ void makeplots( const string califilename, const string infilename, const string
     TBranch * b_phoseedtimeErr_1;
     TBranch * b_phoseedpcmulti_1; 
     TBranch * b_phoseedpctime_1;
-    TBranch * b_phoseedpcltime_1;
     TBranch * b_phoseedpce_1;
     TBranch * b_phoseedkuNotStctime_1; 
     TBranch * b_phoseedkuWtStctime_1;
@@ -182,8 +178,8 @@ void makeplots( const string califilename, const string infilename, const string
     fInTree->SetBranchAddress("phoseedpcmulti_0", &phoseedpcmulti_0, &b_phoseedpcmulti_0);
     fInTree->SetBranchAddress("phoseedpctime_0", &phoseedpctime_0, &b_phoseedpctime_0);
     fInTree->SetBranchAddress("phoseedpce_0", &phoseedpce_0, &b_phoseedpce_0);
-    fInTree->SetBranchAddress("phoseedpcltime_0", &phoseedpcltime_0, &b_phoseedpcltime_0);
-    fInTree->SetBranchAddress("phoseedPcalotime_0", &phoseedpctime_0, &b_phoseedpctime_0);
+    //fInTree->SetBranchAddress("phoseedpcltime_0", &phoseedpctime_0, &b_phoseedpctime_0);
+    //fInTree->SetBranchAddress("phoseedPcalotime_0", &phoseedpctime_0, &b_phoseedpctime_0);
     fInTree->SetBranchAddress("phoseedkuNotStctime_0", &phoseedkuNotStctime_0, &b_phoseedkuNotStctime_0);
     fInTree->SetBranchAddress("phoseedkuWtStctime_0", &phoseedkuWtStctime_0, &b_phoseedkuWtStctime_0);
     fInTree->SetBranchAddress("phoseedkuWootStctime_0", &phoseedkuWootStctime_0, &b_phoseedkuWootStctime_0);
@@ -208,8 +204,8 @@ void makeplots( const string califilename, const string infilename, const string
     fInTree->SetBranchAddress("phoseedpcmulti_1", &phoseedpcmulti_1, &b_phoseedpcmulti_1);
     fInTree->SetBranchAddress("phoseedpctime_1", &phoseedpctime_1, &b_phoseedpctime_1);
     fInTree->SetBranchAddress("phoseedpce_1", &phoseedpce_1, &b_phoseedpce_1);
-    fInTree->SetBranchAddress("phoseedpcltime_1", &phoseedpcltime_1, &b_phoseedpcltime_1);
-    fInTree->SetBranchAddress("phoseedPcalotime_1", &phoseedpctime_1, &b_phoseedpctime_1);
+    //fInTree->SetBranchAddress("phoseedpcltime_1", &phoseedpctime_1, &b_phoseedpctime_1);
+    //fInTree->SetBranchAddress("phoseedPcalotime_1", &phoseedpctime_1, &b_phoseedpctime_1);
     fInTree->SetBranchAddress("phoseedkuWtStctime_1", &phoseedkuWtStctime_1, &b_phoseedkuWtStctime_1);
     fInTree->SetBranchAddress("phoseedkuWootStctime_1", &phoseedkuWootStctime_1, &b_phoseedkuWootStctime_1);
     fInTree->SetBranchAddress("phoseedkuMfootStctime_1", &phoseedkuMfootStctime_1, &b_phoseedkuMfootStctime_1);
@@ -241,7 +237,6 @@ void makeplots( const string califilename, const string infilename, const string
     string histname_pctvwt("hist_pctvwt");
     string histname_pctvkutmf("hist_pctvkutmf");
     string histname_pctvkucc("hist_pctvkucc");
-    string histname_pctvpclt("hist_pctvpclt");
 
     string histname_dpctvdratio("hist_dpctvdratio");
     string histname_dpctvdwt("hist_dpctvdwt");
@@ -253,7 +248,6 @@ void makeplots( const string califilename, const string infilename, const string
     string histname_dratiovdkucc("hist_dratiovdkucc");
 
     string histname_pcalo("hist_pcalo");
-    string histname_leadpcalo("hist_leadpcalo");
     string histname_rawpcalo("hist_rawpcalo");
     string histname_pcTOF("hist_pcTOF");
     string histname_ratio("hist_ratio");
@@ -293,11 +287,11 @@ void makeplots( const string califilename, const string infilename, const string
     string fXTitle("A_{eff}/#sigma_{n} (EBEB)");
     std::vector<Double_t> fXBins;
     Bool_t fXVarBins = false;
-    string xbinstr("VARIABLE 75 100 125 150 175 225 275 325 375 475 600 750 950 1275 1700 2250");
+    //string xbinstr("VARIABLE 75 100 125 150 175 225 275 325 375 475 600 750 950 1275 1700 2250");
     //string xbinstr("VARIABLE 0 2 4 6 8 10 12 14 16 20 24 30 38 52 68 100");
-    //string xbinstr("VARIABLE 4 6 7 8 9 12 20");
-    int nMyBins = 17;
-    //int nMyBins = 8;
+    string xbinstr("VARIABLE 4 6 7 8 9 12 20");
+    //int nMyBins = 17;
+    int nMyBins = 9;
     string fYTitle("#Delta(Photon Seed Time) [ns] (EBEB)");
     std::vector<Double_t> fYBins;
     Bool_t fYVarBins = false;
@@ -384,13 +378,13 @@ void makeplots( const string califilename, const string infilename, const string
     //float kutmftend = 1.06619;//2
     float kutmftend = 2.0;//2
 
-    float kucctdiv = stddiv*2;
+    float kucctdiv = stddiv;
     //float kucctstart = -3.4418;
     //float kucctstart = -2.96;
-    float kucctstart = -4.0;
+    float kucctstart = -2.0;
     //float kucctend = -1.1082;//2.3336
     //float kucctend = -0.96;//2
-    float kucctend = 4.0;//2
+    float kucctend = 2.0;//2
 
     float dtdiv = stddiv;
     float dtstart = -2;
@@ -417,8 +411,6 @@ void makeplots( const string califilename, const string infilename, const string
     hist_ratio->Sumw2();
     auto hist_pcalo = new TH1F(histname_pcalo.c_str(),histtitletmp.c_str(),tdiv,tstart,tend);
     hist_pcalo->Sumw2();
-    auto hist_leadpcalo = new TH1F(histname_leadpcalo.c_str(),histtitletmp.c_str(),tdiv,tstart,tend);
-    hist_leadpcalo->Sumw2();
     auto hist_pcTOF = new TH1F(histname_pcTOF.c_str(),histtitletmp.c_str(),tpdiv,tpstart,tpend);
     hist_pcTOF->Sumw2();
     auto hist_rawpcalo = new TH1F(histname_rawpcalo.c_str(),histtitletmp.c_str(),tpdiv,tpstart,tpend);
@@ -442,8 +434,6 @@ void makeplots( const string califilename, const string infilename, const string
     hist_pctvkutmf->Sumw2();
     auto hist_pctvkucc = new TH2F(histname_pctvkucc.c_str(),histtitletmp.c_str(),kucctdiv,kucctstart,kucctend,pcalotdiv,pcalotstart,pcalotend);
     hist_pctvkucc->Sumw2();
-    auto hist_pctvpclt = new TH2F(histname_pctvpclt.c_str(),histtitletmp.c_str(),pcalotdiv,pcalotstart,pcalotend,pcalotdiv,pcalotstart,pcalotend);
-    hist_pctvpclt->Sumw2();
 
 //    auto hist_dpctvdratio = new TH2F(histname_dpctvdratio.c_str(),histtitletmp.c_str(),dtdiv,dtstart,dtend,dtdiv,dtstart,dtend);
 //    hist_dpctvdratio->Sumw2();
@@ -576,7 +566,6 @@ void makeplots( const string califilename, const string infilename, const string
         //b_phoseedtimeErr_0->GetEntry(entry);
         b_phoseedpcmulti_0->GetEntry(entry);
         b_phoseedpctime_0->GetEntry(entry);
-        b_phoseedpcltime_0->GetEntry(entry);
         b_phoseedpce_0->GetEntry(entry);
         //std::cout << "3/4 way 0" << std::endl;
         b_phoseedkuNotStctime_0->GetEntry(entry);
@@ -600,7 +589,6 @@ void makeplots( const string califilename, const string infilename, const string
         //b_phoseedtimeErr_1->GetEntry(entry);
         b_phoseedpcmulti_1->GetEntry(entry);
         b_phoseedpctime_1->GetEntry(entry);
-        b_phoseedpcltime_1->GetEntry(entry);
         b_phoseedpce_1->GetEntry(entry);
         b_phoseedkuNotStctime_1->GetEntry(entry);
         b_phoseedkuWtStctime_1->GetEntry(entry);
@@ -612,10 +600,10 @@ void makeplots( const string califilename, const string infilename, const string
         //if( (phoseedE_0 < 5.f) or (phoseedE_1 < 5.f) ) continue;
 
         //auto amp_0 = (phoseedE_0/phoseedadcToGeV_0)/phoseedpedrms12_0;
-        //auto amp_0 = phoseedpce_0;
+        auto amp_0 = phoseedpce_0;
         //auto amp_1 = (phoseedE_1/phoseedadcToGeV_1)/phoseedpedrms12_1;
-        //auto amp_1 = phoseedpce_1;
-        //auto effA = (amp_0*amp_1)/sqrt((amp_0*amp_0)+(amp_1*amp_1));
+        auto amp_1 = phoseedpce_1;
+        auto effA = (amp_0*amp_1)/sqrt((amp_0*amp_0)+(amp_1*amp_1));
 
         //if( (amp_0 < 10.f) or (amp_1 < 10.f) ) continue;
         //if( effA < 20.f ) continue;
@@ -702,12 +690,10 @@ void makeplots( const string califilename, const string infilename, const string
 
         if( (phoseedpctime_0 < 0.0 ) || (phoseedpctime_1 < 0.0 ) )  continue;
         auto pctime_0 = phoseedpctime_0 - phoseedpcTOF_0;
-        auto pcltime_0 = phoseedpcltime_0 - phoseedpcTOF_0;
         //auto pctime_0 = phoseedpctime_0;
         //auto pctime_0c = phoseedpctime_0; // - icPC_0;
         //auto pctime_0c = phoseedpctime_0 - icPC_0;
         auto pctime_1 = phoseedpctime_1 - phoseedpcTOF_1;
-        auto pcltime_1 = phoseedpcltime_1 - phoseedpcTOF_1;
         //auto pctime_1 = phoseedpctime_1;
         //auto pctime_1c = phoseedpctime_1;  // - icPC_1;
         //auto pctime_1c = phoseedpctime_1 - icPC_1;
@@ -724,20 +710,13 @@ void makeplots( const string califilename, const string infilename, const string
         auto yfilltmf1 = pctime_1 - kuMfootStctime_1;
         auto yfillcc0 = pctime_0 - kuMfootCCStctime_0;
         auto yfillcc1 = pctime_1 - kuMfootCCStctime_1;
-        auto yfillpc = pctime_0 - pctime_1;
-        auto yfillpcl = pcltime_0 - pcltime_1;
+        auto yfill = pctime_0 - pctime_1;
         auto yfillc = (pctime_0 - pctime_1) - icPC_0;
 
-        //auto amp_0 = (phoseedE_0/phoseedadcToGeV_0)/phoseedpedrms12_0;
-        //auto amp_0 = phoseedpce_0;
-        //auto amp_1 = (phoseedE_1/phoseedadcToGeV_1)/phoseedpedrms12_1;
-        //auto amp_1 = phoseedpce_1;
-        //auto effA = (amp_0*amp_1)/sqrt((amp_0*amp_0)+(amp_1*amp_1));
-
-        auto effa0 = ((phoseedE_0/phoseedadcToGeV_0)/phoseedpedrms12_0); ///sqrt(2);
-        //auto effa0 = phoseedpce_0;///sqrt(2);
-        auto effa1 = ((phoseedE_1/phoseedadcToGeV_1)/phoseedpedrms12_1); ///sqrt(2);
-        //auto effa1 = phoseedpce_1;///sqrt(2);
+        //auto effa0 = ((phoseedE_0/phoseedadcToGeV_0)/phoseedpedrms12_0)/sqrt(2);
+        auto effa0 = phoseedpce_0/sqrt(2);
+        //auto effa1 = ((phoseedE_1/phoseedadcToGeV_1)/phoseedpedrms12_1)/sqrt(2);
+        auto effa1 = phoseedpce_1/sqrt(2);
         auto xfill = (effa0*effa1)/sqrt(pow(effa0,2)+pow(effa1,2));
 
         auto e_cut = (phoseedE_0>=10)&&(phoseedE_0<=120)&&(phoseedE_1>=10)&&(phoseedE_1<=120);
@@ -746,14 +725,14 @@ void makeplots( const string califilename, const string infilename, const string
         auto pccut = (phoseedpctime_0>0)&&(phoseedpctime_1>0);
         //auto isd_cut = (phoseedTT_0!=phoseedTT_1); //diffrent
         auto isd_cut = (phoseedTT_0==phoseedTT_1); //same
-        //auto multi_cut = ((phoseedpcmulti_0 == 1)&&(phoseedpcmulti_1 > 1))||((phoseedpcmulti_0 > 1)&&(phoseedpcmulti_1 == 1)); 
+      //auto multi_cut = ((phoseedpcmulti_0 == 1)&&(phoseedpcmulti_1 > 1))||((phoseedpcmulti_0 > 1)&&(phoseedpcmulti_1 == 1)); 
         auto multi_cut = true;
         auto event_good = e_cut && eta_cut && isd_cut && pccut && multi_cut;
 
         if( event_good ){ 
             counter++;
-            theHist->Fill(xfill,yfillpcl);
-            hist_data_profile->Fill(yfillpcl);
+            theHist->Fill(xfill,yfill);
+            hist_data_profile->Fill(yfill);
         //}
 
             theHist_rt->Fill(effa0,yfillrt0);
@@ -784,7 +763,6 @@ void makeplots( const string califilename, const string infilename, const string
 
 		  hist_ratio->Fill(time_0);
         hist_pcalo->Fill(pctime_0);
-        hist_leadpcalo->Fill(pcltime_0);
         hist_rawpcalo->Fill(phoseedpctime_0);
         hist_pcTOF->Fill(phoseedpcTOF_0);
         hist_wt->Fill(kuWtStctime_0);
@@ -801,7 +779,6 @@ void makeplots( const string califilename, const string infilename, const string
 
         hist_ratio->Fill(time_1);
         hist_pcalo->Fill(pctime_1);
-        hist_leadpcalo->Fill(pcltime_1);
         hist_rawpcalo->Fill(phoseedpctime_1);
         hist_pcTOF->Fill(phoseedpcTOF_1);
         hist_wt->Fill(kuWtStctime_1);
@@ -820,13 +797,11 @@ void makeplots( const string califilename, const string infilename, const string
         hist_pctvwt->Fill(kuWtStctime_0,pctime_0);
         hist_pctvkutmf->Fill(kuMfootStctime_0,pctime_0);
         hist_pctvkucc->Fill(kuMfootCCStctime_0,pctime_0);
-        hist_pctvpclt->Fill(pcltime_0,pctime_0);
 
         hist_pctvratio->Fill(time_1,pctime_1);
         hist_pctvwt->Fill(kuWtStctime_1,pctime_1);
         hist_pctvkutmf->Fill(kuMfootStctime_1,pctime_1);
         hist_pctvkucc->Fill(kuMfootCCStctime_1,pctime_1);
-        hist_pctvpclt->Fill(pcltime_1,pctime_1);
 
         //hist_dpctvdratio->Fill(time_0-time_1,pctime_0-pctime_1);
         //hist_dpctvdwt->Fill(kuWtStctime_0-kuWtStctime_1,pctime_0-pctime_1);
@@ -869,7 +844,6 @@ void makeplots( const string califilename, const string infilename, const string
 
     hist_ratio->Write();
     hist_pcalo->Write();
-    hist_leadpcalo->Write();
     hist_rawpcalo->Write();
     hist_pcTOF->Write();
     hist_wt->Write();
@@ -888,7 +862,6 @@ void makeplots( const string califilename, const string infilename, const string
     hist_pctvwt->Write();
     hist_pctvkutmf->Write();
     hist_pctvkucc->Write();
-    hist_pctvpclt->Write();
 
     //hist_dpctvdratio->Write();
     //hist_dpctvdwt->Write();
@@ -923,7 +896,6 @@ void makeplots( const string califilename, const string infilename, const string
     delete hist_pctvwt;
     delete hist_pctvkutmf;
     delete hist_pctvkucc;
-    delete hist_pctvpclt;
 
     //delete hist_dpctvdratio;
     //delete hist_dpctvdwt;
@@ -940,7 +912,6 @@ void makeplots( const string califilename, const string infilename, const string
 
     delete hist_ratio;
     delete hist_pcalo;
-    delete hist_leadpcalo;
     delete hist_rawpcalo;
     delete hist_pcTOF;
     delete hist_wt;

@@ -30,8 +30,9 @@ p22=wc_ku_ana_plot_kurh_vs_mc
 p23=wc_ku_InterCali_aveRecHit_isoot_kurhs_mc
 p24=wc_ku_plot2dRes_ctu_mc
 p25=wc_ku_plot_kurh_vs_mc_eta
+p26=runTimeFitter_sp
 
-all: $(p1) $(p2) $(p3) $(6) $(22)
+all: $(p1) $(p2) $(p3) $(p6) $(p22)
 # $(p4) $(p5) $(p7)
 
 $(p1): $(p1).cpp
@@ -108,4 +109,7 @@ $(p24): $(p24).cpp
 
 $(p25): $(p25).cpp
 	$(CC) -o $(p25).obj $(p25).cpp $(CFLAGS) $(INCLUDES) $(LFLAGS) $(LIBS)
+
+$(p26): $(p26).cpp
+	$(CC) -o $(p26).obj $(p26).cpp $(CFLAGS) $(INCLUDES) $(LFLAGS) $(LIBS)
 
