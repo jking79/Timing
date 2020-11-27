@@ -6,7 +6,7 @@ from optparse import OptionParser
 from CRABAPI.RawCommand import crabCommand
 from CRABClient.ClientExceptions import ClientException
 from httplib import HTTPException
-from in_r18D_list import file_list 
+#from in_r18D_list import file_list 
 
 def getOptions():
     """
@@ -137,7 +137,7 @@ def subcrab( runs, events, reqmem ):
             #trial          = "tt_kurhs_pc_mc_v30"  # as v29 with pcalo double checked and expanded.
             #trial          = "tt_kurhs_pc_mc_v31"  # as v30 with p_dv  pulled.
             #trial          = "tt_kurhs_pc_mc_v32"  # as v31 with pcalo time produced in ana by rechit.
-            trial          = "tt_kurhs_pc_mc_v32a"  # as v32 w/ rechit Emin set to 0.1 GeV instead of 1.0 GeV
+            trial          = "tt_kurhs_pc_mc_v32b"  # as v32 w/ rechit Emin set to 0.1 GeV instead of 1.0 GeV
 
             rname = trial+'_'+primaryDataset+'_'+dataset+'_request_dispho'
             config.General.requestName = trial+'_'+primaryDataset+'_'+dataset+'_request_dispho'
@@ -145,7 +145,7 @@ def subcrab( runs, events, reqmem ):
             config.Data.outputDatasetTag = trial+'_'+primaryDataset+'_'+dataset+'_output_dispho'
 
 
-            config.JobType.pyCfgParams   = ['globalTag=102X_upgrade2018_realistic_v20',#'nThreads='+str(config.JobType.numCores), 
+            config.JobType.pyCfgParams   = ['globalTag=102X_upgrade2018_realistic_v21',#'nThreads='+str(config.JobType.numCores), 
                                             'inputPaths='+inputPaths,'inputFilters='+inputFilters,'inputFlags='+inputFlags, 
                                             'onlyGED=True', 'outputFileName=output.root', #'rlelist='+events,
 					                             'kuRechitValid=True','lhcInfoValid=False', 'rawCollectionsValid=True','mcValid=True' ]

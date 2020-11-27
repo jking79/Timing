@@ -701,12 +701,12 @@ void makeplots( const string califilename, const string infilename, const string
         //auto kuMfootCCStctime_1 = phoseedkuMfootCCStctime_1 - ic4_1;
 
         if( (phoseedpctime_0 < 0.0 ) || (phoseedpctime_1 < 0.0 ) )  continue;
-        auto pctime_0 = phoseedpctime_0 - phoseedpcTOF_0;
+        auto pctime_0 = phoseedpctime_0; // - phoseedpcTOF_0;
         auto pcltime_0 = phoseedpcltime_0 - phoseedpcTOF_0;
         //auto pctime_0 = phoseedpctime_0;
         //auto pctime_0c = phoseedpctime_0; // - icPC_0;
         //auto pctime_0c = phoseedpctime_0 - icPC_0;
-        auto pctime_1 = phoseedpctime_1 - phoseedpcTOF_1;
+        auto pctime_1 = phoseedpctime_1; // - phoseedpcTOF_1;
         auto pcltime_1 = phoseedpcltime_1 - phoseedpcTOF_1;
         //auto pctime_1 = phoseedpctime_1;
         //auto pctime_1c = phoseedpctime_1;  // - icPC_1;
@@ -752,8 +752,8 @@ void makeplots( const string califilename, const string infilename, const string
 
         if( event_good ){ 
             counter++;
-            theHist->Fill(xfill,yfillpcl);
-            hist_data_profile->Fill(yfillpcl);
+            theHist->Fill(xfill,yfillpc);
+            hist_data_profile->Fill(yfillpc);
         //}
 
             theHist_rt->Fill(effa0,yfillrt0);

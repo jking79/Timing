@@ -111,10 +111,10 @@ def subcrab( runs, events, reqmem ):
         # Will submit one task for each of these input datasets.
         inputDataAndOpts = [
 
-            #['/EGamma/Run2018A-17Sep2018-v2/MINIAOD'], # for ABC change to GT 102X_dataRun2_v12
+            #['/EGamma/Run2018A-17Sep2018-v2/MINIAOD'], # for ABC change to GT 102X_dataRun2_v13
             #['/EGamma/Run2018B-17Sep2018-v1/MINIAOD'],
             #['/EGamma/Run2018C-17Sep2018-v1/MINIAOD'],
-            ['/EGamma/Run2018D-22Jan2019-v2/MINIAOD'],  # for D change to GT 102X_dataRun2_v15 
+            ['/EGamma/Run2018D-22Jan2019-v2/MINIAOD'],  # for D change to GT 102X_dataRun2_v16
             ##['/EGamma/Run2018E-PromptReco-v1/MINIAOD'],
 
 	    ]
@@ -154,15 +154,15 @@ def subcrab( runs, events, reqmem ):
             #trial          = "tt_kurhs_nolhc_v18"  # as v15 w/ NM pull 17May20   replaced Wt with KansasDummy and pulling amplitudes from KS uncali rechit collection
             #trial          = "tt_kurhs_nolhc_v19"  # as v18 w/ NM pull 22May20   replaced Wt with KansasDummy and pulling amplitudes from KS uncali rechit collection
             #trial          = "tt_kurhs_nolhc_v20"  # as v19 w/ NM pull 29May20 _+ new GT for D  replaced Wt with KansasDummy and pulling amplitudes from KS uncali rechit collection
-            trial          = "tt_kurhs_nolhc_v21"  # s v20 w/ Wt restored and Woot as KansasDummy
+            trial          = "tt_kurhs_nolhc_v21a"  # s v20 w/ Wt restored and Woot as KansasDummy
 
             config.General.requestName   = trial+"_"+primaryDataset+"_"+runEra+"_"+runs+"_"+dataset+"_dispho"
             config.Data.outputDatasetTag = trial+"_"+primaryDataset+"_"+dataset+"_"+runEra+"_"+runs+"_dispho"
 
 
 	    ####  old  ####  for 2018 EGamma 2tier 102X_dataRun2_Sep2018Rereco_v1 or  globalTag=102X_dataRun2_Prompt_v11
-       # ABC 102X_dataRun2_v12   D  102X_dataRun2_Prompt_v15
-            config.JobType.pyCfgParams   = ['globalTag=102X_dataRun2_Prompt_v15',#'nThreads='+str(config.JobType.numCores), 
+       # ABC 102X_dataRun2_v13   D  102X_dataRun2_Prompt_v16
+            config.JobType.pyCfgParams   = ['globalTag=102X_dataRun2_Prompt_v16',#'nThreads='+str(config.JobType.numCores), 
                                             'inputPaths='+inputPaths,'inputFilters='+inputFilters,'inputFlags='+inputFlags, 
                                             'onlyGED=True', 'outputFileName=output.root', #'rlelist='+events,
 					                             'mcValid=False','kuRechitValid=True','lhcInfoValid=False', 'rawCollectionsValid=True' ]
@@ -207,7 +207,7 @@ def submit_run2018A():
         ##subcrab( "315257-315322","",2500)
         ##subcrab( "315721-316240","",2500)
 
-        #subcrab( "315721-316110","",2500)
+        subcrab( "315721-316110","",2500)
         #subcrab( "316111-316995","",2500)
 
         #subcrab( "315257-315322", event_list_path + "sel_315257v315322_EG2018A.txt", 2500 )
@@ -235,7 +235,7 @@ def submit_run2018A():
         #subcrab( "316876-316995", event_list_path + "sel_316876v316995_EG2018A.txt", 3250 )
 
 def submit_run2018B():
-	      subcrab( "317080-319077","",2500)
+        subcrab( "317080-319077","",2500)
 
 #        subcrab( "317080-317182", event_list_path + "sel_317080v317182_EG2018B.txt", 3000 )
 #        subcrab( "317212-317297", event_list_path + "sel_317212v317297_EG2018B.txt", 3000 )

@@ -1524,7 +1524,7 @@ void Skimmer::FillOutPhos(const UInt_t entry)
       outpho.seedpcltime = pclt;
    	outpho.seedpctime = wt;
       fOutPcaloGTIdHist->Fill(wt-pclt);
-      fOutPcaloMultiHist->Fill(pcmult);
+      fOutPcaloPhoMultiHist->Fill(pcmult);
       fOutPcaloLeadTimeHist->Fill(pclt);
    	fOutPcaloWTimeHist->Fill(wt);
    	fOutPcaloSumTimeHist->Fill(pcwt);

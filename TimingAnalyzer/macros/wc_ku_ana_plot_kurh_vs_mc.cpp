@@ -624,7 +624,7 @@ void makeplots( const string califilename, const string infilename, const string
         auto amp_0 = (phoseedE_0/phoseedadcToGeV_0)/phoseedpedrms12_0;
 
         //if( (amp_0/std::sqrt(2)) < 20.f ){ std::cout << " - Skip: amplitude" << std::endl; continue; }
-        if( (amp_0/std::sqrt(2)) < 20.f ){ continue; }
+        //if( (amp_0/std::sqrt(2)) < 20.f ){ continue; }
         //if( (phoseedEcal_0 == ECAL::EB) || (phoseedEcal_1 == ECAL::EB) ) continue;
         //if( (phoseedEcal_0 == ECAL::EP) || (phoseedEcal_1 == ECAL::EP) ) continue;
         //if( (phoseedEcal_0 == ECAL::EM) || (phoseedEcal_1 == ECAL::EM) ) continue;
