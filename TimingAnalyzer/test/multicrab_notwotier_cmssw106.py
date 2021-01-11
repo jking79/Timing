@@ -125,10 +125,11 @@ def docrab( dataset ):
             #trial          = "ot_106_mini_v10_2018_redele" # as 41 above  onetier_mini_nolhc_v9
             #trial          = "ot_106_mini_v10_2018D_gt28_redele" # as 41 above  onetier_mini_nolhc_v9
             #trial          = "ot_106_mini_v10_2018C_gt28_redele" # as 41 above  onetier_mini_nolhc_v9
-            trial          = "ot_106_mini_v10_2018_gt28_redele" # as 41 above  onetier_mini_nolhc_v9
+            #trial          = "ot_106_mini_v10_2018_gt28_redele" # as 41 above  onetier_mini_nolhc_v9
             #trial          = "ot_106_mini_v10_2017_redele" # as 41 above  onetier_mini_nolhc_v9
             #trial          = "ot_106_mini_v10_2016_redele" # as 41 above  onetier_mini_nolhc_v9
             #trial          = "onetier_mini_v10_2016_redele" # as 41 above  onetier_mini_nolhc_v9
+            trial          = "ot_106_mini_v11_2018D_gt28_redele" # as 41 above  onetier_mini_nolhc_v9
 
             #runs           = inputRuns
             runs	   = "Full"
@@ -199,10 +200,10 @@ def run_multi():
 
 # Dataset: /EGamma/Run2018-12Nov2019_UL2018-/MINIAOD
 
-            ['/EGamma/Run2018A-12Nov2019_UL2018-v2/MINIAOD',''],
+            #['/EGamma/Run2018A-12Nov2019_UL2018-v2/MINIAOD',''],
             #['/EGamma/Run2018B-12Nov2019_UL2018-v2/MINIAOD',''],
             #['/EGamma/Run2018C-12Nov2019_UL2018-v2/MINIAOD',''],
-            #['/EGamma/Run2018D-12Nov2019_UL2018-v4/MINIAOD',''],
+            ['/EGamma/Run2018D-12Nov2019_UL2018-v4/MINIAOD',''],
     
 # Dataset: /DoubleEG/Run2016-21Feb2020_UL2016-/MINIAOD
 
