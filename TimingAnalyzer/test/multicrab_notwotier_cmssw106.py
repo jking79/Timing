@@ -130,6 +130,7 @@ def docrab( dataset ):
             #trial          = "ot_106_mini_v10_2016_redele" # as 41 above  onetier_mini_nolhc_v9
             #trial          = "onetier_mini_v10_2016_redele" # as 41 above  onetier_mini_nolhc_v9
             trial          = "ot_106_mini_v11_2018D_gt28_redele" # as 41 above  onetier_mini_nolhc_v9
+            trial          = "ot_106_mini_v11_2018D_gt27_redele" # as 41 above  onetier_mini_nolhc_v9
 
             #runs           = inputRuns
             runs	   = "Full"
@@ -141,7 +142,7 @@ def docrab( dataset ):
             #config.Data.secondaryInputDataset = secInputPaths
 
 #>>>>>>>>>>>>>>>>>>>     #2018   #globalTag=106X_dataRun2_v28
-            config.JobType.pyCfgParams   = ['globalTag=106X_dataRun2_v28',#'nThreads='+str(config.JobType.numCores),
+            config.JobType.pyCfgParams   = ['globalTag=106X_dataRun2_v27',#'nThreads='+str(config.JobType.numCores),
                                             'inputPaths='+inputPaths,'inputFilters='+inputFilters,
                                             'inputFlags='+inputFlags, 'onlyGED=True',
                                             'outputFileName=output.root', 'kuRechitValid=False','rawCollectionsValid=False']
