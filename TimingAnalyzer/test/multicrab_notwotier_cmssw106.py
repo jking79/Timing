@@ -58,10 +58,7 @@ def docrab( dataset ):
     if options.crabCmd == 'submit':
 
         # External files needed by CRAB
-        #inputDir     = '/home/t3-ku/jaking/ecaltiming/ku_cmssw_ecaltiming/CMSSW_10_2_5/src/Timing/TimingAnalyzer/test/input/'
-	     #inputDir     = '/home/t3-ku/jaking/ecaltiming/CMSSW_9_4_10/src/Timing/TimingAnalyzer/test/input/'
-        #inputDir     = '/home/t3-ku/jaking/ecaltiming/CMSSW_9_4_10/src/Timing/TimingAnalyzer/test/input/'
-        inputDir     = '/home/t3-ku/jaking/ecaltiming/CMSSW_10_6_14/src/Timing/TimingAnalyzer/test/input/'
+        inputDir     = '/home/t3-ku/jaking/ecaltiming/CMSSW_10_6_20/src/Timing/TimingAnalyzer/test/input/'
         inputPaths   = 'HLTpathsWExtras.txt'
         inputFilters = 'HLTfilters.txt'
         inputFlags   = 'METflags.txt'
@@ -129,7 +126,7 @@ def docrab( dataset ):
             #trial          = "ot_106_mini_v10_2017_redele" # as 41 above  onetier_mini_nolhc_v9
             #trial          = "ot_106_mini_v10_2016_redele" # as 41 above  onetier_mini_nolhc_v9
             #trial          = "onetier_mini_v10_2016_redele" # as 41 above  onetier_mini_nolhc_v9
-            trial          = "ot_106_mini_v11_2018D_gt28_redele" # as 41 above  onetier_mini_nolhc_v9
+            #trial          = "ot_106_mini_v11_2018D_gt28_redele" # as 41 above  onetier_mini_nolhc_v9
             trial          = "ot_106_mini_v11_2018D_gt27_redele" # as 41 above  onetier_mini_nolhc_v9
 
             #runs           = inputRuns
@@ -142,22 +139,14 @@ def docrab( dataset ):
             #config.Data.secondaryInputDataset = secInputPaths
 
 #>>>>>>>>>>>>>>>>>>>     #2018   #globalTag=106X_dataRun2_v28
+            #config.JobType.pyCfgParams   = ['globalTag=106X_dataRun2_v28',#'nThreads='+str(config.JobType.numCores),
+#>>>>>>>>>>>>>>>>>>>	    #2017   #globalTag=106X_dataRun2_v20
+            #config.JobType.pyCfgParams   = ['globalTag=106X_dataRun2_v20',#'nThreads='+str(config.JobType.numCores),
+#>>>>>>>>>>>>>>>>>>>	    #2016  #globalTag=106X_dataRun2_v27
             config.JobType.pyCfgParams   = ['globalTag=106X_dataRun2_v27',#'nThreads='+str(config.JobType.numCores),
                                             'inputPaths='+inputPaths,'inputFilters='+inputFilters,
                                             'inputFlags='+inputFlags, 'onlyGED=True',
                                             'outputFileName=output.root', 'kuRechitValid=False','rawCollectionsValid=False']
-
-#>>>>>>>>>>>>>>>>>>>	    #2017   #globalTag=106X_dataRun2_v20
-            #config.JobType.pyCfgParams   = ['globalTag=106X_dataRun2_v20',#'nThreads='+str(config.JobType.numCores),
-            #                                'inputPaths='+inputPaths,'inputFilters='+inputFilters,
-            #                                'inputFlags='+inputFlags, 'onlyGED=True',
-            #                                'outputFileName=output.root', 'kuRechitValid=False','rawCollectionsValid=False']
-
-#>>>>>>>>>>>>>>>>>>>	    #2016  #globalTag=106X_dataRun2_v27
-            #config.JobType.pyCfgParams   = ['globalTag=106X_dataRun2_v27',#'nThreads='+str(config.JobType.numCores),
-            #                                'inputPaths='+inputPaths,'inputFilters='+inputFilters,
-            #                                'inputFlags='+inputFlags, 'onlyGED=True',
-            #                                'outputFileName=output.root', 'kuRechitValid=False','rawCollectionsValid=False']
 
 
             config.Data.inputDataset     = inDO[0]
