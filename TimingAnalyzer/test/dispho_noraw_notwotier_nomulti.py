@@ -66,11 +66,11 @@ options.register('leptondRmin',0.3,VarParsing.multiplicity.singleton,VarParsing.
 options.register('smearjetEmin',0.01,VarParsing.multiplicity.singleton,VarParsing.varType.float,'min jet E for smearing');
 
 ## trigger input
-options.register('inputPaths','/home/t3-ku/jaking/ecaltiming/ku_cmssw_ecaltiming/CMSSW_10_2_5/src/Timing/TimingAnalyzer/test/input/HLTpathsWExtras.txt',VarParsing.multiplicity.singleton,VarParsing.varType.string,'text file list of input signal paths');
-options.register('inputFilters','/home/t3-ku/jaking/ecaltiming/ku_cmssw_ecaltiming/CMSSW_10_2_5/src/Timing/TimingAnalyzer/test/input/HLTfilters.txt',VarParsing.multiplicity.singleton,VarParsing.varType.string,'text file list of input signal filters');
+options.register('inputPaths','/home/t3-ku/jaking/ecaltiming/CMSSW_10_6_20/src/Timing/TimingAnalyzer/test/input/HLTpathsWExtras.txt',VarParsing.multiplicity.singleton,VarParsing.varType.string,'text file list of input signal paths');
+options.register('inputFilters','/home/t3-ku/jaking/ecaltiming/CMSSW_10_6_20/src/Timing/TimingAnalyzer/test/input/HLTfilters.txt',VarParsing.multiplicity.singleton,VarParsing.varType.string,'text file list of input signal filters');
 
 ## met filter input
-options.register('inputFlags','/home/t3-ku/jaking/ecaltiming/ku_cmssw_ecaltiming/CMSSW_10_2_5/src/Timing/TimingAnalyzer/test/input/METflags.txt',VarParsing.multiplicity.singleton,VarParsing.varType.string,'text file list of input MET filter flags');
+options.register('inputFlags','/home/t3-ku/jaking/ecaltiming/CMSSW_10_6_20/src/Timing/TimingAnalyzer/test/input/METflags.txt',VarParsing.multiplicity.singleton,VarParsing.varType.string,'text file list of input MET filter flags');
 
 ## data or MC options
 options.register('isMC',False,VarParsing.multiplicity.singleton,VarParsing.varType.bool,'flag to indicate data or MC');
@@ -85,7 +85,7 @@ options.register('BR',1.0,VarParsing.multiplicity.singleton,VarParsing.varType.f
 
 ## GT to be used
 #options.register('globalTag','101X_dataRun2_Prompt_v11',VarParsing.multiplicity.singleton,VarParsing.varType.string,'gloabl tag to be used');
-options.register('globalTag','94X_dataRun2_ReReco_EOY17_v6',VarParsing.multiplicity.singleton,VarParsing.varType.string,'gloabl tag to be used');
+options.register('globalTag','106X_dataRun2_v28',VarParsing.multiplicity.singleton,VarParsing.varType.string,'gloabl tag to be used');
 
 ## do a demo run over only 1k events
 options.register('demoMode',False,VarParsing.multiplicity.singleton,VarParsing.varType.bool,'flag to run over only 1k events');
@@ -94,7 +94,7 @@ options.register('demoMode',False,VarParsing.multiplicity.singleton,VarParsing.v
 options.register('processName','TREE',VarParsing.multiplicity.singleton,VarParsing.varType.string,'process name to be considered');
 
 ## outputFile Name
-options.register('outputFileName','ku_test_twotier_multi_run17_dispho.root',VarParsing.multiplicity.singleton,VarParsing.varType.string,'output file name created by cmsRun');
+options.register('outputFileName','ku_test_UL8D_dispho.root',VarParsing.multiplicity.singleton,VarParsing.varType.string,'output file name created by cmsRun');
 
 ## etra bits
 options.register('nThreads',8,VarParsing.multiplicity.singleton,VarParsing.varType.int,'number of threads per job');
@@ -200,10 +200,10 @@ process.load("Geometry.CaloEventSetup.CaloTowerConstituents_cfi")
 process.load('Configuration.StandardSequences.RawToDigi_Data_cff')
 process.load('Configuration.StandardSequences.L1Reco_cff')
 process.load('Configuration.StandardSequences.Reconstruction_Data_cff')
-process.load('Timing.TimingAnalyzer.jwk_ku_ecalLocalRecoSequence_cff')
+#process.load('Timing.TimingAnalyzer.jwk_ku_ecalLocalRecoSequence_cff')
 
 #process.load('PhysicsTools.PatAlgos.slimming.metFilterPaths_cff')
-#process.load('Configuration.StandardSequences.PAT_cff')
+process.load('Configuration.StandardSequences.PAT_cff')
 #process.load('Timing.TimingAnalyzer.jwk_PAT_cff')
 
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff')
@@ -238,99 +238,12 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 100000
 #eventList = open(options.rlelist,'r')
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(#'file:jwk_reco_data_DIGI2RAW.root'),
-    '/store/data/Run2017B/SingleElectron/MINIAOD/09Aug2019_UL2017-v1/130000/000698DC-325D-BA42-8BAB-FE708FC18AE5.root'
+   #'/store/data/Run2017B/SingleElectron/MINIAOD/09Aug2019_UL2017-v1/130000/000698DC-325D-BA42-8BAB-FE708FC18AE5.root'
+    '/store/data/Run2018D/EGamma/MINIAOD/12Nov2019_UL2018-v4/260000/B492981C-E2C5-014A-993E-0C85FF79A330.root'
 	#'/store/data/Run2017D/DoubleEG/MINIAOD/31Mar2018-v1/00000/A20F8F1B-4137-E811-A406-B083FED12B5C.root'
 	#'/store/data/Run2016B/DoubleEG/MINIAOD/17Jul2018_ver2-v1/00000/FA955B82-4C8D-E811-B99F-008CFA165F44.root'
 	#'file:rootSourceFiles/run2017D/miniaod/A20F8F1B-4137-E811-A406-B083FED12B5C.root'
         ),
-#    secondaryFileNames = cms.untracked.vstring(
-	#323414
-
-#        '/store/data/Run2017D/DoubleEG/RAW/v1/000/302/634/00000/DAC2DFF0-D997-E711-A34C-02163E0143AD.root',
-#        '/store/data/Run2017D/DoubleEG/RAW/v1/000/302/634/00000/AA23A5AC-D297-E711-A984-02163E019C2D.root',
-#        '/store/data/Run2017D/DoubleEG/RAW/v1/000/302/634/00000/9CFEC4E0-D497-E711-ABAC-02163E0142DA.root',
-#        '/store/data/Run2017D/DoubleEG/RAW/v1/000/302/634/00000/8E7447D5-D297-E711-9FD3-02163E01A6FE.root',
-#        '/store/data/Run2017D/DoubleEG/RAW/v1/000/302/634/00000/8C3CCEB5-D297-E711-9176-02163E01A4AB.root',
-#        '/store/data/Run2017D/DoubleEG/RAW/v1/000/302/634/00000/625E43CB-D297-E711-B0E3-02163E01A516.root',
-#        '/store/data/Run2017D/DoubleEG/RAW/v1/000/302/634/00000/58779778-DB97-E711-9BDD-02163E01A521.root',
-#        '/store/data/Run2017D/DoubleEG/RAW/v1/000/302/634/00000/4CB2AEC2-D297-E711-9E14-02163E01A371.root',
-#        '/store/data/Run2017D/DoubleEG/RAW/v1/000/302/634/00000/36BE6CCD-D297-E711-8D54-02163E019E1B.root',
-#        '/store/data/Run2017D/DoubleEG/RAW/v1/000/302/634/00000/361700E4-D497-E711-B8B9-02163E019C43.root',
-#        '/store/data/Run2017D/DoubleEG/RAW/v1/000/302/634/00000/1A117DB3-D297-E711-BF5F-02163E01A571.root',
-#        '/store/data/Run2017D/DoubleEG/RAW/v1/000/302/634/00000/E6D783BA-D297-E711-9E48-02163E019DB9.root', # first 100 events
-#        '/store/data/Run2017D/DoubleEG/RAW/v1/000/302/634/00000/00BDA6C5-D297-E711-8A62-02163E01A50A.root',
-#        '/store/data/Run2017D/DoubleEG/RAW/v1/000/302/596/00000/F0667189-D896-E711-832E-02163E01A550.root',
-#        '/store/data/Run2017D/DoubleEG/RAW/v1/000/302/596/00000/C4293084-D896-E711-B007-02163E01A5C5.root',
-#        '/store/data/Run2017D/DoubleEG/RAW/v1/000/302/596/00000/88F70D92-D896-E711-82C9-02163E019D76.root',
-#        '/store/data/Run2017D/DoubleEG/RAW/v1/000/302/635/00000/BE242B8A-D797-E711-A2D3-02163E011B46.root',
-#        '/store/data/Run2017D/DoubleEG/RAW/v1/000/302/635/00000/5EC367A5-D797-E711-BDC4-02163E019C4F.root',
-#        '/store/data/Run2017D/DoubleEG/RAW/v1/000/302/635/00000/424DBDAF-D797-E711-8D9E-02163E0140F1.root',
-#        '/store/data/Run2017D/DoubleEG/RAW/v1/000/302/635/00000/0C4970B9-D797-E711-99B9-02163E01A637.root',
-#        '/store/data/Run2017D/DoubleEG/RAW/v1/000/302/484/00000/F491E3F9-6E94-E711-BAF5-02163E0141EE.root',
-#        '/store/data/Run2017D/DoubleEG/RAW/v1/000/302/484/00000/4E8B066B-6E94-E711-9D75-02163E0135A6.root',
-#        '/store/data/Run2017D/DoubleEG/RAW/v1/000/302/484/00000/32F2B665-6E94-E711-853D-02163E013728.root',
-#        '/store/data/Run2017D/DoubleEG/RAW/v1/000/302/635/00000/5249E1A5-DE97-E711-9E87-02163E014209.root',
-#        '/store/data/Run2017D/DoubleEG/RAW/v1/000/302/635/00000/1E2183B2-D797-E711-8442-02163E01470E.root',
-#        '/store/data/Run2017D/DoubleEG/RAW/v1/000/302/635/00000/128E33A6-D797-E711-BFF5-02163E019D18.root',
-#        '/store/data/Run2017D/DoubleEG/RAW/v1/000/302/634/00000/34CCF3B7-D297-E711-988D-02163E012BC7.root',
-#        '/store/data/Run2017D/DoubleEG/RAW/v1/000/302/634/00000/0CBAC5A2-D297-E711-8D81-02163E012B20.root',
-#        '/store/data/Run2017D/DoubleEG/RAW/v1/000/302/635/00000/F04E8394-D797-E711-BBFE-02163E01A76B.root',
-#        '/store/data/Run2017D/DoubleEG/RAW/v1/000/302/635/00000/AE7C9CBC-D797-E711-AC72-02163E019BA4.root',
-#        '/store/data/Run2017D/DoubleEG/RAW/v1/000/302/635/00000/9ADD3F8B-D797-E711-9693-02163E0138EE.root',
-#        '/store/data/Run2017D/DoubleEG/RAW/v1/000/302/634/00000/E0A843DD-D497-E711-AAB3-02163E0141A8.root',
-#        '/store/data/Run2017D/DoubleEG/RAW/v1/000/302/634/00000/6E9B2AC8-D297-E711-AF22-02163E019E52.root',
-#        '/store/data/Run2017D/DoubleEG/RAW/v1/000/302/634/00000/4A426FB5-D297-E711-8D2A-02163E014280.root',
-#        '/store/data/Run2017D/DoubleEG/RAW/v1/000/302/646/00000/00F6BE97-DC97-E711-9DFD-02163E01414C.root',
-#        '/store/data/Run2017D/DoubleEG/RAW/v1/000/302/635/00000/98FB558B-D797-E711-A174-02163E019E74.root',
-#        '/store/data/Run2017D/DoubleEG/RAW/v1/000/302/635/00000/5E65A4DF-D797-E711-A140-02163E01A26A.root',
-#        '/store/data/Run2017D/DoubleEG/RAW/v1/000/302/635/00000/5A30D696-D797-E711-98FB-02163E012558.root',
-#        '/store/data/Run2017D/DoubleEG/RAW/v1/000/302/635/00000/00952BAF-D797-E711-A646-02163E019BB0.root',
-#        '/store/data/Run2017D/DoubleEG/RAW/v1/000/302/479/00000/DA3EC5B1-4C94-E711-8DDB-02163E019B44.root',
-#        '/store/data/Run2017D/DoubleEG/RAW/v1/000/302/479/00000/AAA374AA-4C94-E711-952D-02163E0127F2.root'
-#
-#        'file:rootSourceFiles/run2017D/raw/00952BAF-D797-E711-A646-02163E019BB0.root',
-#        'file:rootSourceFiles/run2017D/raw/00BDA6C5-D297-E711-8A62-02163E01A50A.root',
-#        'file:rootSourceFiles/run2017D/raw/00F6BE97-DC97-E711-9DFD-02163E01414C.root',
-#        'file:rootSourceFiles/run2017D/raw/0C4970B9-D797-E711-99B9-02163E01A637.root',
-#        'file:rootSourceFiles/run2017D/raw/0CBAC5A2-D297-E711-8D81-02163E012B20.root',
-#        'file:rootSourceFiles/run2017D/raw/128E33A6-D797-E711-BFF5-02163E019D18.root',
-#        'file:rootSourceFiles/run2017D/raw/1A117DB3-D297-E711-BF5F-02163E01A571.root',
-#        'file:rootSourceFiles/run2017D/raw/1E2183B2-D797-E711-8442-02163E01470E.root',
-#        'file:rootSourceFiles/run2017D/raw/32F2B665-6E94-E711-853D-02163E013728.root',
-#        'file:rootSourceFiles/run2017D/raw/34CCF3B7-D297-E711-988D-02163E012BC7.root',
-#        'file:rootSourceFiles/run2017D/raw/361700E4-D497-E711-B8B9-02163E019C43.root',
-#        'file:rootSourceFiles/run2017D/raw/36BE6CCD-D297-E711-8D54-02163E019E1B.root',
-#        'file:rootSourceFiles/run2017D/raw/424DBDAF-D797-E711-8D9E-02163E0140F1.root',
-#        'file:rootSourceFiles/run2017D/raw/4A426FB5-D297-E711-8D2A-02163E014280.root',
-#        'file:rootSourceFiles/run2017D/raw/4CB2AEC2-D297-E711-9E14-02163E01A371.root',
-#        'file:rootSourceFiles/run2017D/raw/4E8B066B-6E94-E711-9D75-02163E0135A6.root',
-#        'file:rootSourceFiles/run2017D/raw/5249E1A5-DE97-E711-9E87-02163E014209.root',
-#        'file:rootSourceFiles/run2017D/raw/58779778-DB97-E711-9BDD-02163E01A521.root',
-#        'file:rootSourceFiles/run2017D/raw/5A30D696-D797-E711-98FB-02163E012558.root',
-#        'file:rootSourceFiles/run2017D/raw/5E65A4DF-D797-E711-A140-02163E01A26A.root',
-#        'file:rootSourceFiles/run2017D/raw/5EC367A5-D797-E711-BDC4-02163E019C4F.root',
-#        'file:rootSourceFiles/run2017D/raw/625E43CB-D297-E711-B0E3-02163E01A516.root',
-#        'file:rootSourceFiles/run2017D/raw/6E9B2AC8-D297-E711-AF22-02163E019E52.root',
-#        'file:rootSourceFiles/run2017D/raw/88F70D92-D896-E711-82C9-02163E019D76.root',
-#        'file:rootSourceFiles/run2017D/raw/8C3CCEB5-D297-E711-9176-02163E01A4AB.root',
-#        'file:rootSourceFiles/run2017D/raw/8E7447D5-D297-E711-9FD3-02163E01A6FE.root',
-#        'file:rootSourceFiles/run2017D/raw/98FB558B-D797-E711-A174-02163E019E74.root',
-#        'file:rootSourceFiles/run2017D/raw/9ADD3F8B-D797-E711-9693-02163E0138EE.root',
-#        'file:rootSourceFiles/run2017D/raw/9CFEC4E0-D497-E711-ABAC-02163E0142DA.root',
-#        'file:rootSourceFiles/run2017D/raw/AA23A5AC-D297-E711-A984-02163E019C2D.root',
-#        'file:rootSourceFiles/run2017D/raw/AAA374AA-4C94-E711-952D-02163E0127F2.root',
-#        'file:rootSourceFiles/run2017D/raw/AE7C9CBC-D797-E711-AC72-02163E019BA4.root',
-#        'file:rootSourceFiles/run2017D/raw/BE242B8A-D797-E711-A2D3-02163E011B46.root',
-#        'file:rootSourceFiles/run2017D/raw/C4293084-D896-E711-B007-02163E01A5C5.root',
-#        'file:rootSourceFiles/run2017D/raw/DA3EC5B1-4C94-E711-8DDB-02163E019B44.root',
-#        'file:rootSourceFiles/run2017D/raw/DAC2DFF0-D997-E711-A34C-02163E0143AD.root',
-#        'file:rootSourceFiles/run2017D/raw/E0A843DD-D497-E711-AAB3-02163E0141A8.root',
-#        'file:rootSourceFiles/run2017D/raw/E6D783BA-D297-E711-9E48-02163E019DB9.root', # first 100 events
-#        'file:rootSourceFiles/run2017D/raw/F04E8394-D797-E711-BBFE-02163E01A76B.root',
-#        'file:rootSourceFiles/run2017D/raw/F0667189-D896-E711-832E-02163E01A550.root',
-#        'file:rootSourceFiles/run2017D/raw/F491E3F9-6E94-E711-BAF5-02163E0141EE.root'
-#	),
-    #eventsToProcess = cms.untracked.VEventRange(eventList)
 )
 
 
@@ -338,12 +251,25 @@ process.source = cms.Source("PoolSource",
 #if   options.demoMode : process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(1000))
 #else                  : process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(options.maxEvents))
 #process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(1))
-process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(10000))
+process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(1000))
 #process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(-1))
 
 # Set the global tag depending on the sample type
-from Configuration.AlCa.GlobalTag import GlobalTag
-process.GlobalTag.globaltag = options.globalTag  
+#from Configuration.AlCa.GlobalTag import GlobalTag
+#process.GlobalTag.globaltag = options.globalTag  
+from CondCore.CondDB.CondDB_cfi import *
+process.GlobalTag = cms.ESSource("PoolDBESSource",
+                                 CondDB.clone(connect = cms.string('frontier://FrontierProd/CMS_CONDITIONS')),
+                                 globaltag = cms.string('106X_dataRun2_v28'),
+                                 #Get time calibration (corrections) tag
+                                 toGet = cms.VPSet(
+                                   cms.PSet(record = cms.string("EcalTimeCalibConstantsRcd"),
+                                     tag = cms.string("EcalTimeCalibConstants_2018_RunD_UL_Corr_v2"),
+                                     connect = cms.string("sqlite_file:EcalTimeCalibConstants_2018_RunD_UL_Corr_v2.db"),
+                                          )
+                                 )
+)
+
 
 ## Create output file
 ## Setup the service to make a ROOT TTree
@@ -354,6 +280,16 @@ process.TFileService = cms.Service("TFileService",
 #if   options.isMC : triggerFlagsProcess = "PAT"
 #else              : triggerFlagsProcess = "RECO"
 triggerFlagsProcess = "RECO"
+
+
+process.load("RecoLocalCalo.EcalRecProducers.ecalRecalibRecHit_cfi")
+process.ecalRecalibRecHit.EBRecHitCollection = cms.InputTag("reducedEgamma", "reducedEBRecHits")
+process.ecalRecalibRecHit.EERecHitCollection = cms.InputTag("reducedEgamma", "reducedEERecHits")
+process.ecalRecalibRecHit.EBRecalibRecHitCollection = cms.string('recalibEcalRecHitsEB')
+process.ecalRecalibRecHit.EERecalibRecHitCollection = cms.string('recalibEcalRecHitsEE')
+process.ecalRecalibRecHit.doTimeCalib = True
+process.recalib_sequence = cms.Sequence(process.ecalRecalibRecHit)
+process.recalpath = cms.Path(process.recalib_sequence)
 
 ## generate track collection at miniAOD
 from PhysicsTools.PatAlgos.slimming.unpackedTracksAndVertices_cfi import unpackedTracksAndVertices
@@ -461,8 +397,10 @@ process.tree = cms.EDAnalyzer("DisPhoMulti",
    ootPhotons = cms.InputTag("slimmedOOTPhotons"),
 
    ## ecal recHits
-   recHitsEB = cms.InputTag("reducedEgamma", "reducedEBRecHits"),
-   recHitsEE = cms.InputTag("reducedEgamma", "reducedEERecHits"),
+   #recHitsEB = cms.InputTag("reducedEgamma", "reducedEBRecHits"),
+   recHitsEB = cms.InputTag("ecalRecalibRecHit", "recalibEcalRecHitsEB"),
+   #recHitsEE = cms.InputTag("reducedEgamma", "reducedEBRecHits"),
+   recHitsEE = cms.InputTag("ecalRecalibRecHit", "recalibEcalRecHitsEE"),
 
    ## ecal kuRecHits
    kuRecHitsEB = cms.InputTag("kuEcalRecHit", "kuRecHitsEB"),
@@ -531,84 +469,91 @@ process.tree = cms.EDAnalyzer("DisPhoMulti",
 
 # Set up the path
 #process.treePath = cms.Path(
+#   process.unpackedTracksAndVertices +
+#   #process.ecalBadCalibReducedMINIAODFilter +
+#   process.tree
+#)
+
 process.tree_step = cms.EndPath(
 	process.unpackedTracksAndVertices +
-        #process.ecalBadCalibReducedMINIAODFilter +
+   #process.ecalBadCalibReducedMINIAODFilter +
 	process.tree
 )
 
-process.jwk_digisunpacker = cms.Sequence(
-				process.L1TRawToDigi+
-				#siPixelDigis+
-				#siStripDigis+
-        			process.ecalDigis+
-        			process.ecalPreshowerDigis#+
-	                        #hcalDigis+
-	                        #muonCSCDigis+
-	                        #muonDTDigis+
-	                        #muonRPCDigis+
-	                      	#castorDigis+
-	                      	#scalersRawToDigi+
-	                      	#tcdsDigis+
-	                      	#onlineMetaDataDigis
-        			)
+#process.jwk_digisunpacker = cms.Sequence(
+#				process.L1TRawToDigi+
+#				#siPixelDigis+
+#				#siStripDigis+
+#        			process.ecalDigis+
+#        			process.ecalPreshowerDigis#+
+#	                        #hcalDigis+
+#	                        #muonCSCDigis+
+#	                        #muonDTDigis+
+#	                        #muonRPCDigis+
+#	                      	#castorDigis+
+#	                      	#scalersRawToDigi+
+#	                      	#tcdsDigis+
+#	                      	#onlineMetaDataDigis
+#        			)
+#
+#process.jwk_calolocalreco = cms.Sequence(
+#				#process.ku_min_ecalLocalRecoSequence
+#                                process.ku_multi_ecalLocalRecoSequence
+#                                #process.ku_ecalLocalRecoSequence
+#                                #process.ecalLocalRecoSequence
+#				#process.hcalLocalRecoSequence
+#				)
+#
+#process.jwk_localreco = cms.Sequence(
+#				process.bunchSpacingProducer+
+#				#process.trackerlocalreco+
+#				#process.muonlocalreco+
+#				process.jwk_calolocalreco
+#				#process.castorreco
+#				)
+#
+#process.jwk_highlevelreco = cms.Sequence(
+#			      #process.egammaHighLevelRecoPrePF*
+#                              #process.particleFlowReco*
+#                              #process.egammaHighLevelRecoPostPF*
+#                              #process.muoncosmichighlevelreco*
+#                              #process.muonshighlevelreco *
+#                              #process.particleFlowLinks*
+#                              #process.jetHighLevelReco*
+#                              #process.metrecoPlusHCALNoise*
+#                              #process.btagging*
+#                              #process.recoPFMET*
+#                              #process.PFTau*
+#                              #process.reducedRecHits #*
+#                              #process.cosmicDCTracksSeq
+#                             )
+#
+#process.jwk_reconstruction = cms.Sequence(
+#				#process.localreco*
+#            process.jwk_localreco*
+#				#process.globalreco*
+#				#process.jwk_highlevelreco*
+#				process.logErrorHarvester
+#)
 
-process.jwk_calolocalreco = cms.Sequence(
-				#process.ku_min_ecalLocalRecoSequence
-                                process.ku_multi_ecalLocalRecoSequence
-                                #process.ku_ecalLocalRecoSequence
-                                #process.ecalLocalRecoSequence
-				#process.hcalLocalRecoSequence
-				)
-
-process.jwk_localreco = cms.Sequence(
-				process.bunchSpacingProducer+
-				#process.trackerlocalreco+
-				#process.muonlocalreco+
-				process.jwk_calolocalreco
-				#process.castorreco
-				)
-
-process.jwk_highlevelreco = cms.Sequence(
-			      #process.egammaHighLevelRecoPrePF*
-                              #process.particleFlowReco*
-                              #process.egammaHighLevelRecoPostPF*
-                              #process.muoncosmichighlevelreco*
-                              #process.muonshighlevelreco *
-                              #process.particleFlowLinks*
-                              #process.jetHighLevelReco*
-                              #process.metrecoPlusHCALNoise*
-                              #process.btagging*
-                              #process.recoPFMET*
-                              #process.PFTau*
-                              #process.reducedRecHits #*
-                              #process.cosmicDCTracksSeq
-                             )
-
-process.jwk_reconstruction = cms.Sequence(
-				#process.localreco*
-                                process.jwk_localreco*
-				#process.globalreco*
-				#process.jwk_highlevelreco*
-				process.logErrorHarvester
-)
-
-process.content = cms.EDAnalyzer("EventContentAnalyzer")
-process.content_step = cms.Path(process.content)
+#process.content = cms.EDAnalyzer("EventContentAnalyzer")
+#process.content_step = cms.Path(process.content)
 
 #process.raw2digi_step = cms.Path(process.RawToDigi)
-process.ecalraw2digi_step = cms.Path(process.jwk_digisunpacker)
-process.L1Reco_step = cms.Path(process.L1Reco)
-process.reconstruction_step = cms.Path(process.jwk_reconstruction)
-process.endjob_step = cms.EndPath(process.endOfProcess)
+#process.ecalraw2digi_step = cms.Path(process.jwk_digisunpacker)
+#process.L1Reco_step = cms.Path(process.L1Reco)
+#process.reconstruction_step = cms.Path(process.jwk_reconstruction)
+#process.endjob_step = cms.EndPath(process.endOfProcess)
 
 process.schedule = cms.Schedule(
 		#process.raw2digi_step,
 		#process.ecalraw2digi_step,
-                #process.L1Reco_step,
+      #process.L1Reco_step,
 		#process.reconstruction_step,
 		#process.content_step,
+      #process.treePath,
 		#process.endjob_step,
+      process.recalpath,
 		process.tree_step
 )
 

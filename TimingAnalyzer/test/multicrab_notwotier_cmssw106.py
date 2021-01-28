@@ -58,13 +58,11 @@ def docrab( dataset ):
     if options.crabCmd == 'submit':
 
         # External files needed by CRAB
-        #inputDir     = '/home/t3-ku/jaking/ecaltiming/ku_cmssw_ecaltiming/CMSSW_10_2_5/src/Timing/TimingAnalyzer/test/input/'
-	     #inputDir     = '/home/t3-ku/jaking/ecaltiming/CMSSW_9_4_10/src/Timing/TimingAnalyzer/test/input/'
-        #inputDir     = '/home/t3-ku/jaking/ecaltiming/CMSSW_9_4_10/src/Timing/TimingAnalyzer/test/input/'
-        inputDir     = '/home/t3-ku/jaking/ecaltiming/CMSSW_10_6_14/src/Timing/TimingAnalyzer/test/input/'
+        inputDir     = '/home/t3-ku/jaking/ecaltiming/CMSSW_10_6_20_recali/src/Timing/TimingAnalyzer/test/input/'
         inputPaths   = 'HLTpathsWExtras.txt'
         inputFilters = 'HLTfilters.txt'
         inputFlags   = 'METflags.txt'
+        inputCaliDB   = 'EcalTimeCalibConstants_2018_RunD_UL_Corr_v2.db'
         #inputJSON    = 'golden2016.json'
         #inputJSON    = 'golden2017.json'
         inputJSON    = 'Cert_314472-325175_13TeV_PromptReco_Collisions18_JSON.txt'
@@ -88,7 +86,7 @@ def docrab( dataset ):
         config.JobType.psetName    = 'dispho_noraw_notwotier_nomulti.py'
         #config.JobType.numCores    = 8
         config.JobType.pyCfgParams = None
-        config.JobType.inputFiles  = [ inputDir+inputPaths , inputDir+inputFilters , inputDir+inputFlags ]
+        config.JobType.inputFiles  = [ inputDir+inputPaths, inputDir+inputFilters, inputDir+inputFlags, inputDir+inputCaliDB ]
 
         config.Data.inputDataset   = None
         #config.Data.useParent      = True
@@ -129,7 +127,8 @@ def docrab( dataset ):
             #trial          = "ot_106_mini_v10_2017_redele" # as 41 above  onetier_mini_nolhc_v9
             #trial          = "ot_106_mini_v10_2016_redele" # as 41 above  onetier_mini_nolhc_v9
             #trial          = "onetier_mini_v10_2016_redele" # as 41 above  onetier_mini_nolhc_v9
-            trial          = "ot_106_mini_v11_2018D_gt28_redele" # as 41 above  onetier_mini_nolhc_v9
+            #trial          = "ot_106_mini_v11_t4_2018D_gt28_redele" # +recali rechit collection produced
+            trial          = "ot_106_mini_v12_t5_2018D_gt27_redele" # redo
 
             #runs           = inputRuns
             runs	   = "Full"
@@ -141,22 +140,14 @@ def docrab( dataset ):
             #config.Data.secondaryInputDataset = secInputPaths
 
 #>>>>>>>>>>>>>>>>>>>     #2018   #globalTag=106X_dataRun2_v28
-            config.JobType.pyCfgParams   = ['globalTag=106X_dataRun2_v28',#'nThreads='+str(config.JobType.numCores),
+            #config.JobType.pyCfgParams   = ['globalTag=106X_dataRun2_v28',#'nThreads='+str(config.JobType.numCores),
+#>>>>>>>>>>>>>>>>>>>	    #2017   #globalTag=106X_dataRun2_v20
+            #config.JobType.pyCfgParams   = ['globalTag=106X_dataRun2_v20',#'nThreads='+str(config.JobType.numCores),
+#>>>>>>>>>>>>>>>>>>>	    #2016  #globalTag=106X_dataRun2_v27
+            config.JobType.pyCfgParams   = ['globalTag=106X_dataRun2_v27',#'nThreads='+str(config.JobType.numCores),
                                             'inputPaths='+inputPaths,'inputFilters='+inputFilters,
                                             'inputFlags='+inputFlags, 'onlyGED=True',
                                             'outputFileName=output.root', 'kuRechitValid=False','rawCollectionsValid=False']
-
-#>>>>>>>>>>>>>>>>>>>	    #2017   #globalTag=106X_dataRun2_v20
-            #config.JobType.pyCfgParams   = ['globalTag=106X_dataRun2_v20',#'nThreads='+str(config.JobType.numCores),
-            #                                'inputPaths='+inputPaths,'inputFilters='+inputFilters,
-            #                                'inputFlags='+inputFlags, 'onlyGED=True',
-            #                                'outputFileName=output.root', 'kuRechitValid=False','rawCollectionsValid=False']
-
-#>>>>>>>>>>>>>>>>>>>	    #2016  #globalTag=106X_dataRun2_v27
-            #config.JobType.pyCfgParams   = ['globalTag=106X_dataRun2_v27',#'nThreads='+str(config.JobType.numCores),
-            #                                'inputPaths='+inputPaths,'inputFilters='+inputFilters,
-            #                                'inputFlags='+inputFlags, 'onlyGED=True',
-            #                                'outputFileName=output.root', 'kuRechitValid=False','rawCollectionsValid=False']
 
 
             config.Data.inputDataset     = inDO[0]
